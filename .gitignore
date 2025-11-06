@@ -1,0 +1,76 @@
+##############################################
+# Python project .gitignore
+##############################################
+
+# Environment & secrets
+azure.env
+*.env
+.env
+
+# Virtual environments
+venv/
+
+# Python cache & compiled artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.dll
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Packaging / distribution
+*.whl
+*.spec
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Editors / IDE
+.vscode/
+*.swp
+*.tmp
+
+# Logs & sqlite/db
+*.log
+*.sqlite
+*.db
+runs.db
+
+# Generated outputs & large artifacts (keep source scripts)
+/datasets/
+/apriori_outputs/
+/extractor_outputs/
+/validation_reports/
+/visuals/
+/db_prepared/
+
+# Seed file (comment out if you want versioning)
+master_seed.txt
+
+# Large CSVs (ignore all except curated ones)
+*.csv
+!generation_log.csv  # Keep generation log for audit
+!README.md
+!requirements.txt
+
+# Caches
+.cache/
+.mypy_cache/
+.pytest_cache/
+__pycache__/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Misc OS
+.DS_Store
+Thumbs.db
+
+# Performance profiles
+*.profile
