@@ -1,0 +1,89 @@
+name: Tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - sieves/**
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+
+    - name: Maximize build space
+      shell: bash
+      run: |
+          sudo rm -rf /usr/share/dotnet \
+            /usr/local/lib/android \
+            /opt/ghc \
+            /opt/hostedtoolcache/CodeQL
+
+    - name: Checkout repo
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install tesseract-ocr
+
+    - name: Install Python dependencies
+      run: |
+        uv venv .venv --python 3.12
+        uv build
+        source .venv/bin/activate
+        uv pip install ./dist/sieves-*.whl
+        # Optional dependencies need to be installed in separate command.
+        uv pip install 'sieves[ingestion,distill,test]'
+
+    - name: Create and enable 4 GB swap
+      run: |
+        sudo fallocate -l 4G /swapfile
+        sudo chmod 600 /swapfile
+        sudo mkswap /swapfile
+        sudo swapon /swapfile
+        free -h
+
+    - name: Build docs
+      run: |
+        source .venv/bin/activate
+        mkdocs build
+
+    - name: Stage tests out-of-tree
+      run: |
+        mkdir -p "$RUNNER_TEMP/sieves-tests"
+        rsync -a --delete sieves/tests/ "$RUNNER_TEMP/sieves-tests/"
+
+    - name: Run tests
+      working-directory: ${{ runner.temp }}/sieves-tests
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      run: |
+        source $GITHUB_WORKSPACE/.venv/bin/activate
+        pytest -x --cov=sieves --cov-report=xml:$GITHUB_WORKSPACE/coverage.xml -m "not slow" -c "$GITHUB_WORKSPACE/pyproject.toml"
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: coverage.xml

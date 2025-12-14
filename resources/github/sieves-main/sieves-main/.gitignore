@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+build/
+dist/
+*.egg-info/
+.idea
+.venv/
+.env
+.windsurfrules
+site/
+.DS_Store

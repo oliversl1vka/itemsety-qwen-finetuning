@@ -22,6 +22,29 @@ from typing import List, Tuple, Dict, Any, Optional
 import pandas as pd
 from dotenv import load_dotenv
 
+#############################################
+# Logging path helper
+#############################################
+LOG_ROOT = Path('logs')
+LOG_KINDS = {
+    'apriori': 'apriori',
+    'extractor': 'extractor',
+    'validation': 'validation',
+    'db_prepared': 'db_prepared'
+}
+
+def resolve_log_path(kind: str, stem: str, hash_prefix: str, suffix: str = "", model_prefix: str = "") -> Path:
+    """Return path under logs/<kind>/ for generation log JSON for a given dataset stem/hash.
+    suffix: extra string (already starting with _ if desired) appended before .json for uniqueness (e.g. timestamp).
+    model_prefix: model identifier prefix (e.g. 'gpt_4_1_') to prepend to filename.
+    Naming pattern: <model_prefix><kind>_generation_log_<stem>_<hash><suffix>.json
+    Unrecognized kind falls back to 'misc'.
+    """
+    safe_kind = LOG_KINDS.get(kind, 'misc')
+    subdir = LOG_ROOT / safe_kind
+    filename = f"{model_prefix}{kind}_generation_log_{stem}_{hash_prefix}{suffix}.json"
+    return subdir / filename
+
 #############################
 # Validation Helpers (placed early to avoid NameError)
 #############################
@@ -176,6 +199,7 @@ def build_run_summary(apriori_sets: List[Dict[str, Any]], llm_sets: List[Dict[st
         'max_size': args.max_size,
         'llm_full': bool(args.llm_full),
         'llm_chunk_size': args.llm_chunk_size,
+        'llm_model': getattr(args, 'llm_model', 'unknown'),
         'apriori_itemset_count': len(apriori_sets),
         'llm_itemset_count': len(llm_sets),
         'validation_passed': validation_passed,
@@ -249,14 +273,14 @@ def persist_run_to_sqlite(run_summary: Dict[str, Any], db_path: str) -> int:
     new_cols = [
         ('python_version','TEXT'), ('dataset_id','TEXT'), ('dataset_name','TEXT'), ('dataset_hash','TEXT'),
         ('dataset_size_rows','INTEGER'), ('dataset_size_bytes','INTEGER'), ('run_duration_ms','INTEGER'),
-        ('error_message','TEXT')
+        ('error_message','TEXT'), ('llm_model','TEXT')
     ]
     insert_sql = (
         "INSERT INTO runs (timestamp, python_version, data_path, dataset_id, dataset_name, dataset_hash, "
         "dataset_size_rows, dataset_size_bytes, min_support, max_size, llm_full, llm_chunk_size, "
         "apriori_itemset_count, llm_itemset_count, validation_passed, apriori_valid_ratio, llm_valid_ratio, "
-        "apriori_errors, llm_errors, run_duration_ms, invariants, apriori_output_path, llm_output_path, validation_report_path, error_message) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "apriori_errors, llm_errors, run_duration_ms, invariants, apriori_output_path, llm_output_path, validation_report_path, error_message, llm_model) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
     conn = sqlite3.connect(db_path)
     try:
@@ -294,7 +318,8 @@ def persist_run_to_sqlite(run_summary: Dict[str, Any], db_path: str) -> int:
             run_summary['apriori_output_path'],
             run_summary['llm_output_path'],
             run_summary['validation_report_path'],
-            run_summary.get('error_message')
+            run_summary.get('error_message'),
+            run_summary.get('llm_model', 'unknown')
         ))
         conn.commit()
         return cur.lastrowid
@@ -443,13 +468,24 @@ def llm_extract_full(transactions: List[List[str]], min_support: int, system_pro
     can_init = all([endpoint, api_key, api_version, deployment]) and not deployment.startswith('<')
     if not can_init:
         return fallback_singletons(transactions, min_support)
-    llm = AzureChatOpenAI(
-        azure_endpoint=endpoint,
-        api_key=api_key,
-        api_version=api_version,
-        deployment_name=deployment,
-        temperature=0.0,
-    )
+    
+    # Detect if this is a reasoning model (o-series, gpt-5, gpt-5.1)
+    # Reasoning models don't support temperature and other common parameters
+    is_reasoning_model = any(keyword in deployment.lower() for keyword in ['gpt-5', 'gpt-51', 'o4-', 'o-series'])
+    
+    # Build LLM kwargs based on model type
+    llm_kwargs = {
+        'azure_endpoint': endpoint,
+        'api_key': api_key,
+        'api_version': api_version,
+        'deployment_name': deployment,
+    }
+    
+    # Only add temperature for non-reasoning models
+    if not is_reasoning_model:
+        llm_kwargs['temperature'] = 0.0
+    
+    llm = AzureChatOpenAI(**llm_kwargs)
     template = (
         "{system}\nMin support count: {min_support}\nTransactions chunk rows {start}-{end}:\n{chunk_json}\n"
         "Return ONLY JSON array: [{'itemset':[...],'count':n,'evidence_rows':[...]}] with count >= {min_support}."
@@ -533,10 +569,13 @@ def main():
     parser.add_argument('--output-llm', default='extractor_output.json')
     parser.add_argument('--llm-full', action='store_true', help='Use ALL rows for LLM extraction (chunked)')
     parser.add_argument('--llm-chunk-size', type=int, default=50)
+    parser.add_argument('--llm-model', default=os.getenv('LLM_MODEL','gpt_4_1'), help='LLM model identifier stored in runs.db (default env LLM_MODEL or gpt_4_1)')
     parser.add_argument('--system-prompt', default='extractor_system_prompt.md')
     parser.add_argument('--sqlite-db', default='runs.db', help='SQLite database file path')
     parser.add_argument('--disable-db', action='store_true', help='Disable SQLite persistence')
     parser.add_argument('--cleanup-old', action='store_true', help='Remove generic output files (non-hash) after each run')
+    parser.add_argument('--artifact-mode', choices=['overwrite','timestamp'], default='overwrite',
+                        help='overwrite: reuse hash-based filenames (default). timestamp: append run timestamp for unique artifacts every run.')
     args = parser.parse_args()
 
     load_dotenv('azure.env')
@@ -572,6 +611,10 @@ def main():
     print(f"Processing {total_files} dataset(s)...")
     successes = 0
     failures = 0
+    # Ensure log directories exist
+    for k in LOG_KINDS.values():
+        (LOG_ROOT / k).mkdir(parents=True, exist_ok=True)
+
     for idx, data_path in enumerate(data_files, start=1):
         print(f"\n=== [{idx}/{total_files}] Dataset: {data_path} ===")
         single_start = time.perf_counter()
@@ -587,15 +630,26 @@ def main():
             dataset_meta = compute_dataset_metadata(data_path, transactions)
             hash_prefix = dataset_meta['dataset_hash'][:12] if dataset_meta['dataset_hash'] != 'unavailable' else 'unknown'
             stem = Path(data_path).stem
-            # Ensure output directories exist
-            apriori_dir = Path('apriori_outputs'); apriori_dir.mkdir(exist_ok=True)
-            extractor_dir = Path('extractor_outputs'); extractor_dir.mkdir(exist_ok=True)
-            summary_dir = Path('db_prepared'); summary_dir.mkdir(exist_ok=True)
-            validation_dir = Path('validation_reports'); validation_dir.mkdir(exist_ok=True)
-            apriori_file = f"apriori_output_{stem}_{hash_prefix}.json"
-            llm_file = f"extractor_output_{stem}_{hash_prefix}.json"
-            validation_file = f"validation_report_{stem}_{hash_prefix}.json"
-            summary_file = f"db_prepared_{stem}_{hash_prefix}.json"
+            # Per-run timestamp (UTC) for uniqueness when artifact-mode=timestamp
+            run_ts = datetime.now(UTC).strftime('%Y%m%d%H%M%S')
+            suffix = f"_{run_ts}" if args.artifact_mode == 'timestamp' else ""
+            # Model prefix for filenames
+            model_prefix = f"{args.llm_model}_"
+            # Ensure output directories exist (under artifacts/)
+            artifacts_root = Path('artifacts')
+            apriori_dir = artifacts_root / 'apriori_outputs'; apriori_dir.mkdir(parents=True, exist_ok=True)
+            extractor_dir = artifacts_root / 'extractor_outputs'; extractor_dir.mkdir(parents=True, exist_ok=True)
+            summary_dir = artifacts_root / 'db_prepared'; summary_dir.mkdir(parents=True, exist_ok=True)
+            validation_dir = artifacts_root / 'validation_reports'; validation_dir.mkdir(parents=True, exist_ok=True)
+            apriori_file = f"{model_prefix}apriori_output_{stem}_{hash_prefix}{suffix}.json"
+            llm_file = f"{model_prefix}extractor_output_{stem}_{hash_prefix}{suffix}.json"
+            validation_file = f"{model_prefix}validation_report_{stem}_{hash_prefix}{suffix}.json"
+            summary_file = f"{model_prefix}db_prepared_{stem}_{hash_prefix}{suffix}.json"
+            # Log file paths (generation logs) under logs/ (mirror artifact suffix for uniqueness)
+            apriori_log_path = resolve_log_path('apriori', stem, hash_prefix, suffix, model_prefix)
+            extractor_log_path = resolve_log_path('extractor', stem, hash_prefix, suffix, model_prefix)
+            validation_log_path = resolve_log_path('validation', stem, hash_prefix, suffix, model_prefix)
+            summary_log_path = resolve_log_path('db_prepared', stem, hash_prefix, suffix, model_prefix)
             apriori_path_full = str(apriori_dir / apriori_file)
             llm_path_full = str(extractor_dir / llm_file)
             validation_path_full = str(validation_dir / validation_file)
@@ -604,17 +658,60 @@ def main():
             print(f"Apriori found {len(apriori_sets)} itemsets (count >= {args.min_support}).")
             with open(apriori_path_full, 'w', encoding='utf-8') as f:
                 json.dump(apriori_sets, f, ensure_ascii=False, indent=2)
+            # Write apriori generation log (minimal - only unique timing info)
+            try:
+                apriori_log = {
+                    'stage_duration_ms': int((time.perf_counter() - single_start) * 1000),
+                    'itemsets_found': len(apriori_sets),
+                    'timestamp': datetime.now(UTC).isoformat(),
+                }
+                apriori_log_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(apriori_log_path, 'w', encoding='utf-8') as lf:
+                    json.dump(apriori_log, lf, ensure_ascii=False, indent=2)
+            except Exception as e:
+                print(f"(Warn) Failed to write apriori generation log: {e}")
             target_transactions = transactions if args.llm_full else transactions[:min(args.llm_chunk_size, len(transactions))]
             scope = 'ALL' if args.llm_full else f'SAMPLE({len(target_transactions)})'
             print(f"Running LLM extraction over {scope} transactions (chunk_size={args.llm_chunk_size}) ...")
+            llm_extraction_start = time.perf_counter()
             llm_sets = llm_extract_full(target_transactions, args.min_support, system_prompt_text,
                                         args.llm_chunk_size, endpoint, api_key, api_version, deployment)
+            llm_extraction_duration = int((time.perf_counter() - llm_extraction_start) * 1000)
             print(f"LLM produced {len(llm_sets)} itemsets.")
             with open(llm_path_full, 'w', encoding='utf-8') as f:
                 json.dump(llm_sets, f, ensure_ascii=False, indent=2)
+            # Write extractor generation log (minimal - same format as apriori)
+            try:
+                extractor_log = {
+                    'stage_duration_ms': llm_extraction_duration,
+                    'itemsets_found': len(llm_sets),
+                    'timestamp': datetime.now(UTC).isoformat(),
+                }
+                extractor_log_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(extractor_log_path, 'w', encoding='utf-8') as lf:
+                    json.dump(extractor_log, lf, ensure_ascii=False, indent=2)
+            except Exception as e:
+                print(f"(Warn) Failed to write extractor generation log: {e}")
             validation = validate_all(apriori_sets, llm_sets, transactions, args.min_support)
             with open(validation_path_full, 'w', encoding='utf-8') as vf:
                 json.dump(validation, vf, ensure_ascii=False, indent=2)
+            # Validation generation log (minimal - only errors if present)
+            try:
+                val_log = {
+                    'apriori_errors': len(validation['apriori']['errors']),
+                    'llm_errors': len(validation['llm']['errors']),
+                    'timestamp': datetime.now(UTC).isoformat(),
+                }
+                # Add first 3 error details if any exist (for quick debugging)
+                if validation['apriori']['errors']:
+                    val_log['apriori_error_sample'] = validation['apriori']['errors'][:3]
+                if validation['llm']['errors']:
+                    val_log['llm_error_sample'] = validation['llm']['errors'][:3]
+                validation_log_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(validation_log_path, 'w', encoding='utf-8') as lf:
+                    json.dump(val_log, lf, ensure_ascii=False, indent=2)
+            except Exception as e:
+                print(f"(Warn) Failed to write validation generation log: {e}")
             apr_err = len(validation['apriori']['errors'])
             llm_err = len(validation['llm']['errors'])
             validation_passed = apr_err == 0 and llm_err == 0
@@ -630,14 +727,19 @@ def main():
             dataset_meta = compute_dataset_metadata(data_path, [])
             hash_prefix = dataset_meta['dataset_hash'][:12] if dataset_meta['dataset_hash'] != 'unavailable' else 'unknown'
             stem = Path(data_path).stem
-            apriori_dir = Path('apriori_outputs'); apriori_dir.mkdir(exist_ok=True)
-            extractor_dir = Path('extractor_outputs'); extractor_dir.mkdir(exist_ok=True)
-            summary_dir = Path('db_prepared'); summary_dir.mkdir(exist_ok=True)
-            validation_dir = Path('validation_reports'); validation_dir.mkdir(exist_ok=True)
-            apriori_file = f"apriori_output_{stem}_{hash_prefix}.json"
-            llm_file = f"extractor_output_{stem}_{hash_prefix}.json"
-            validation_file = f"validation_report_{stem}_{hash_prefix}.json"
-            summary_file = f"db_prepared_{stem}_{hash_prefix}.json"
+            run_ts = datetime.now(UTC).strftime('%Y%m%d%H%M%S')
+            suffix = f"_{run_ts}" if args.artifact_mode == 'timestamp' else ""
+            # Model prefix for filenames
+            model_prefix = f"{args.llm_model}_"
+            artifacts_root = Path('artifacts')
+            apriori_dir = artifacts_root / 'apriori_outputs'; apriori_dir.mkdir(parents=True, exist_ok=True)
+            extractor_dir = artifacts_root / 'extractor_outputs'; extractor_dir.mkdir(parents=True, exist_ok=True)
+            summary_dir = artifacts_root / 'db_prepared'; summary_dir.mkdir(parents=True, exist_ok=True)
+            validation_dir = artifacts_root / 'validation_reports'; validation_dir.mkdir(parents=True, exist_ok=True)
+            apriori_file = f"{model_prefix}apriori_output_{stem}_{hash_prefix}{suffix}.json"
+            llm_file = f"{model_prefix}extractor_output_{stem}_{hash_prefix}{suffix}.json"
+            validation_file = f"{model_prefix}validation_report_{stem}_{hash_prefix}{suffix}.json"
+            summary_file = f"{model_prefix}db_prepared_{stem}_{hash_prefix}{suffix}.json"
             apriori_path_full = str(apriori_dir / apriori_file)
             llm_path_full = str(extractor_dir / llm_file)
             validation_path_full = str(validation_dir / validation_file)
@@ -650,10 +752,37 @@ def main():
             except Exception:
                 pass
         run_duration_ms = int((time.perf_counter() - single_start) * 1000)
-        run_summary = build_run_summary(apriori_sets, llm_sets, validation, args, validation_passed, dataset_meta, run_duration_ms,
-                                        apriori_path_full, llm_path_full, validation_path_full, summary_path_full, error_message)
+        run_summary = build_run_summary(
+            apriori_sets,
+            llm_sets,
+            validation,
+            args,
+            validation_passed,
+            dataset_meta,
+            run_duration_ms,
+            apriori_path_full,
+            llm_path_full,
+            validation_path_full,
+            summary_path_full,
+            error_message
+        )
         with open(summary_path_full, 'w', encoding='utf-8') as rs:
             json.dump(run_summary, rs, ensure_ascii=False, indent=2)
+        # Summary generation log (minimal - only failures/errors)
+        try:
+            summary_log = {
+                'validation_passed': validation_passed,
+                'run_duration_ms': run_duration_ms,
+                'timestamp': datetime.now(UTC).isoformat(),
+            }
+            # Only add error message if present
+            if error_message:
+                summary_log['error'] = error_message
+            summary_log_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(summary_log_path, 'w', encoding='utf-8') as lf:
+                json.dump(summary_log, lf, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"(Warn) Failed to write summary generation log: {e}")
         print(f"Run summary written to {summary_path_full}")
         if args.cleanup_old:
             removed = cleanup_generic_outputs(Path('.'))

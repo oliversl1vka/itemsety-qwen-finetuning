@@ -1,0 +1,87 @@
+site_name: sieves
+site_url: https://sieves.ai/docs
+docs_dir: docs
+repo_url: https://github.com/mantisai/sieves
+repo_name: "sieves on GitHub"
+
+theme:
+  name: material
+  features:
+    - navigation.top
+    - navigation.tabs
+    - navigation.footer
+    - header.autohide
+  palette:
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+  logo: 'assets/sieve.png'
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: sphinx
+            show_source: true
+            inherited_members: true
+            extra:
+              signatures: true
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - pymdownx.superfences
+
+nav:
+  - Home:
+    - index.md
+    - about.md
+  - API:
+    - pipeline.md
+    - doc.md
+    - bridge.md
+    - Tasks:
+      - tasks/task.md
+      - Preprocessing:
+        - Ingestion:
+          - tasks/preprocessing/ingestion/ingestion.md
+          - tasks/preprocessing/ingestion/docling.md
+          - tasks/preprocessing/ingestion/marker.md
+        - Chunking:
+          - tasks/preprocessing/chunking/chunking.md
+          - tasks/preprocessing/chunking/chonkie.md
+          - tasks/preprocessing/chunking/naive.md
+
+      - Predictive:
+        - tasks/predictive/classification.md
+        - tasks/predictive/information_extraction.md
+        - tasks/predictive/ner.md
+        - tasks/predictive/pii_masking.md
+        - tasks/predictive/question_answering.md
+        - tasks/predictive/sentiment_analysis.md
+        - tasks/predictive/summarization.md
+        - tasks/predictive/translation.md
+
+    - Engines:
+        - engines/base_engine.md
+        - All Engines:
+            - engines/dspy.md
+            - engines/gliner.md
+            - engines/huggingface.md
+            - engines/langchain.md
+            - engines/outlines.md
+  - Guides:
+      - guides/getting_started.md
+      - guides/preprocessing.md
+      - guides/serialization.md
+      - guides/custom_tasks.md
+      - guides/optimization.md
+      - guides/distillation.md

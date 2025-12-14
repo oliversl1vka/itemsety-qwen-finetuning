@@ -14,6 +14,7 @@ import json
 import os
 import random
 import string
+import sys
 from datetime import datetime, UTC
 from pathlib import Path
 from secrets import token_hex
@@ -32,7 +33,7 @@ import pandas as pd
 
 CONFIG = {
     # Counts / sizes
-    "num_datasets": 90,  # Number of datasets per run
+    "num_datasets": 100,  # Number of datasets per run
     "rows_range": (5, 100),  # (min_rows, max_rows)
     "cols_range": (10, 100),  # (min_cols, max_cols)
     # Probabilities for column data types
@@ -96,7 +97,7 @@ CONFIG = {
     "output_dir": "datasets",
     "data_subfolder": "",  # empty => no nested subfolder
     "prefix": "ds",
-    "log_filename": "generation_log.csv",
+    "log_filename": "logs/generation_log.csv",  # Dataset generation log in logs/ directory
 }
 
 
@@ -366,7 +367,7 @@ def file_sha256(path: str) -> str:
 
 def allocate_next_id(cfg: Dict[str, any]) -> int:
     """Re-scan log and filesystem under lock to avoid ID collisions."""
-    log_path = os.path.join(cfg["output_dir"], cfg["log_filename"])
+    log_path = cfg["log_filename"]  # Use log_filename directly (already includes logs/ prefix)
     max_id = 0
     if os.path.isfile(log_path):
         try:
@@ -431,23 +432,110 @@ def generate_and_save_global(global_id: int, cfg: Dict[str, any] = CONFIG) -> st
     return path
 
 
-# generate using persistent indices (no locking needed for single-process usage)
-paths: List[str] = []
-next_id = allocate_next_id(CONFIG)
-for _ in range(CONFIG["num_datasets"]):
-    paths.append(generate_and_save_global(next_id))
-    next_id += 1
+if __name__ == "__main__":
+    import argparse
+    
+    parser = argparse.ArgumentParser(
+        description="Generate synthetic datasets for frequent itemset mining",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python dataset_generation.py --count 5          # Generate 5 datasets
+  python dataset_generation.py --count 10 --rows 10-50 --cols 20-100
+  
+⚠️  WARNING: Generated datasets are appended to existing datasets/ directory.
+    Use --count carefully to avoid generating too many files!
+        """
+    )
+    parser.add_argument(
+        "--count", type=int, default=None,
+        help=f"Number of datasets to generate (default: {CONFIG['num_datasets']} - USE WITH CAUTION!)"
+    )
+    parser.add_argument(
+        "--rows", type=str, default=None,
+        help=f"Row range as 'min-max' (default: {CONFIG['rows_range'][0]}-{CONFIG['rows_range'][1]})"
+    )
+    parser.add_argument(
+        "--cols", type=str, default=None,
+        help=f"Column range as 'min-max' (default: {CONFIG['cols_range'][0]}-{CONFIG['cols_range'][1]})"
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true",
+        help="Show what would be generated without creating files"
+    )
+    
+    args = parser.parse_args()
+    
+    # Parse count
+    if args.count is None:
+        print(f"⚠️  WARNING: No --count specified, using default: {CONFIG['num_datasets']}")
+        print(f"   This will generate {CONFIG['num_datasets']} new datasets!")
+        response = input("   Continue? (yes/no): ")
+        if response.lower() not in ['yes', 'y']:
+            print("Aborted.")
+            sys.exit(0)
+        num_to_generate = CONFIG['num_datasets']
+    else:
+        num_to_generate = args.count
+    
+    # Parse ranges
+    if args.rows:
+        try:
+            min_r, max_r = map(int, args.rows.split('-'))
+            CONFIG['rows_range'] = (min_r, max_r)
+        except:
+            print(f"❌ Invalid --rows format. Use 'min-max' (e.g., '10-50')")
+            sys.exit(1)
+    
+    if args.cols:
+        try:
+            min_c, max_c = map(int, args.cols.split('-'))
+            CONFIG['cols_range'] = (min_c, max_c)
+        except:
+            print(f"❌ Invalid --cols format. Use 'min-max' (e.g., '20-100')")
+            sys.exit(1)
+    
+    # Show configuration
+    print("=" * 60)
+    print("DATASET GENERATION CONFIGURATION")
+    print("=" * 60)
+    print(f"Number of datasets: {num_to_generate}")
+    print(f"Rows range: {CONFIG['rows_range'][0]}-{CONFIG['rows_range'][1]}")
+    print(f"Cols range: {CONFIG['cols_range'][0]}-{CONFIG['cols_range'][1]}")
+    print(f"Output directory: {CONFIG['output_dir']}")
+    print(f"Generation log: {CONFIG['log_filename']}")
+    
+    next_id = allocate_next_id(CONFIG)
+    print(f"Next dataset ID: {next_id}")
+    print("=" * 60)
+    
+    if args.dry_run:
+        print("\n🔍 DRY RUN - No files will be created")
+        print(f"Would generate: ds_{next_id:04d} to ds_{next_id + num_to_generate - 1:04d}")
+        sys.exit(0)
+    
+    # Generate datasets
+    paths: List[str] = []
+    for i in range(num_to_generate):
+        paths.append(generate_and_save_global(next_id))
+        next_id += 1
+        if (i + 1) % 10 == 0:
+            print(f"  Progress: {i + 1}/{num_to_generate} datasets generated...")
 
-# append log safely
-log_df = pd.DataFrame(log)
-log_path_final = CONFIG["log_filename"]  # root-level generation log
-if os.path.isfile(log_path_final):
-    # append without header
-    log_df.to_csv(log_path_final, mode="a", header=False, index=False)
-else:
-    log_df.to_csv(log_path_final, index=False)
+    # append log safely
+    log_df = pd.DataFrame(log)
+    log_path_final = CONFIG["log_filename"]  # logs/generation_log.csv
+    # Ensure logs directory exists
+    os.makedirs(os.path.dirname(log_path_final), exist_ok=True)
+    if os.path.isfile(log_path_final):
+        # append without header
+        log_df.to_csv(log_path_final, mode="a", header=False, index=False)
+    else:
+        log_df.to_csv(log_path_final, index=False)
 
-print(
-    f"✅ Generated {len(paths)} datasets → stored in: {data_dir}. Last ID: {log[-1]['id']} "
-    f"(config_hash={CONFIG_HASH[:8]} master_seed={format(MASTER_SEED, 'x')[:8]}...)"
-)
+    print(
+        f"\n✅ Generated {len(paths)} datasets → stored in: {data_dir}"
+        f"\n   Last ID: {log[-1]['id']}"
+        f"\n   Config hash: {CONFIG_HASH[:8]}"
+        f"\n   Master seed: {format(MASTER_SEED, 'x')[:8]}..."
+    )

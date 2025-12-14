@@ -1,0 +1,43 @@
+codecov:
+  require_ci_to_pass: true
+
+coverage:
+  # How coverage metrics are presented
+  precision: 2
+  round: down
+  range: "70...100"
+
+  # Define coverage thresholds.
+  status:
+    project:
+      default:
+        # Fails CI if coverage < 90%
+        target: 90
+    patch:
+      default:
+        target: 10
+
+  # Optionally ignore specific files/dirs.
+  ignore:
+    - "sieves/tests"
+    - "docs"
+    - "**/test_*.py"
+    - "sieves/engines/engine_import.py"
+    - "sieves/tasks/distillation/distillation_import.py"
+
+comment:
+  layout: "diff, flags, files"
+  behavior: default
+  require_changes: false  # learn more in the Requiring Changes section below
+  require_base: false        # [true :: must have a base report to post]
+  require_head: true       # [true :: must have a head report to post]
+  hide_project_coverage: true # [true :: only show coverage on the git diff]
+
+parsers:
+  # Example parser config
+  gcov:
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: no
+      macro: no

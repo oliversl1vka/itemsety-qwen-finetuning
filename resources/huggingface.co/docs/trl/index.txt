@@ -1,0 +1,127 @@
+Hugging Face's logo
+Hugging Face
+
+TRL documentation
+
+TRL - Transformer Reinforcement Learning
+
+
+
+
+Copy page
+
+TRL - Transformer Reinforcement Learning
+TRL is a full stack library where we provide a set of tools to train transformer language models with methods like Supervised Fine-Tuning (SFT), Group Relative Policy Optimization (GRPO), Direct Preference Optimization (DPO), Reward Modeling, and more. The library is integrated with 🤗 transformers.
+
+🎉 What’s New
+OpenEnv Integration: TRL now supports OpenEnv, the open-source framework from Meta for defining, deploying, and interacting with environments in reinforcement learning and agentic workflows.
+
+Explore how to seamlessly integrate TRL with OpenEnv in our dedicated documentation.
+
+Taxonomy
+Below is the current list of TRL trainers, organized by method type (⚡️ = vLLM support; 🧪 = experimental).
+
+Online methods
+GRPOTrainer ⚡️
+RLOOTrainer ⚡️
+OnlineDPOTrainer 🧪 ⚡️
+NashMDTrainer 🧪 ⚡️
+PPOTrainer 🧪
+XPOTrainer 🧪 ⚡️
+Reward modeling
+RewardTrainer
+PRMTrainer 🧪
+Offline methods
+SFTTrainer
+DPOTrainer
+BCOTrainer 🧪
+CPOTrainer 🧪
+KTOTrainer 🧪
+ORPOTrainer 🧪
+Knowledge distillation
+GKDTrainer 🧪
+MiniLLMTrainer 🧪
+You can also explore TRL-related models, datasets, and demos in the TRL Hugging Face organization.
+
+Learn
+Learn post-training with TRL and other libraries in 🤗 smol course.
+
+Contents
+The documentation is organized into the following sections:
+
+Getting Started: installation and quickstart guide.
+Conceptual Guides: dataset formats, training FAQ, and understanding logs.
+How-to Guides: reducing memory usage, speeding up training, distributing training, etc.
+Integrations: DeepSpeed, Liger Kernel, PEFT, etc.
+Examples: example overview, community tutorials, etc.
+API: trainers, utils, etc.
+Blog posts
+thumbnail
+Published October 23, 2025
+
+Building the Open Agent Ecosystem Together: Introducing OpenEnv
+
+thumbnail
+Published on August 7, 2025
+
+Vision Language Model Alignment in TRL ⚡️
+
+thumbnail
+Published on June 3, 2025
+
+NO GPU left behind: Unlocking Efficiency with Co-located vLLM in TRL
+
+thumbnail
+Published on May 25, 2025
+
+🐯 Liger GRPO meets TRL
+
+thumbnail
+Published on January 28, 2025
+
+Open-R1: a fully open reproduction of DeepSeek-R1
+
+thumbnail
+Published on July 10, 2024
+
+Preference Optimization for Vision Language Models with TRL
+
+thumbnail
+Published on June 12, 2024
+
+Putting RL back in RLHF
+
+thumbnail
+Published on September 29, 2023
+
+Finetune Stable Diffusion Models with DDPO via TRL
+
+thumbnail
+Published on August 8, 2023
+
+Fine-tune Llama 2 with DPO
+
+thumbnail
+Published on April 5, 2023
+
+StackLLaMA: A hands-on guide to train LLaMA with RLHF
+
+thumbnail
+Published on March 9, 2023
+
+Fine-tuning 20B LLMs with RLHF on a 24GB consumer GPU
+
+thumbnail
+Published on December 9, 2022
+
+Illustrating Reinforcement Learning from Human Feedback
+
+Talks
+thumbnail
+Talk given on October 30, 2025
+
+Fine tuning with TRL
+
+Update on GitHub
+Installation
+→

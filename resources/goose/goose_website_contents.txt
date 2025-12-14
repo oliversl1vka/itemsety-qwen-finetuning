@@ -1,0 +1,71 @@
+Skip to main content
+❄️ Level up your AI skills with Advent of AI ❄️
+
+Block Logo
+goose logo
+your local AI agent, automating engineering tasks seamlessly
+
+
+Open Source
+Built with transparency and collaboration in mind, goose empowers developers to contribute, customize, and innovate freely.
+
+Runs Locally
+Goose runs locally to execute tasks efficiently, keeping control in your hands.
+
+Extensible
+Customize goose with your preferred LLM and enhance its capabilities by connecting it to any external MCP server or API.
+
+Autonomous
+Goose independently handles complex tasks, from debugging to deployment, freeing you to focus on what matters most.
+
+Loved by engineers
+Prem Pillai's profile picture
+Prem Pillai
+Software Engineer
+With Goose, I feel like I am Maverick. Thanks a ton for creating this. 🙏 I have been having way too much fun with it today.
+
+Jarrod Sibbison's profile picture
+Jarrod Sibbison
+Software Engineer
+I wanted to construct some fake data for an API with a large request body and business rules I haven't memorized. So I told Goose which object to update and a test to run that calls the vendor. Got it to use the errors descriptions from the vendor response to keep correcting the request until it was successful. So good!
+
+Manik Surtani's profile picture
+Manik Surtani
+Head of Open Source
+I asked Goose to write up a few Google Scripts that mimic Clockwise's functionality (particularly, creating blocks on my work calendar based on events in my personal calendar, as well as color-coding calendar entries based on type and importance). Took me under an hour. If you haven't tried Goose yet, I highly encourage you to do so!
+
+Andrey Bolduzev's profile picture
+Andrey Bolduzev
+Android Engineer
+If anyone was looking for another reason to check it out: I just asked Goose to break a string-array into individual string resources across eleven localizations, and it performed amazingly well and saved me a bunch of time doing it manually or figuring out some way to semi-automate it.
+
+Kang Huang's profile picture
+Kang Huang
+Software Engineer
+Hi team, thank you for much for making Goose, it's so amazing. Our team is working on migrating Dashboard components to React components. I am working with Goose to help the migration.
+
+Lily Delalande's profile picture
+Lily Delalande
+Software Engineer
+Wanted to document what I had Goose do -- took about 30 minutes end to end! I created a custom CLI command in the gh CLI library to download in-line comments on PRs about code changes (currently they aren't directly viewable). I don't know Go that well and I definitely didn't know where to start looking in the code base or how to even test the new command was working and Goose did it all for me 😁
+
+Rizel Scarlett's profile picture
+Rizel Scarlett
+Developer Advocate
+My sister had been asking me for months to help her build a Google Docs extension but I kept putting it off. Today, we hopped on FaceTime and built one in just 30 minutes with Goose!
+
+Quick Links
+Install goose
+Extensions
+Community
+Spotlight
+Discord
+YouTube
+LinkedIn
+Twitter / X
+BlueSky
+Nostr
+More
+Blog
+GitHub
+Copyright © 2025 Block, Inc.

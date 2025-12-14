@@ -2,13 +2,18 @@
 # Python project .gitignore
 ##############################################
 
-# Environment & secrets
+# Environment & secrets (CRITICAL!)
 azure.env
 *.env
 .env
+*.key
+*.pem
 
 # Virtual environments
 venv/
+.venv/
+ENV/
+env/
 
 # Python cache & compiled artifacts
 __pycache__/
@@ -21,6 +26,8 @@ __pycache__/
 .eggs/
 build/
 dist/
+*.pyc
+*$py.class
 
 # Packaging / distribution
 *.whl
@@ -32,14 +39,19 @@ dist/
 
 # Editors / IDE
 .vscode/
+.idea/
 *.swp
+*.swo
 *.tmp
+*~
 
 # Logs & sqlite/db
 *.log
 *.sqlite
-*.db
+*.db-journal
+*.db-wal
 runs.db
+logs/
 
 # Generated outputs & large artifacts (keep source scripts)
 /datasets/
@@ -48,6 +60,14 @@ runs.db
 /validation_reports/
 /visuals/
 /db_prepared/
+artifacts/
+
+# Fine-tuning artifacts (optional - comment out if you want to track)
+training_data/
+hf_dataset/
+checkpoints/
+runs/
+wandb/
 
 # Seed file (comment out if you want versioning)
 master_seed.txt
@@ -57,6 +77,12 @@ master_seed.txt
 !generation_log.csv  # Keep generation log for audit
 !README.md
 !requirements.txt
+
+# Test/temporary files
+ds_TEST.csv
+temp_*.csv
+scratch_*.py
+test_*.py
 
 # Caches
 .cache/
@@ -71,6 +97,11 @@ htmlcov/
 # Misc OS
 .DS_Store
 Thumbs.db
+ehthumbs.db
+Desktop.ini
 
 # Performance profiles
 *.profile
+
+# Archive (keep structure but ignore contents if needed)
+# archive/

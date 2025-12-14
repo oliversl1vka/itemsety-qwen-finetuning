@@ -1,0 +1,367 @@
+"""Bridge base class and types."""
+
+from __future__ import annotations
+
+import abc
+from collections import defaultdict
+from collections.abc import Iterable
+from typing import Any, Generic, Literal, TypeVar, override
+
+import gliner2
+import pydantic
+
+from sieves.data import Doc
+from sieves.engines import EngineInferenceMode, gliner_
+from sieves.engines.types import GenerationSettings
+
+TaskPromptSignature = TypeVar("TaskPromptSignature", covariant=True)
+TaskResult = TypeVar("TaskResult")
+TaskBridge = TypeVar("TaskBridge", bound="Bridge[TaskPromptSignature, TaskResult, EngineInferenceMode]")  # type: ignore[valid-type]
+
+
+class Bridge(Generic[TaskPromptSignature, TaskResult, EngineInferenceMode], abc.ABC):
+    """Bridge base class."""
+
+    def __init__(
+        self, task_id: str, prompt_instructions: str | None, overwrite: bool, generation_settings: GenerationSettings
+    ):
+        """Initialize new bridge.
+
+        :param task_id: Task ID.
+        :param prompt_instructions: Custom prompt instructions. If None, default instructions are used.
+        :param overwrite: Whether to overwrite text with produced text. Considered only by bridges for tasks producing
+            fluent text - like translation, summarization, PII masking, etc.
+        :param generation_settings: Generation settings including inference_mode.
+        """
+        self._task_id = task_id
+        self._custom_prompt_instructions = prompt_instructions
+        self._overwrite = overwrite
+        self._generation_settings = generation_settings
+
+    @property
+    @abc.abstractmethod
+    def _default_prompt_instructions(self) -> str:
+        """Return default prompt instructions.
+
+        Instructions are injected at the beginning of each prompt.
+
+        :return: Default prompt instructions.
+        """
+
+    @property
+    def _prompt_instructions(self) -> str:
+        """Returns prompt instructions.
+
+        :returns: If `_custom_prompt_instructions` is set, this is used. Otherwise, `_default_prompt_instructions` is
+            used.
+        """
+        return self._custom_prompt_instructions or self._default_prompt_instructions
+
+    @property
+    @abc.abstractmethod
+    def _prompt_example_template(self) -> str | None:
+        """Return default prompt template for example injection.
+
+        Examples are injected between instructions and conclusions.
+
+        :return: Default prompt example template.
+        """
+
+    @property
+    @abc.abstractmethod
+    def _prompt_conclusion(self) -> str | None:
+        """Return prompt conclusion.
+
+        Prompt conclusions are injected at the end of each prompt.
+
+        :return: Default prompt conclusion.
+        """
+
+    @property
+    def prompt_template(self) -> str:
+        """Return prompt template.
+
+        Chains `_prompt_instructions`, `_prompt_example_template` and `_prompt_conclusion`.
+
+        Note: different engines have different expectations as how a prompt should look like. E.g. outlines supports the
+        Jinja 2 templating format for insertion of values and few-shot examples, whereas DSPy integrates these things in
+        a different value in the workflow and hence expects the prompt not to include these things. Mind engine-specific
+        expectations when creating a prompt template.
+        :return str | None: Prompt template as string. None if not used by engine.
+        """
+        return f"""
+        {self._custom_prompt_instructions or self._prompt_instructions}
+        {self._prompt_example_template or ""}
+        {self._prompt_conclusion or ""}
+        """
+
+    @property
+    @abc.abstractmethod
+    def prompt_signature(self) -> type[TaskPromptSignature] | TaskPromptSignature:
+        """Create output signature.
+
+        E.g.: `Signature` in DSPy, Pydantic objects in outlines, JSON schema in jsonformers.
+        This is engine-specific.
+
+        :return type[_TaskPromptSignature] | _TaskPromptSignature: Output signature object. This can be an instance
+            (e.g. a regex string) or a class (e.g. a Pydantic class).
+        """
+
+    @property
+    @abc.abstractmethod
+    def inference_mode(self) -> EngineInferenceMode:
+        """Return inference mode.
+
+        :return EngineInferenceMode: Inference mode.
+        """
+
+    def extract(self, docs: Iterable[Doc]) -> Iterable[dict[str, Any]]:
+        """Extract all values from doc instances that are to be injected into the prompts.
+
+        :param docs: Docs to extract values from.
+        :return Iterable[dict[str, Any]]: All values from doc instances that are to be injected into the prompts
+        """
+        return ({"text": doc.text if doc.text else None} for doc in docs)
+
+    @abc.abstractmethod
+    def integrate(self, results: Iterable[TaskResult], docs: Iterable[Doc]) -> Iterable[Doc]:
+        """Integrate results into Doc instances.
+
+        :param results: Results from prompt executable.
+        :param docs: Doc instances to update.
+        :return Iterable[Doc]: Updated doc instances.
+        """
+
+    @abc.abstractmethod
+    def consolidate(self, results: Iterable[TaskResult], docs_offsets: list[tuple[int, int]]) -> Iterable[TaskResult]:
+        """Consolidate results for document chunks into document results.
+
+        :param results: Results per document chunk.
+        :param docs_offsets: Chunk offsets per document. Chunks per document can be obtained with
+            `results[docs_chunk_offsets[i][0]:docs_chunk_offsets[i][1]]`.
+        :return Iterable[_TaskResult]: Results per document.
+        """
+
+
+class GliNERBridge(Bridge[gliner2.inference.engine.Schema, gliner_.Result, gliner_.InferenceMode]):
+    """Bridge for GLiNER2 models."""
+
+    def __init__(
+        self,
+        task_id: str,
+        prompt_instructions: str | None,
+        prompt_signature: gliner2.inference.engine.Schema | gliner2.inference.engine.StructureBuilder,
+        generation_settings: GenerationSettings,
+        inference_mode: gliner_.InferenceMode,
+    ):
+        """Initialize GLiNER2 bridge.
+
+        Important: currently only GLiNER2 schemas/structures with one key each are supported. We do NOT support
+        composite requests like `create_schema().entities().classification(). ...`.
+
+        :param task_id: Task ID.
+        :param prompt_instructions: Custom prompt instructions. If None, default instructions are used.
+        :param prompt_signature: GLiNER2 schema (list of field definitions).
+        :param generation_settings: Generation settings including inference_mode.
+        """
+        super().__init__(
+            task_id=task_id,
+            prompt_instructions=prompt_instructions,
+            overwrite=False,
+            generation_settings=generation_settings,
+        )
+        self._prompt_signature = prompt_signature
+        # If prompt signature is a structure, we create a Pydantic representation of it for easier downstream result
+        # processing - e.g. when creating a HF dataset.
+        self._prompt_signature_pydantic = (
+            self.schema_to_pydantic()
+            if isinstance(prompt_signature, gliner2.inference.engine.StructureBuilder)
+            else None
+        )
+
+        self._inference_mode = inference_mode
+
+    @override
+    @property
+    def _default_prompt_instructions(self) -> str:
+        # GLiNER2 doesn't support custom instructions.
+        return ""
+
+    @override
+    @property
+    def _prompt_example_template(self) -> str | None:
+        return None
+
+    @override
+    @property
+    def _prompt_conclusion(self) -> str | None:
+        return None
+
+    @override
+    @property
+    def prompt_signature(self) -> gliner2.inference.engine.Schema | gliner2.inference.engine.StructureBuilder:
+        return self._prompt_signature
+
+    @property
+    def prompt_signature_pydantic(self) -> type[pydantic.BaseModel] | None:
+        """Return Pydantic model representation of GLiNER2 schema.
+
+        Returns:
+            Pydantic model representation of GLiNER2 schema.
+        """
+        return self._prompt_signature_pydantic
+
+    @override
+    @property
+    def inference_mode(self) -> gliner_.InferenceMode:
+        return self._generation_settings.inference_mode or self._inference_mode
+
+    def schema_to_pydantic(self) -> type[pydantic.BaseModel]:
+        """Convert a Gliner2 Schema object to Pydantic models.
+
+        If the schema is a structure with more than one entry, a wrapper class `Schema` is created.
+
+        Returns:
+            Pydantic model representation of GLiNER2 schema.
+        """
+        if isinstance(self._prompt_signature, gliner2.inference.engine.StructureBuilder):
+            field_metadata = self._prompt_signature.schema._field_metadata
+        else:
+            assert isinstance(self._prompt_signature, gliner2.inference.engine.Schema)
+            field_metadata = self._prompt_signature._field_metadata
+
+        # Group fields by class name.
+        classes: dict[str, dict[str, Any]] = {}
+        for key, meta in field_metadata.items():
+            class_name, field_name = key.split(".")
+            if class_name not in classes:
+                classes[class_name] = {}
+            classes[class_name][field_name] = meta
+
+        # Create models for each class
+        models: dict[str, type[pydantic.BaseModel]] = {}
+        for class_name, fields in classes.items():
+            field_definitions = {}
+            for field_name, meta in fields.items():
+                dtype = meta["dtype"]
+                choices = meta["choices"]
+
+                # Determine the field type.
+                inner_field_type = Literal[*choices] if choices else str  # type: ignore[invalid-type-form]
+                field_type = list[inner_field_type] if dtype == "list" else inner_field_type
+                field_definitions[field_name] = (field_type, ...)
+
+            model = pydantic.create_model(class_name, **field_definitions)
+            models[class_name] = model
+
+        # Create wrapper "Schema" model with lowercase attribute names if more than one structure is present.
+        if len(models) > 1:
+            raise TypeError(
+                "Composite GliNER2 schemas are not supported. Use a single structure/entitity/classification per Sieves"
+                " task."
+            )
+
+        return models[list(models.keys())[0]]
+
+    @override
+    def integrate(self, results: Iterable[gliner_.Result], docs: Iterable[Doc]) -> Iterable[Doc]:
+        for doc, result in zip(docs, results):
+            match self._inference_mode:
+                case gliner_.InferenceMode.classification:
+                    assert hasattr(self._prompt_signature.schema, "__getitem__")
+                    is_multilabel = self._prompt_signature.schema["classifications"][0]["multi_label"]
+
+                    if is_multilabel:
+                        doc.results[self._task_id] = []
+                        for res in sorted(result, key=lambda x: x["score"], reverse=True):
+                            assert isinstance(res, dict)
+                            doc.results[self._task_id].append((res["label"], res["score"]))
+
+                    else:
+                        doc.results[self._task_id] = (result[0]["label"], result[0]["score"])
+
+                case gliner_.InferenceMode.entities:
+                    doc.results[self._task_id] = result
+
+                case gliner_.InferenceMode.structure:
+                    assert len(result) == 1
+                    entity_type_name = list(result.keys())[0]
+                    assert issubclass(self._prompt_signature_pydantic, pydantic.BaseModel)
+                    doc.results[self._task_id] = [
+                        self._prompt_signature_pydantic.model_validate(
+                            {key: value["text"] for key, value in entity.items()}
+                        )
+                        for entity in result[entity_type_name]
+                    ]
+
+        return docs
+
+    @override
+    def consolidate(
+        self, results: Iterable[gliner_.Result], docs_offsets: list[tuple[int, int]]
+    ) -> Iterable[gliner_.Result]:
+        results = list(results)
+
+        # Determine label scores for chunks per document.
+        for doc_offset in docs_offsets:
+            scores: dict[str, float] = defaultdict(lambda: 0)
+            entities: dict[str, list[str] | dict[str, str | list[str]]] = {}
+
+            for res in results[doc_offset[0] : doc_offset[1]]:
+                match self._inference_mode:
+                    case gliner_.InferenceMode.classification:
+                        keys = list(res.keys())
+                        assert len(keys) == 1, "Composite GliNER2 schemas are not supported."
+                        extracted_res = res[keys[0]]
+
+                        # In case of single-label: pad to list so that we can process in a unified way.
+                        if isinstance(extracted_res, dict):
+                            extracted_res = [extracted_res]
+
+                        for entry in extracted_res:
+                            # GliNER might use two different structures here, depending on the version.
+                            if "label" in entry:
+                                scores[entry["label"]] += entry["confidence"]
+                            else:
+                                keys = list(entry.keys())
+                                assert len(keys) == 1, "Composite GliNER2 schemas are not supported."
+                                for label, confidence in entry[keys[0]]:
+                                    scores[label] += confidence
+
+                    case gliner_.InferenceMode.entities:
+                        for entity_type in res["entities"]:
+                            if len(res["entities"][entity_type]):
+                                if entity_type not in entities:
+                                    entities[entity_type] = []
+                                relevant_entities: list[str] = entities[entity_type]
+                                relevant_entities.extend(res["entities"][entity_type])
+
+                    case gliner_.InferenceMode.structure:
+                        for entity_type in res:
+                            if entity_type not in entities:
+                                entities[entity_type] = []
+                            relevant_entities: list[str] = entities[entity_type]
+                            relevant_entities.extend(res[entity_type])
+
+            match self._inference_mode:
+                case gliner_.InferenceMode.classification:
+                    # Ensure that all labels have been assigned - GLiNER2 is somtimes negligent about this.
+                    assert hasattr(self._prompt_signature.schema, "__getitem__")
+                    for label in self._prompt_signature.schema["classifications"][0]["labels"]:
+                        if label not in scores:
+                            scores[label] = 0.0
+
+                    # Average score, sort in descending order.
+                    sorted_scores: list[dict[str, str | float]] = sorted(
+                        (
+                            {"label": attr, "score": score / (doc_offset[1] - doc_offset[0])}
+                            for attr, score in scores.items()
+                        ),
+                        key=lambda x: x["score"],
+                        reverse=True,
+                    )
+
+                    yield sorted_scores
+
+                case gliner_.InferenceMode.entities | gliner_.InferenceMode.structure:
+                    yield entities
