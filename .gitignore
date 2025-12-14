@@ -64,8 +64,10 @@ logs/
 artifacts/
 
 # Fine-tuning artifacts (optional - comment out if you want to track)
-training_data/
-hf_dataset/
+# training_data/  # Now tracked for enhanced dataset
+# hf_dataset/     # Now tracked for enhanced dataset
+!training_data/all_training_examples_enhanced.json
+!hf_dataset_enhanced/
 checkpoints/
 runs/
 wandb/
