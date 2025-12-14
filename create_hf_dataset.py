@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Convert exported training data to HuggingFace Dataset format.
 Supports conversational format for SFT training.
