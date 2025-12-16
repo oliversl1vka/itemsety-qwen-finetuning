@@ -1,66 +1,90 @@
 # Server Training - Quick Steps
 
-## ✅ Dataset Fixed
+## ✅ Dataset Fixed & Ready
 - **Problem**: Arrow files were corrupted (Not an Arrow file error)
 - **Solution**: Regenerated with `create_hf_dataset.py` - now **88 train / 10 validation**
-- **Status**: Local `hf_dataset_enhanced/` contains valid Arrow files
+- **Status**: ✅ Committed to GitHub (779c85a + 0cc31bd)
+- **GitHub Repo**: https://github.com/oliversl1vka/itemsety-qwen-finetuning
 
-## 🚀 Training Options
+## 🚀 Training on XAI Server
 
-### Option A: Train Locally from Disk (RECOMMENDED)
-**Why**: Bypasses Hub caching issues, uses valid local files
+### Step 1: Clone Repository on Server
+```bash
+# SSH to server
+ssh your_username@jupytergpu
 
-1. **Upload to Server**:
-   ```bash
-   # Via SCP (from local machine)
-   scp -r hf_dataset_enhanced/ user@server:/path/to/notebook/
-   
-   # Or via Git (if you push to GitHub)
-   git add hf_dataset_enhanced/
-   git commit -m "Add regenerated dataset"
-   git push
-   # Then on server: git pull
-   ```
+# Clone repo (use HTTPS or SSH)
+git clone https://github.com/oliversl1vka/itemsety-qwen-finetuning.git
+cd itemsety-qwen-finetuning
+
+# Verify dataset is present
+ls -lh hf_dataset_enhanced/
+python test_dataset_loading.py
+```
+
 
 2. **Open Jupyter Notebook**: `qwen_finetuning_server.ipynb`
 
 3. **Run Cells Sequentially**:
-   - Cell 1-2: System check + package install
-   - Cell 3: Verify `./hf_dataset_enhanced` exists ✅
-   - Cell 4: **Load with `load_from_disk`** (already configured!)
-   - Cell 5-6: Load 4-bit quantized model + LoRA
-   - Cell 7-8: Training config (BFloat16, paged_adamw_8bit)
-   - Cell 9+: Start training
+   - **Cell 1**: System resources check
+   - **Cell 2**: Install packages (`pip install datasets transformers trl peft accelerate bitsandbytes`)
+   - **Cell 3**: Verify `./hf_dataset_enhanced` exists ✅
+   - **Cell 4**: Load dataset with `load_from_disk('./hf_dataset_enhanced')` 
+     - Expected: **88 train / 10 validation** ✅
+   - **Cell 5**: Load 4-bit quantized Qwen2.5-0.5B model
+   - **Cell 6**: Configure LoRA (r=16, alpha=32)
+   - **Cell 7-8**: Training config (BFloat16, paged_adamw_8bit, 3 epochs)
+   - **Cell 9+**: Start training with SFTTrainer
 
 4. **Expected Output**:
    ```
    Train examples: 88
    Validation examples: 10
+   Columns: ['messages', 'metadata']
    ✅ Model loaded successfully with 4-bit quantization!
    Total parameters: 494.0M
    Trainable parameters: 8.65M (1.75%)
    ```
 
-### Option B: Fix Hub and Load from There
-**Why**: If you want to use `load_dataset()` instead
+### Step 2: Monitor Training
+- Training should take **~10-20 minutes** (3 epochs × 88 examples with 4-bit)
+- Watch for:
+  - Loss decreasing (start ~2.5 → target <1.0)
+  - No OOM errors
+  - Eval checkpoints at steps 50, 100
 
-1. **Force Hub Refresh**:
-   ```bash
-   # Delete and recreate Hub repo
-   huggingface-cli delete-repo OliverSlivka/itemsety-real-training --type dataset
-   python -c "from huggingface_hub import HfApi; HfApi().create_repo('OliverSlivka/itemsety-real-training', repo_type='dataset', private=True)"
-   python -c "from huggingface_hub import HfApi; HfApi().upload_folder(folder_path='hf_dataset_enhanced', repo_id='OliverSlivka/itemsety-real-training', repo_type='dataset')"
-   ```
+### Step 3: After Training
+```python
+# Test the trained model
+from peft import PeftModel, AutoModelForCausalLM
+from transformers import AutoTokenizer
 
-2. **Test Loading**:
-   ```python
-   from datasets import load_dataset
-   ds = load_dataset('OliverSlivka/itemsety-real-training', download_mode='force_redownload')
-   print(len(ds['train']))  # Should show 88
-   ```
+model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-0.5B-Instruct")
+model = PeftModel.from_pretrained(model, "./qwen_itemset_model_enhanced")
+tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-0.5B-Instruct")
 
-3. **Update Notebook**:
-   - Change Cell 4 from `load_from_disk("./hf_dataset_enhanced")` to `load_dataset('OliverSlivka/itemsety-real-training')`
+# Test inference
+test_prompt = "Extract frequent itemsets from: milk, bread, eggs, milk..."
+inputs = tokenizer(test_prompt, return_tensors="pt")
+outputs = model.generate(**inputs, max_new_tokens=512)
+print(tokenizer.decode(outputs[0]))
+```
+
+## 🚫 HuggingFace Hub Issue (FYI)
+**Problem**: `load_dataset('OliverSlivka/itemsety-real-training')` still shows 1 row despite fresh upload  
+**Cause**: Hub caching/processing delays with Arrow files  
+**Solution**: Use `load_from_disk('./hf_dataset_enhanced')` instead (already in notebook) ✅
+
+To fix Hub later (optional):
+```bash
+# Force Hub to reprocess
+huggingface-cli delete-repo OliverSlivka/itemsety-real-training --type dataset
+huggingface-cli create-repo OliverSlivka/itemsety-real-training --type dataset --private
+python -c "from huggingface_hub import HfApi; HfApi().upload_folder(folder_path='hf_dataset_enhanced', repo_id='OliverSlivka/itemsety-real-training', repo_type='dataset')"
+
+# Test with force redownload
+python -c "from datasets import load_dataset; ds = load_dataset('OliverSlivka/itemsety-real-training', download_mode='force_redownload'); print(len(ds['train']))"
+```
 
 ## 🔍 Troubleshooting
 
