@@ -1,0 +1,45 @@
+[
+    {
+        "itemset": ["hugehamo", "seweco"],
+        "vidence": "row_count=1",
+        "explainer": "The itemsets are 'hugehamo' and 'seweco'. These appear together in the first row of transactions."
+    },
+    {
+        "itemset": ["tosada", "cenepiku"],
+        "vidence": "row_count=2",
+        "explainer": "The itemsets are 'tosada' and 'cenepiku'. These appear together in the second row of transactions."
+    },
+    {
+        "itemset": ["qiwo", "kuwe"],
+        "vidence": "row_count=2",
+        "explainer": "The itemsets are 'qiwo' and 'kuwe'. These appear together in the third row of transactions."
+    },
+    {
+        "itemset": ["cenepiku", "cenepiku"],
+        "vidence": "row_count=2",
+        "explainer": "The itemsets are 'cenepiku' and 'cenepiku'. This appears twice in the same transaction."
+    },
+    {
+        "itemset": ["xumideni", "texaqupe"],
+        "vidence": "row_count=2",
+        "explainer": "The itemsets are 'xumideni' and 'texaqupe'. These appear together in the fourth row of transactions."
+    },
+    {
+        "itemset": ["sisayu", "sisayu"],
+        "vidence": "row_count=2",
+        "explainer": "The itemsets are 'sisayu' and 'sisayu'. This appears twice in the same transaction."
+    },
+    {
+        "itemset": ["hazewu", "hazewu"],
+        "vidence": "row_count=2",
+        "explainer": "The itemsets are 'hazewu' and 'hazewu'. These appear together in the fifth row of transactions."
+    },
+    {
+        "itemset": ["tutabuva", "tutabuva"],
+        "vidence": "row_count=2",
+        "explainer": "The itemsets are 'tutabuva' and 'tutabuva'. This appears twice in the same transaction."
+    },
+    {
+        "itemset": ["wampiri", "wampiri"],
+        "vidence": "row_count=2",
+        "

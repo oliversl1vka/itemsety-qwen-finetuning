@@ -1,0 +1,7 @@
+{
+  "total_examples": 98,
+  "skipped": 2,
+  "model_filter": "gpt_4_1",
+  "max_csv_rows": 20,
+  "output_directory": "training_data"
+}

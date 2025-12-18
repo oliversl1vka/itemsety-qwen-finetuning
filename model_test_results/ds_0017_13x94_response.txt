@@ -1,0 +1,9 @@
+```json
+[
+    {
+        "itemset": ["attr_46_int", "attr_40_float", "attr_22_float", "attr_34_text"],
+        "observed_support_count": 3,
+        "explanation": "The itemset 'attr_46_int', 'attr_40_float', and 'attr_22_float' appear together with the transaction ID 'attr_34_text'. These items are highly supported by the dataset and are likely to be frequent occurrences within the transactions."
+    },
+    {
+        "itemset": ["attr_46_int", "attr_40_float", "attr_22_float", "attr_34_text", "attr_26_int", "attr_38_text", "attr_15_text", "attr_30_int", "attr_66_int", "attr_47_text", "attr_75_int", "attr_67_text", "attr_43_float", "attr_27_float", "attr_36_bool", "attr_55_text", "attr_12_float", "attr_85_int", "attr_66_int", "attr_47_text", "attr_75_int", "attr_67_text", "attr_43_float", "attr_27_float", "attr_36_bool", "attr_55_text", "attr_12_float", "attr_85_int", "attr_66_int", "attr_47_text", "attr_75_int", "attr_67_text", "attr_43_float", "attr_27_float", "attr_36_bool", "attr_55_text", "attr_12_float", "attr_85_int", "attr_66_int", "attr_47_text", "attr_75_int", "attr_67_text", "attr_43_float", "attr_27_float", "attr_36_bool", "attr_55_text", "attr_12_float", "attr_85_int", "attr_66_int", "attr_47_text", "attr_75_int", "attr_67_text", "attr_43_float", "attr_27_float", "attr_36_bool", "attr_55_text
