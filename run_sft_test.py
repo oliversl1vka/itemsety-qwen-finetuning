@@ -75,8 +75,8 @@ training_args = SFTConfig(
 
     # Training schedule
     num_train_epochs=1,
-    per_device_train_batch_size=2,
-    gradient_accumulation_steps=8,
+    per_device_train_batch_size=1,  # Reduced from 2 to avoid OOM
+    gradient_accumulation_steps=16,  # Increased to maintain effective batch
     learning_rate=2e-4,
     warmup_steps=5,
     max_steps=12,
@@ -95,15 +95,18 @@ training_args = SFTConfig(
     logging_steps=1,
     report_to="none",
 
-    # Evaluation
-    eval_strategy="steps",
-    eval_steps=5,
+    # Evaluation - DISABLED to avoid OOM during eval
+    eval_strategy="no",
+    # eval_steps=5,  # Disabled
 
     # Saving
     save_strategy="no",
 
-    # Sequence length
-    max_length=2048,
+    # Sequence length - reduced to save memory
+    max_length=1024,
+    
+    # Memory optimization
+    per_device_eval_batch_size=1,
 )
 
 print("✅ Training configuration set for test run (fp32 mode - T4 safe)")
