@@ -2,7 +2,7 @@ import gradio as gr
 import spaces
 import subprocess
 
-@spaces.GPU(duration=7200)  # 2-hour GPU allocation
+# Note: @spaces.GPU removed - using persistent paid GPU instead
 def run_training(training_mode):
     """
     Run training with GPU support via @spaces.GPU decorator.
