@@ -85,6 +85,7 @@ training_args = SFTConfig(
 
     # Precision
     fp16=True,
+    bf16=False,  # Explicitly disable bfloat16 (T4 compatibility)
 
     # Logging
     logging_steps=1,

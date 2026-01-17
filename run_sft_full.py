@@ -89,6 +89,7 @@ training_args = SFTConfig(
     
     # Precision
     fp16=True,  # Use FP16 for training
+    bf16=False,  # Explicitly disable bfloat16 (T4 compatibility)
     
     # Logging
     logging_steps=5,
@@ -127,6 +128,8 @@ trainer = SFTTrainer(
 print("✅ Trainer initialized")
 
 # Show GPU memory before training
+print(f"CUDA available: {torch.cuda.is_available()}")
+print(f"PyTorch CUDA version: {torch.version.cuda}")
 if torch.cuda.is_available():
     gpu_stats = torch.cuda.get_device_properties(0)
     start_memory = round(torch.cuda.max_memory_reserved() / 1024**3, 3)
