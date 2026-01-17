@@ -11,6 +11,28 @@ def run_training(training_mode):
         training_mode: "test" for quick 50-example test, "full" for production 439-example training
     """
     
+    # Upgrade libraries
+    upgrade_command = "pip install --upgrade torch transformers trl peft accelerate bitsandbytes"
+    yield f"🚀 Upgrading libraries...\n{upgrade_command}\n\n"
+    
+    process_upgrade = subprocess.Popen(
+        upgrade_command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        shell=True,
+    )
+    
+    output_upgrade = ""
+    for line in iter(process_upgrade.stdout.readline, ''):
+        output_upgrade += line
+        yield output_upgrade
+    
+    process_upgrade.stdout.close()
+    process_upgrade.wait()
+    
+    yield output_upgrade + "✅ Libraries upgraded.\n\n"
+
     if training_mode == "test":
         command = "python run_sft_test.py"
         description = "🧪 TEST RUN: 50 examples, Qwen2.5-3B (4-bit LoRA)"
@@ -28,7 +50,7 @@ def run_training(training_mode):
         shell=True,
     )
     
-    output = f"{description}\n\n{'='*60}\n\n"
+    output = ""
     for line in iter(process.stdout.readline, ''):
         output += line
         yield output
