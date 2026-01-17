@@ -1,4 +1,3 @@
-
 import torch
 from datasets import load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
@@ -14,34 +13,36 @@ dataset = load_dataset(DATASET_NAME)
 train_dataset = dataset["train"].shuffle(seed=42).select(range(50))
 eval_dataset = dataset["validation"].shuffle(seed=42)
 
-
 print(f"✅ Dataset loaded: {len(train_dataset)} train, {len(eval_dataset)} eval examples for test run.")
 print(f"   Columns: {train_dataset.column_names}")
-# The dataset should have a 'messages' column in ChatML format.
-# SFTTrainer will automatically format it.
 
 # ===== 2. Load Model with 4-bit Quantization =====
-MODEL_NAME = "Qwen/Qwen2.5-3B-Instruct"  # 3B model for better performance
-OUTPUT_DIR = "OliverSlivka/qwen2.5-3b-itemset-test"  # Test repo on Hub
+MODEL_NAME = "Qwen/Qwen2.5-3B-Instruct"
+OUTPUT_DIR = "OliverSlivka/qwen2.5-3b-itemset-test"
 
 print(f"🔥 Loading {MODEL_NAME} with 4-bit quantization...")
 
-# 4-bit quantization config
+# 4-bit quantization config - use float32 for compute to avoid bf16 issues
 bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=torch.float16,
+    bnb_4bit_compute_dtype=torch.float32,  # Use fp32 for computation (T4 safe)
     bnb_4bit_use_double_quant=True,
 )
 
-# Load model
+# Load model - explicitly use float32 to avoid bf16 issues on T4
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_NAME,
     quantization_config=bnb_config,
-    torch_dtype=torch.float16,  # Force fp16 (T4 doesn't support bf16)
     device_map="auto",
     trust_remote_code=True,
+    attn_implementation="eager",  # Avoid flash attention which might use bf16
 )
+
+# Ensure model is in float32 for non-quantized parts
+for param in model.parameters():
+    if param.dtype == torch.bfloat16:
+        param.data = param.data.to(torch.float32)
 
 # Load tokenizer
 tokenizer = AutoTokenizer.from_pretrained(
@@ -51,7 +52,7 @@ tokenizer = AutoTokenizer.from_pretrained(
 if tokenizer.pad_token is None:
     tokenizer.pad_token = tokenizer.eos_token
 
-print("✅ Model and tokenizer loaded with 4-bit quantization")
+print("✅ Model and tokenizer loaded with 4-bit quantization (fp32 compute)")
 
 # ===== 3. LoRA Configuration =====
 peft_config = LoraConfig(
@@ -66,45 +67,49 @@ peft_config = LoraConfig(
 print(f"🎯 LoRA config: r={peft_config.r}, alpha={peft_config.lora_alpha}")
 
 # ===== 4. Training Configuration for Test Run =====
+# CRITICAL: Disable ALL mixed precision to avoid bf16 issues on T4
 training_args = SFTConfig(
     output_dir=OUTPUT_DIR,
-    push_to_hub=True,  # Push test model to verify everything works
-    hub_strategy="end",  # Push only at the end
+    push_to_hub=True,
+    hub_strategy="end",
 
-    # Training schedule for quick test
-    num_train_epochs=1, # Single epoch is enough for a test
-    per_device_train_batch_size=2,  # Smaller batch for 3B model
-    gradient_accumulation_steps=8,  # Effective batch = 16
+    # Training schedule
+    num_train_epochs=1,
+    per_device_train_batch_size=2,
+    gradient_accumulation_steps=8,
     learning_rate=2e-4,
     warmup_steps=5,
-    max_steps=12,  # Limit steps for a quick run (50 examples / (2*8) batch size rounded up)
+    max_steps=12,
 
     # Optimization
     optim="paged_adamw_8bit",
     max_grad_norm=0.3,
     gradient_checkpointing=True,
 
-    # Precision
-    fp16=True,
-    bf16=False,  # Explicitly disable bfloat16 (T4 compatibility)
+    # CRITICAL: Disable ALL mixed precision (fp16 AND bf16)
+    # This avoids the GradScaler bf16 issue on T4
+    fp16=False,
+    bf16=False,
 
     # Logging
     logging_steps=1,
+    report_to="none",
 
     # Evaluation
     eval_strategy="steps",
     eval_steps=5,
 
     # Saving
-    save_strategy="no", # No need to save checkpoints for test
+    save_strategy="no",
 
     # Sequence length
     max_length=2048,
 )
 
-print("✅ Training configuration set for test run")
+print("✅ Training configuration set for test run (fp32 mode - T4 safe)")
 print(f"   Effective batch size: {training_args.per_device_train_batch_size * training_args.gradient_accumulation_steps}")
 print(f"   Max steps: {training_args.max_steps}")
+print(f"   Mixed precision: DISABLED (fp32 training)")
 
 # ===== 5. Initialize Trainer =====
 print("🎯 Initializing SFTTrainer...")
@@ -123,12 +128,18 @@ print("✅ Trainer initialized")
 print("\n🚀 Starting test training...")
 print("="*60)
 
-import torch
 print(f"CUDA available: {torch.cuda.is_available()}")
 print(f"PyTorch CUDA version: {torch.version.cuda}")
 if torch.cuda.is_available():
     print(f"Current device: {torch.cuda.current_device()}")
     print(f"Device name: {torch.cuda.get_device_name(torch.cuda.current_device())}")
+
+# Check model dtype
+print(f"Model dtype check:")
+for name, param in model.named_parameters():
+    if param.requires_grad:
+        print(f"  {name}: {param.dtype}")
+        break
 
 trainer.train()
 
