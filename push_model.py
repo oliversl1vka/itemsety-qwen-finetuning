@@ -27,15 +27,27 @@ def push_trained_model():
     
     print(f"✓ HF_TOKEN found (length: {len(hf_token)} chars)")
     
-    # Check for trained model
-    output_dir = "OliverSlivka/qwen2.5-3b-itemset-extractor"
-    local_output = Path("./output") if Path("./output").exists() else Path(output_dir)
+    # Check for trained model - look in known locations
+    possible_locations = [
+        Path("./trained_adapter"),  # New location
+        Path("./output"),
+        Path("OliverSlivka/qwen2.5-3b-itemset-extractor"),
+        Path("OliverSlivka/qwen2.5-3b-itemset-test"),
+    ]
     
-    # Look for checkpoint directories
+    adapter_path = None
+    for loc in possible_locations:
+        config_file = loc / "adapter_config.json"
+        if config_file.exists():
+            adapter_path = loc
+            break
+    
+    # Also look for checkpoint directories
     checkpoint_dirs = list(Path(".").glob("**/checkpoint-*"))
     adapter_files = list(Path(".").glob("**/adapter_config.json"))
     
     print(f"\n📁 Searching for trained model...")
+    print(f"   Adapter path found: {adapter_path}")
     print(f"   Checkpoint dirs found: {len(checkpoint_dirs)}")
     print(f"   Adapter configs found: {len(adapter_files)}")
     
@@ -44,7 +56,15 @@ def push_trained_model():
     for af in adapter_files[:5]:
         print(f"   - {af}")
     
-    if not adapter_files and not checkpoint_dirs:
+    # Use found adapter_path or fall back to search
+    if not adapter_path:
+        if adapter_files:
+            adapter_path = adapter_files[0].parent
+        elif checkpoint_dirs:
+            checkpoint_dirs.sort(key=lambda x: int(x.name.split("-")[-1]) if x.name.split("-")[-1].isdigit() else 0)
+            adapter_path = checkpoint_dirs[-1]
+    
+    if not adapter_path or not adapter_path.exists():
         print("\n❌ No trained model found!")
         print("   The model may have been cleared from memory.")
         print("   You need to run training again.")
@@ -92,8 +112,11 @@ def push_trained_model():
         adapter_path = checkpoint_dirs[-1]
     
     print(f"\n📂 Using adapter from: {adapter_path}")
-    
-    # List files to be uploaded
+        # Verify adapter_config.json exists
+    if not (adapter_path / "adapter_config.json").exists():
+        print(f"\\n❌ adapter_config.json not found in {adapter_path}")
+        return False
+        # List files to be uploaded
     print("\n📄 Files to upload:")
     for f in adapter_path.iterdir():
         size = f.stat().st_size if f.is_file() else 0

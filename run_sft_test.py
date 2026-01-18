@@ -68,10 +68,12 @@ print(f"🎯 LoRA config: r={peft_config.r}, alpha={peft_config.lora_alpha}")
 
 # ===== 4. Training Configuration for Test Run =====
 # CRITICAL: Disable ALL mixed precision to avoid bf16 issues on T4
+# Local save directory
+LOCAL_OUTPUT_DIR = "./trained_adapter"
+
 training_args = SFTConfig(
-    output_dir=OUTPUT_DIR,
-    push_to_hub=True,
-    hub_strategy="end",
+    output_dir=LOCAL_OUTPUT_DIR,
+    push_to_hub=False,  # We'll push manually with better error handling
 
     # Training schedule
     num_train_epochs=1,
@@ -148,4 +150,49 @@ trainer.train()
 
 print("="*60)
 print("✅ Test training complete!")
+
+# ===== 7. Save model locally =====
+print("\n💾 Saving model locally...")
+trainer.save_model(LOCAL_OUTPUT_DIR)
+print(f"✓ Model saved to {LOCAL_OUTPUT_DIR}")
+
+# List saved files
+import os
+print("\n📁 Saved files:")
+for f in os.listdir(LOCAL_OUTPUT_DIR):
+    size = os.path.getsize(os.path.join(LOCAL_OUTPUT_DIR, f))
+    print(f"   {f}: {size/1024:.1f} KB")
+
+# ===== 8. Push to HuggingFace Hub =====
+print(f"\n⬆️ Pushing to HuggingFace Hub: {OUTPUT_DIR}")
+try:
+    from huggingface_hub import HfApi, login
+    import os
+    
+    hf_token = os.environ.get("HF_TOKEN")
+    if hf_token:
+        login(token=hf_token)
+        api = HfApi()
+        
+        # Create repo if doesn't exist
+        try:
+            api.create_repo(repo_id=OUTPUT_DIR, exist_ok=True, repo_type="model")
+        except Exception as e:
+            print(f"   Repo creation note: {e}")
+        
+        # Upload folder
+        api.upload_folder(
+            folder_path=LOCAL_OUTPUT_DIR,
+            repo_id=OUTPUT_DIR,
+            repo_type="model",
+        )
+        print(f"✅ Model pushed to: https://huggingface.co/{OUTPUT_DIR}")
+    else:
+        print("⚠️ HF_TOKEN not found - model saved locally but not pushed to Hub")
+        print(f"   You can manually push from: {LOCAL_OUTPUT_DIR}")
+except Exception as e:
+    print(f"❌ Push failed: {e}")
+    print(f"   Model is saved locally at: {LOCAL_OUTPUT_DIR}")
+    print("   You can push manually later using the 'Push Model' tab")
+
 print("\n🎉 Quick test run finished successfully!")
