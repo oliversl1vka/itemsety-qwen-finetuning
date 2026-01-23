@@ -458,34 +458,32 @@ def apriori_frequent_itemsets(transactions: List[List[str]], min_support: int = 
 
 
 def llm_extract_full(transactions: List[List[str]], min_support: int, system_prompt: str, chunk_size: int,
-                     endpoint: str, api_key: str, api_version: str, deployment: str) -> List[Dict[str, Any]]:
+                     api_key: str, model: str) -> List[Dict[str, Any]]:
+    """Extract frequent itemsets using OpenAI Chat Completions API directly."""
     try:
-        from langchain_openai import AzureChatOpenAI
+        from langchain_openai import ChatOpenAI
         from langchain_core.prompts import ChatPromptTemplate
         from langchain_core.output_parsers import StrOutputParser
     except Exception:
         return fallback_singletons(transactions, min_support)
-    can_init = all([endpoint, api_key, api_version, deployment]) and not deployment.startswith('<')
-    if not can_init:
+    if not api_key:
         return fallback_singletons(transactions, min_support)
     
-    # Detect if this is a reasoning model (o-series, gpt-5, gpt-5.1)
-    # Reasoning models don't support temperature and other common parameters
-    is_reasoning_model = any(keyword in deployment.lower() for keyword in ['gpt-5', 'gpt-51', 'o4-', 'o-series'])
+    # Detect if this is a reasoning model (o-series, o1, o3, o4)
+    # Reasoning models don't support temperature parameter
+    is_reasoning_model = any(keyword in model.lower() for keyword in ['o1-', 'o3-', 'o4-', 'o-series'])
     
     # Build LLM kwargs based on model type
     llm_kwargs = {
-        'azure_endpoint': endpoint,
         'api_key': api_key,
-        'api_version': api_version,
-        'deployment_name': deployment,
+        'model': model,
     }
     
     # Only add temperature for non-reasoning models
     if not is_reasoning_model:
         llm_kwargs['temperature'] = 0.0
     
-    llm = AzureChatOpenAI(**llm_kwargs)
+    llm = ChatOpenAI(**llm_kwargs)
     template = (
         "{system}\nMin support count: {min_support}\nTransactions chunk rows {start}-{end}:\n{chunk_json}\n"
         "Return ONLY JSON array: [{'itemset':[...],'count':n,'evidence_rows':[...]}] with count >= {min_support}."
@@ -569,7 +567,7 @@ def main():
     parser.add_argument('--output-llm', default='extractor_output.json')
     parser.add_argument('--llm-full', action='store_true', help='Use ALL rows for LLM extraction (chunked)')
     parser.add_argument('--llm-chunk-size', type=int, default=50)
-    parser.add_argument('--llm-model', default=os.getenv('LLM_MODEL','gpt_4_1'), help='LLM model identifier stored in runs.db (default env LLM_MODEL or gpt_4_1)')
+    parser.add_argument('--llm-model', default=os.getenv('LLM_MODEL','gpt-4o'), help='OpenAI model name (default env LLM_MODEL or gpt-4o)')
     parser.add_argument('--system-prompt', default='extractor_system_prompt.md')
     parser.add_argument('--sqlite-db', default='runs.db', help='SQLite database file path')
     parser.add_argument('--disable-db', action='store_true', help='Disable SQLite persistence')
@@ -578,7 +576,7 @@ def main():
                         help='overwrite: reuse hash-based filenames (default). timestamp: append run timestamp for unique artifacts every run.')
     args = parser.parse_args()
 
-    load_dotenv('azure.env')
+    load_dotenv('openai.env')  # Load OPENAI_API_KEY from openai.env if present
     start_time = time.perf_counter()
     # Support batch mode
     data_files: List[str]
@@ -593,14 +591,12 @@ def main():
     else:
         data_files = [args.data]
 
-    endpoint = os.getenv('AZURE_OPENAI_ENDPOINT','')
-    api_key = os.getenv('AZURE_OPENAI_API_KEY','')
-    api_version = os.getenv('AZURE_OPENAI_API_VERSION','')
-    deployment = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT') or os.getenv('AZURE_OPENAI_DEPLOYMENT','')
-    # Enforce presence of LLM credentials if extraction desired (we always attempt it); abort early if missing
-    missing_llm = not all([endpoint, api_key, api_version, deployment]) or deployment.startswith('<')
-    if missing_llm:
-        print("Missing or placeholder Azure OpenAI credentials. Aborting (no singleton fallback).", file=sys.stderr)
+    # OpenAI API credentials (direct, not Azure)
+    api_key = os.getenv('OPENAI_API_KEY', '')
+    model = args.llm_model  # e.g. gpt-4o, gpt-4-turbo, gpt-3.5-turbo
+    # Enforce presence of OpenAI API key
+    if not api_key:
+        print("Missing OPENAI_API_KEY environment variable. Aborting.", file=sys.stderr)
         sys.exit(3)
     try:
         system_prompt_text = Path(args.system_prompt).read_text(encoding='utf-8').strip() or 'You are a frequent itemset extractor. Return JSON array.'
@@ -675,7 +671,7 @@ def main():
             print(f"Running LLM extraction over {scope} transactions (chunk_size={args.llm_chunk_size}) ...")
             llm_extraction_start = time.perf_counter()
             llm_sets = llm_extract_full(target_transactions, args.min_support, system_prompt_text,
-                                        args.llm_chunk_size, endpoint, api_key, api_version, deployment)
+                                        args.llm_chunk_size, api_key, model)
             llm_extraction_duration = int((time.perf_counter() - llm_extraction_start) * 1000)
             print(f"LLM produced {len(llm_sets)} itemsets.")
             with open(llm_path_full, 'w', encoding='utf-8') as f:

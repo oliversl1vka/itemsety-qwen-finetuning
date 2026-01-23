@@ -40,6 +40,7 @@ bnb_config = BitsAndBytesConfig(
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_NAME,
     quantization_config=bnb_config,
+    torch_dtype=torch.float16,  # Force fp16 (T4 doesn't support bf16)
     device_map="auto",
     trust_remote_code=True,
 )
@@ -89,6 +90,7 @@ training_args = SFTConfig(
     
     # Precision
     fp16=True,  # Use FP16 for training
+    bf16=False,  # Explicitly disable bfloat16 (T4 compatibility)
     
     # Logging
     logging_steps=5,

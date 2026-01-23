@@ -1,0 +1,39 @@
+{
+  "citation": "",
+  "description": "",
+  "features": {
+    "messages": {
+      "feature": {
+        "content": {
+          "dtype": "string",
+          "_type": "Value"
+        },
+        "role": {
+          "dtype": "string",
+          "_type": "Value"
+        }
+      },
+      "_type": "List"
+    },
+    "metadata": {
+      "dataset_id": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "dataset_name": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "itemset_count": {
+        "dtype": "int64",
+        "_type": "Value"
+      },
+      "min_support": {
+        "dtype": "int64",
+        "_type": "Value"
+      }
+    }
+  },
+  "homepage": "",
+  "license": ""
+}

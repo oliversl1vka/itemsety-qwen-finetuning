@@ -21,8 +21,8 @@ print(f"   Columns: {train_dataset.column_names}")
 # SFTTrainer will automatically format it.
 
 # ===== 2. Load Model with 4-bit Quantization =====
-MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
-OUTPUT_DIR = "qwen-itemsety-test" # Local output for test
+MODEL_NAME = "Qwen/Qwen2.5-3B-Instruct"  # 3B model for better performance
+OUTPUT_DIR = "OliverSlivka/qwen2.5-3b-itemset-test"  # Test repo on Hub
 
 print(f"🔥 Loading {MODEL_NAME} with 4-bit quantization...")
 
@@ -38,6 +38,7 @@ bnb_config = BitsAndBytesConfig(
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_NAME,
     quantization_config=bnb_config,
+    torch_dtype=torch.float16,  # Force fp16 (T4 doesn't support bf16)
     device_map="auto",
     trust_remote_code=True,
 )
@@ -67,15 +68,16 @@ print(f"🎯 LoRA config: r={peft_config.r}, alpha={peft_config.lora_alpha}")
 # ===== 4. Training Configuration for Test Run =====
 training_args = SFTConfig(
     output_dir=OUTPUT_DIR,
-    push_to_hub=False, # Do not push for the test run
+    push_to_hub=True,  # Push test model to verify everything works
+    hub_strategy="end",  # Push only at the end
 
     # Training schedule for quick test
     num_train_epochs=1, # Single epoch is enough for a test
-    per_device_train_batch_size=4,
-    gradient_accumulation_steps=4,
+    per_device_train_batch_size=2,  # Smaller batch for 3B model
+    gradient_accumulation_steps=8,  # Effective batch = 16
     learning_rate=2e-4,
     warmup_steps=5,
-    max_steps=12,  # Limit steps for a quick run (50 examples / (4*4) batch size rounded up)
+    max_steps=12,  # Limit steps for a quick run (50 examples / (2*8) batch size rounded up)
 
     # Optimization
     optim="paged_adamw_8bit",
@@ -84,6 +86,7 @@ training_args = SFTConfig(
 
     # Precision
     fp16=True,
+    bf16=False,  # Explicitly disable bfloat16 (T4 compatibility)
 
     # Logging
     logging_steps=1,
