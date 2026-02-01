@@ -1,6 +1,48 @@
 # AI Coding Agent Instructions
 
-Concise guidance for working productively in this frequent itemset mining + LLM extraction project.
+Concise guidance for working productively in this frequent itemset mining + LLM fine-tuning project.
+
+## Repository Structure (Updated 2026-02-01)
+
+```
+itemsety-qwen-finetuning/
+├── pipeline.py                    # Core extraction pipeline (Apriori + LLM)
+├── src/
+│   ├── training/                  # Fine-tuning scripts
+│   │   ├── run_sft_full.py        # Production training
+│   │   ├── run_sft_test.py        # Test training  
+│   │   ├── export_training_data.py
+│   │   ├── create_hf_dataset.py
+│   │   └── upload_dataset_to_hf.py
+│   ├── evaluation/
+│   │   └── eval_finetuned_model.py
+│   ├── data_generation/
+│   │   ├── generate_datasets_v2.py
+│   │   └── generate_eval_datasets_v2.py
+│   └── utils/
+│       ├── visualization.py
+│       ├── compute_stats.py
+│       └── inspect_training_data.py
+├── data/
+│   ├── datasets_v2/               # CSV datasets (500)
+│   ├── training_v2/               # Training examples (ChatML)
+│   └── hf_dataset_v2/             # HuggingFace format
+├── docs/
+│   ├── guides/
+│   └── reports/
+├── scripts/
+│   ├── deployment/                # HF deployment scripts
+│   ├── colab/                     # Google Colab scripts
+│   └── db_maintenance/            # SQLite utilities
+├── .github/
+│   ├── agents/                    # 9 agent definition files
+│   ├── agents_log/                # Agent activity logs
+│   ├── agents_memory/             # Agent persistent memory
+│   └── copilot-instructions.md    # This file
+├── artifacts/                     # Pipeline outputs (gitignored)
+├── logs/                          # Execution logs (gitignored)
+└── runs.db                        # SQLite database (gitignored)
+```
 
 ## Project Essence
 - Pipeline (`pipeline.py`) runs Apriori (deterministic) + LLM extraction (Azure OpenAI via LangChain) over CSV datasets (single file or batch directory).
@@ -65,6 +107,30 @@ python src/utils/visualization.py --db runs.db --outdir visuals --bins 5
 ## Quick Enhancement Ideas
 - Add filtering step in `load_transactions_csv` to exclude purely numeric tokens.
 - Record per-stage timing (Apriori vs LLM vs validation) into DB for longitudinal performance analysis.
+
+## Security Rules
+- **NEVER** commit `azure.env`, `openai.env`, or any file with real API keys
+- **NEVER** hardcode API keys, tokens, or credentials in code
+- **ALWAYS** use environment variables for secrets
+- Files to NEVER modify or read sensitive content from:
+  - `azure.env` (local only, gitignored)
+  - `openai.env` (local only, gitignored)
+  - `runs.db` (local only, gitignored)
+- Template files are safe: `azure.env.template`, `openai.env.template`
+
+## Agent System
+This repo uses 9 specialized agents in `.github/agents/`:
+- **orchestrator.md** - Master workflow coordinator
+- **pipeline-agent.md** - Apriori + LLM extraction
+- **training-agent.md** - Model fine-tuning
+- **evaluation-agent.md** - Model evaluation
+- **deployment-agent.md** - HuggingFace deployment
+- **monitoring-agent.md** - Metrics & visualization
+- **dataset-agent.md** - Dataset generation
+- **maintainer-agent.md** - Documentation maintenance
+- **cleanup-agent.md** - Repository hygiene
+
+Skills are in `.github/agents/skills/`, logs in `.github/agents_log/`, memory in `.github/agents_memory/`.
 
 ---
 Provide feedback if model handling, synthetic log differentiation, or validation invariants need deeper clarification.
