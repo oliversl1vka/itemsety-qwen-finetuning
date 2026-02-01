@@ -9,10 +9,10 @@ Concise guidance for working productively in this frequent itemset mining + LLM 
 
 ## Key Files
 - `pipeline.py` – Orchestrates load → Apriori → LLM → validation → persistence.
-- `dataset_generation.py` – Synthetic dataset factory (100 datasets, randomized schema & perturbations); logs to `logs/generation_log.csv`.
-- `visualization.py` – Comparative plots Apriori vs LLM (uses `runs.db`).
-- `generate_gpt5mini_logs.py` – Creates synthetic gpt_5_mini log summaries (do not treat as real runs).
-- `migrate_add_model_column.py` – Adds/backfills `llm_model` column.
+- `src/data_generation/generate_datasets_v2.py` – Semi-human dataset factory (500 datasets); logs to `data/datasets_v2/generation_log.json`.
+- `src/utils/visualization.py` – Comparative plots Apriori vs LLM (uses `runs.db`).
+- `src/training/run_sft_full.py` – Production fine-tuning script.
+- `src/evaluation/eval_finetuned_model.py` – Model evaluation script.
 - `requirements.txt` – Core runtime deps (pandas, langchain, matplotlib, sqlite via stdlib).
 
 ## Naming & IDs
@@ -44,10 +44,11 @@ Concise guidance for working productively in this frequent itemset mining + LLM 
 
 ## Typical Commands (PowerShell)
 ```powershell
-python pipeline.py --data datasets/ds_0001_5x53.csv --min-support 3 --max-size 3 --llm-full --llm-model gpt_4_1
-python pipeline.py --data-dir datasets --min-support 3 --max-size 3 --llm-full --llm-chunk-size 50 --llm-model gpt_5_mini
-python migrate_add_model_column.py --db runs.db
-python visualization.py --db runs.db --outdir visuals --bins 5
+python pipeline.py --data data/datasets_v2/ds_0001_5x53.csv --min-support 3 --max-size 3 --llm-full --llm-model gpt_4_1
+python pipeline.py --data-dir data/datasets_v2 --min-support 3 --max-size 3 --llm-full --llm-chunk-size 50 --llm-model gpt_4_1
+python src/training/run_sft_full.py
+python src/evaluation/eval_finetuned_model.py --model-path OliverSlivka/qwen2.5-3b-itemset-extractor
+python src/utils/visualization.py --db runs.db --outdir visuals --bins 5
 ```
 
 ## Pitfalls / Gotchas
