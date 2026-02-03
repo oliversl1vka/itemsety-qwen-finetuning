@@ -1,7 +1,7 @@
 # HuggingFace Space Requirements for DPO Training
 
 gradio==4.44.0
-pyaudioop  # Fix for Python 3.13 audioop removal
+pyaudioop-lts  # Fix for Python 3.13 audioop removal
 torch>=2.0.0
 transformers>=4.40.0
 trl>=0.8.0
