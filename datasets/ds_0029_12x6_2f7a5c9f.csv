@@ -1,0 +1,13 @@
+item_1,item_2,item_3,item_4,item_5,item_6
+milk:1,tea:0,coffee:0,cheese:0,rice:1,beef:0
+milk:1,tea:1,coffee:0,cheese:1,rice:0,beef:0
+milk:1,tea:0,coffee:0,cheese:0,rice:0,beef:1
+milk:0,tea:0,coffee:0,cheese:0,rice:1,beef:0
+milk:0,tea:0,coffee:0,cheese:1,rice:0,beef:0
+milk:1,tea:1,coffee:0,cheese:0,rice:1,beef:0
+milk:1,tea:0,coffee:0,cheese:0,rice:0,beef:1
+milk:1,tea:1,coffee:1,cheese:0,rice:1,beef:0
+milk:1,tea:1,coffee:0,cheese:1,rice:0,beef:1
+milk:1,tea:0,coffee:1,cheese:0,rice:1,beef:1
+milk:0,tea:0,coffee:0,cheese:0,rice:0,beef:0
+milk:1,tea:1,coffee:0,cheese:1,rice:0,beef:0

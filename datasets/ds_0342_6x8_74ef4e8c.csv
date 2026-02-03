@@ -1,0 +1,7 @@
+item_1,item_2,item_3,item_4,item_5,item_6,item_7,item_8
+espresso:0,pastry:0,sandwich:1,muffin:0,americano:0,bagel:1,tea:0,cookie:0
+espresso:0,pastry:1,sandwich:0,muffin:0,americano:0,bagel:0,tea:0,cookie:1
+espresso:0,pastry:1,sandwich:1,muffin:0,americano:1,bagel:0,tea:1,cookie:0
+espresso:0,pastry:0,sandwich:1,muffin:0,americano:1,bagel:1,tea:0,cookie:0
+espresso:0,pastry:1,sandwich:1,muffin:1,americano:0,bagel:0,tea:0,cookie:1
+espresso:0,pastry:1,sandwich:0,muffin:1,americano:0,bagel:0,tea:1,cookie:0

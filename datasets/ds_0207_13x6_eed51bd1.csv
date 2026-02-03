@@ -1,0 +1,14 @@
+item_1,item_2,item_3,item_4,item_5,item_6
+insurance:1,cruise:1,hotel:1,museum:0,beach:0,flight:1
+insurance:0,cruise:0,hotel:0,museum:0,beach:1,flight:1
+insurance:0,cruise:1,hotel:0,museum:0,beach:0,flight:0
+insurance:1,cruise:1,hotel:1,museum:0,beach:0,flight:1
+insurance:0,cruise:1,hotel:0,museum:1,beach:0,flight:0
+insurance:1,cruise:1,hotel:1,museum:0,beach:1,flight:0
+insurance:0,cruise:1,hotel:0,museum:0,beach:0,flight:1
+insurance:1,cruise:1,hotel:1,museum:1,beach:1,flight:1
+insurance:1,cruise:0,hotel:1,museum:1,beach:0,flight:0
+insurance:1,cruise:1,hotel:0,museum:0,beach:1,flight:1
+insurance:1,cruise:0,hotel:0,museum:0,beach:0,flight:0
+insurance:1,cruise:1,hotel:1,museum:0,beach:0,flight:0
+insurance:1,cruise:1,hotel:0,museum:0,beach:0,flight:1

@@ -1,0 +1,7 @@
+item_1,item_2,item_3,item_4,item_5,item_6,item_7
+insurance:1,restaurant:1,cruise:0,city:0,safari:0,beach:0,tour:0
+insurance:0,restaurant:1,cruise:0,city:1,safari:0,beach:0,tour:0
+insurance:1,restaurant:0,cruise:1,city:1,safari:0,beach:1,tour:1
+insurance:1,restaurant:0,cruise:1,city:0,safari:0,beach:0,tour:1
+insurance:1,restaurant:0,cruise:1,city:1,safari:0,beach:0,tour:0
+insurance:1,restaurant:0,cruise:1,city:1,safari:0,beach:0,tour:1

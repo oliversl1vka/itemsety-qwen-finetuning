@@ -1,0 +1,8 @@
+item_1,item_2,item_3,item_4,item_5,item_6,item_7
+art:1,english:0,chemistry:1,sports:1,physics:0,music:0,math:1
+art:1,english:0,chemistry:1,sports:1,physics:0,music:0,math:0
+art:0,english:0,chemistry:1,sports:0,physics:1,music:1,math:0
+art:1,english:0,chemistry:0,sports:1,physics:0,music:1,math:0
+art:0,english:1,chemistry:1,sports:1,physics:1,music:0,math:1
+art:0,english:0,chemistry:1,sports:1,physics:0,music:0,math:1
+art:0,english:0,chemistry:1,sports:1,physics:0,music:1,math:1

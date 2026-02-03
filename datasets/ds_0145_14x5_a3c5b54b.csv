@@ -1,0 +1,15 @@
+item_1,item_2,item_3,item_4,item_5
+action:0,thriller:0,musical:0,,
+fantasy:1,comedy:0,thriller:0,action:1,musical:1
+fantasy:0,comedy:0,thriller:1,action:0,musical:0
+fantasy:1,comedy:1,thriller:0,action:0,musical:0
+fantasy:0,comedy:1,thriller:1,action:0,musical:1
+fantasy:0,comedy:0,thriller:1,action:0,musical:1
+fantasy:1,comedy:0,thriller:1,action:0,musical:1
+fantasy:0,comedy:1,thriller:0,action:0,musical:0
+fantasy:1,comedy:1,thriller:1,action:1,musical:0
+fantasy:0,comedy:0,thriller:0,action:1,musical:0
+fantasy:0,comedy:1,thriller:1,action:0,musical:0
+fantasy:0,comedy:1,thriller:0,action:1,musical:0
+fantasy:0,comedy:0,thriller:1,action:1,musical:0
+fantasy:0,comedy:1,thriller:1,action:0,musical:1

@@ -1,0 +1,17 @@
+item_1,item_2,item_3,item_4,item_5,item_6,item_7,item_8,item_9
+bread:1,muffin:0,baguette:0,bagel:0,donuts:1,cake:1,croissant:0,rolls:0,cookies:0
+bread:0,muffin:1,baguette:1,bagel:1,donuts:0,cake:1,croissant:1,rolls:1,cookies:0
+bread:0,muffin:1,baguette:0,bagel:0,donuts:0,cake:0,croissant:0,rolls:0,cookies:0
+bread:0,muffin:0,baguette:1,bagel:0,donuts:0,cake:1,croissant:0,rolls:0,cookies:0
+bread:1,muffin:0,baguette:1,bagel:0,donuts:0,cake:0,croissant:0,rolls:0,cookies:0
+bread:0,muffin:1,baguette:1,bagel:0,donuts:0,cake:0,croissant:0,rolls:0,cookies:0
+bread:1,muffin:0,baguette:0,bagel:1,donuts:1,cake:0,croissant:0,rolls:1,cookies:0
+bread:0,muffin:1,baguette:0,bagel:0,donuts:0,cake:1,croissant:1,rolls:1,cookies:1
+bread:1,muffin:0,baguette:1,bagel:1,donuts:0,cake:0,croissant:0,rolls:0,cookies:0
+bread:1,muffin:0,baguette:0,bagel:1,donuts:0,cake:1,croissant:1,rolls:0,cookies:0
+bread:1,muffin:1,baguette:1,bagel:0,donuts:1,cake:0,croissant:1,rolls:0,cookies:1
+bread:0,muffin:0,baguette:0,bagel:1,donuts:1,cake:1,croissant:0,rolls:0,cookies:0
+bread:1,muffin:1,baguette:0,bagel:0,donuts:1,cake:1,croissant:1,rolls:1,cookies:0
+bread:1,muffin:0,baguette:1,bagel:1,donuts:1,cake:1,croissant:0,rolls:1,cookies:1
+bread:1,muffin:0,baguette:0,bagel:0,donuts:1,cake:0,croissant:0,rolls:1,cookies:0
+bread:1,muffin:0,baguette:0,bagel:0,donuts:0,cake:0,croissant:1,rolls:1,cookies:0
