@@ -21,8 +21,8 @@ print(f"   Columns: {train_dataset.column_names}")
 # SFTTrainer will automatically format it.
 
 # ===== 2. Load Model with 4-bit Quantization =====
-MODEL_NAME = "Qwen/Qwen2.5-3B-Instruct"  # 3B model for better performance
-OUTPUT_DIR = "OliverSlivka/qwen2.5-3b-itemset-test"  # Test repo on Hub
+MODEL_NAME = "Qwen/Qwen2.5-7B-Instruct"  # 7B model for better performance
+OUTPUT_DIR = "OliverSlivka/qwen2.5-7b-itemset-test"  # Test repo on Hub
 
 print(f"🔥 Loading {MODEL_NAME} with 4-bit quantization...")
 
@@ -73,11 +73,11 @@ training_args = SFTConfig(
 
     # Training schedule for quick test
     num_train_epochs=1, # Single epoch is enough for a test
-    per_device_train_batch_size=2,  # Smaller batch for 3B model
-    gradient_accumulation_steps=8,  # Effective batch = 16
+    per_device_train_batch_size=1,  # Smaller batch for 7B model
+    gradient_accumulation_steps=16,  # Effective batch = 16
     learning_rate=2e-4,
     warmup_steps=5,
-    max_steps=12,  # Limit steps for a quick run (50 examples / (2*8) batch size rounded up)
+    max_steps=12,  # Limit steps for a quick run (50 examples / (1*16) batch size rounded up)
 
     # Optimization
     optim="paged_adamw_8bit",

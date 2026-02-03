@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-PRODUCTION Fine-Tuning Script for Qwen2.5-3B on Itemset Extraction
+PRODUCTION Fine-Tuning Script for Qwen2.5-7B on Itemset Extraction
 Full training on 439 examples, 3 epochs, push to Hub
 """
 
@@ -23,8 +23,8 @@ print(f"✅ Dataset loaded: {len(train_dataset)} train, {len(eval_dataset)} eval
 print(f"   Columns: {train_dataset.column_names}")
 
 # ===== 2. Load Model with 4-bit Quantization =====
-MODEL_NAME = "Qwen/Qwen2.5-3B-Instruct"  # Larger model for better performance
-OUTPUT_DIR = "OliverSlivka/qwen2.5-3b-itemset-extractor"  # Hub repo
+MODEL_NAME = "Qwen/Qwen2.5-7B-Instruct"  # 7B model for better performance
+OUTPUT_DIR = "OliverSlivka/qwen2.5-7b-itemset-extractor"  # Hub repo
 
 print(f"🔥 Loading {MODEL_NAME} with 4-bit quantization...")
 
@@ -68,7 +68,7 @@ peft_config = LoraConfig(
 print(f"🎯 LoRA config: r={peft_config.r}, alpha={peft_config.lora_alpha}")
 
 # ===== 4. Training Configuration for PRODUCTION =====
-# Calculate steps: 439 examples / (4 batch * 4 gradient_accum) = ~27 steps per epoch
+# Calculate steps: 439 examples / (1 batch * 16 gradient_accum) = ~27 steps per epoch
 # 3 epochs = ~81 steps total
 training_args = SFTConfig(
     output_dir=OUTPUT_DIR,
@@ -77,8 +77,8 @@ training_args = SFTConfig(
     
     # Training schedule
     num_train_epochs=3,  # Full 3 epochs
-    per_device_train_batch_size=2,  # Smaller batch for 3B model
-    gradient_accumulation_steps=8,  # Effective batch = 16
+    per_device_train_batch_size=1,  # Smaller batch for 7B model
+    gradient_accumulation_steps=16,  # Effective batch = 16
     learning_rate=2e-4,
     warmup_steps=10,
     max_steps=-1,  # Use epochs instead of steps
