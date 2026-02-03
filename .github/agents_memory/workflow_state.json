@@ -1,0 +1,43 @@
+{
+  "workflow_id": "wf_20260203_113413",
+  "status": "running",
+  "current_stage": 6,
+  "stages": {
+    "1_datasets": "completed",
+    "2_pipeline": "completed",
+    "3_export": "completed",
+    "4_push": "completed",
+    "5_validate": "completed",
+    "6_cleanup": "completed",
+    "7_maintain": "pending",
+    "8_finalize": "pending"
+  },
+  "artifacts": {
+    "datasets_count": 500,
+    "datasets_dir": "data/datasets_v2",
+    "datasets_small": 206,
+    "datasets_medium": 201,
+    "datasets_large": 93,
+    "pipeline_runs": 1010,
+    "pipeline_validated": 1010,
+    "pipeline_datasets": 502,
+    "apriori_artifacts": 504,
+    "extractor_artifacts": 504,
+    "training_examples": 488,
+    "training_simple": 488,
+    "training_cot": 488,
+    "hf_dataset_format": "arrow",
+    "hf_space_url": "https://huggingface.co/spaces/OliverSlivka/testrun2",
+    "hf_space_examples": 1001,
+    "training_script_validated": true
+  },
+  "config": {
+    "datasets": 500,
+    "min_support": 3,
+    "max_size": 3,
+    "llm_model": "gpt-4.1-mini"
+  },
+  "started_at": "2026-02-03T11:34:13Z",
+  "updated_at": "2026-02-03T11:41:09Z",
+  "completed_at": null
+}

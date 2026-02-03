@@ -1,8 +1,63 @@
 # Agent Memory Store
 
-This directory contains persistent memory files for each agent. Agents use these files to record insights, lessons learned, and useful knowledge that may help in future tasks.
+This directory contains:
+1. **Persistent memory files** - Curated knowledge for each agent
+2. **Workflow state** - Runtime coordination between agents
 
-## Purpose
+## Workflow State Management
+
+### `workflow_state.json` (Auto-generated, Runtime Only)
+Current workflow execution state:
+
+```json
+{
+  "workflow_id": "wf_20260203_143022",
+  "status": "running",
+  "current_stage": 2,
+  "stages": {
+    "1_datasets": "completed",
+    "2_pipeline": "running",
+    "3_export": "pending",
+    "4_push": "pending",
+    "5_validate": "pending",
+    "6_finalize": "pending"
+  },
+  "artifacts": {
+    "datasets_count": 500,
+    "pipeline_runs": 999,
+    "training_examples": 0,
+    "hf_space_url": null
+  },
+  "config": {
+    "datasets": 500,
+    "min_support": 3,
+    "llm_model": "gpt-4.1-mini"
+  },
+  "started_at": "2026-02-03T14:30:22Z",
+  "updated_at": "2026-02-03T16:45:10Z"
+}
+```
+
+**Usage by agents:**
+- Read state before executing
+- Update state after completion
+- Check dependencies between stages
+
+### `workflow_state.py` (Python Module)
+Helper functions for state management:
+
+```python
+from .github.agents_memory.workflow_state import load_workflow, complete_stage
+
+# Load current state
+wf = load_workflow()
+print(wf.get_status_summary())
+
+# Mark stage complete
+complete_stage("1_datasets", {"datasets_count": 500})
+```
+
+## Agent Memory Files
 
 Unlike logs (which record every action), memory files contain **curated knowledge**:
 - Patterns that worked well
