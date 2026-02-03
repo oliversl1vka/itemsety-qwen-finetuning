@@ -1,6 +1,6 @@
 """Evaluation Pipeline for Fine-tuned Itemset Extraction Model.
 
-Compares fine-tuned Qwen2.5-3B model against ground-truth Apriori results.
+Compares fine-tuned Qwen2.5-7B model against ground-truth Apriori results.
 Runs inference on evaluation datasets and computes comprehensive metrics.
 
 Requirements:
@@ -31,8 +31,8 @@ import pandas as pd
 # Model Configuration
 # =========================
 
-MODEL_NAME = "Qwen/Qwen2.5-3B-Instruct"
-ADAPTER_NAME = "OliverSlivka/qwen2.5-3b-itemset-extractor"
+MODEL_NAME = "Qwen/Qwen2.5-7B-Instruct"
+ADAPTER_NAME = "OliverSlivka/qwen2.5-7b-itemset-extractor"
 
 # Global model cache (loaded once)
 _model = None
