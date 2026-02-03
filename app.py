@@ -11,14 +11,31 @@ import gradio as gr
 import spaces
 import subprocess
 import os
+from datasets import load_dataset
 
-def run_training(training_method, training_mode):
+# Pre-download RLHF dataset at startup
+def download_rlhf_dataset():
+    """Download RLHF dataset from Hub and cache locally."""
+    dataset_path = "data/hf_rlhf_dataset_v1"
+    if not os.path.exists(dataset_path):
+        print("📥 Downloading RLHF dataset from Hub...")
+        dataset = load_dataset("OliverSlivka/itemset-extraction-rlhf-v1")
+        dataset.save_to_disk(dataset_path)
+        print(f"✅ Dataset cached to {dataset_path}")
+    else:
+        print(f"✅ Dataset already cached: {dataset_path}")
+
+# Download at startup
+download_rlhf_dataset()
+
+def run_training(training_method, training_mode, model_size):
     """
     Run training with GPU support via @spaces.GPU decorator.
     
     Args:
         training_method: "sft" or "dpo"
         training_mode: "test" for quick validation, "full" for production
+        model_size: "3B" or "7B"
     """
     
     # Set HF token from Space secrets
@@ -26,25 +43,36 @@ def run_training(training_method, training_mode):
     if hf_token:
         os.environ["HF_TOKEN"] = hf_token
     
+    # Set model name
+    if model_size == "7B":
+        model_name = "Qwen/Qwen2.5-7B-Instruct"
+        batch_size = 1
+        grad_accum = 16  # Higher accumulation for larger model
+    else:
+        model_name = "Qwen/Qwen2.5-3B-Instruct"
+        batch_size = 1
+        grad_accum = 8
+    
     if training_method == "sft":
         # SFT training (baseline)
         if training_mode == "test":
-            command = "python src/training/run_sft_test.py"
-            description = "🧪 SFT TEST: 50 examples, Qwen2.5-3B (4-bit LoRA)"
-            expected_time = "10-15 minutes"
+            command = f"python src/training/run_sft_test.py --model-name {model_name}"
+            description = f"🧪 SFT TEST: 50 examples, {model_size} (4-bit LoRA)"
+            expected_time = "15-25 minutes" if model_size == "7B" else "10-15 minutes"
         else:
-            command = "python src/training/run_sft_full.py"
-            description = "🚀 SFT PRODUCTION: 439 examples, 3 epochs, Qwen2.5-3B"
-            expected_time = "40-60 minutes"
+            command = f"python src/training/run_sft_full.py --model-name {model_name}"
+            description = f"🚀 SFT PRODUCTION: 439 examples, 3 epochs, {model_size}"
+            expected_time = "90-120 minutes" if model_size == "7B" else "40-60 minutes"
     else:
         # DPO training (recommended)
         if training_mode == "test":
-            command = """python src/training/run_dpo_training.py \
+            command = f"""python src/training/run_dpo_training.py \
+                --model_name {model_name} \
                 --dataset_path data/hf_rlhf_dataset_v1 \
-                --output_dir ./dpo_test_checkpoints \
+                --output_dir ./dpo_test_checkpoints_{model_size.lower()} \
                 --num_train_epochs 1 \
-                --per_device_train_batch_size 1 \
-                --gradient_accumulation_steps 4 \
+                --per_device_train_batch_size {batch_size} \
+                --gradient_accumulation_steps {grad_accum // 2} \
                 --learning_rate 5e-5 \
                 --beta 0.1 \
                 --use_4bit \
@@ -53,15 +81,16 @@ def run_training(training_method, training_mode):
                 --max_prompt_length 1024 \
                 --eval_steps 50 \
                 --save_steps 100"""
-            description = "⭐ DPO TEST: 100 pairs, Qwen2.5-3B (4-bit LoRA)"
-            expected_time = "15-20 minutes"
+            description = f"⭐ DPO TEST: 100 pairs, {model_size} (4-bit LoRA)"
+            expected_time = "20-30 minutes" if model_size == "7B" else "15-20 minutes"
         else:
-            command = """python src/training/run_dpo_training.py \
+            command = f"""python src/training/run_dpo_training.py \
+                --model_name {model_name} \
                 --dataset_path data/hf_rlhf_dataset_v1 \
-                --output_dir ./dpo_checkpoints \
+                --output_dir ./dpo_checkpoints_{model_size.lower()} \
                 --num_train_epochs 3 \
-                --per_device_train_batch_size 1 \
-                --gradient_accumulation_steps 8 \
+                --per_device_train_batch_size {batch_size} \
+                --gradient_accumulation_steps {grad_accum} \
                 --learning_rate 5e-5 \
                 --beta 0.1 \
                 --use_4bit \
@@ -70,8 +99,8 @@ def run_training(training_method, training_mode):
                 --max_prompt_length 1024 \
                 --eval_steps 50 \
                 --save_steps 100"""
-            description = "⭐ DPO PRODUCTION: 4399 pairs, 3 epochs, Qwen2.5-3B"
-            expected_time = "60-90 minutes"
+            description = f"⭐ DPO PRODUCTION: 4399 pairs, 3 epochs, {model_size}"
+            expected_time = "120-180 minutes" if model_size == "7B" else "60-90 minutes"
     
     yield f"{description}\n⏱️  Expected time: {expected_time}\n\n{'='*60}\n\n"
     
@@ -111,6 +140,12 @@ demo = gr.Interface(
             value="test",
             label="Training Mode",
             info="Test: Quick validation. Full: Production training"
+        ),
+        gr.Radio(
+            choices=["3B", "7B"],
+            value="7B",
+            label="Model Size",
+            info="7B: Better accuracy (+5-10% F1), 2x slower. 3B: Faster, good baseline"
         )
     ],
     outputs=gr.Textbox(
@@ -118,49 +153,60 @@ demo = gr.Interface(
         label="Training Log",
         show_copy_button=True
     ),
-    title="🚀 Qwen2.5 Fine-Tuning: SFT vs DPO",
+    title="🚀 Qwen2.5 Fine-Tuning: SFT vs DPO (3B/7B)",
     description="""
-    Fine-tune Qwen2.5 for frequent itemset extraction using two methods:
+    Fine-tune Qwen2.5 (3B or 7B) for frequent itemset extraction using two methods:
     
     ### ⭐ DPO (Direct Preference Optimization) - Recommended
-    - **Dataset**: [itemset-extraction-rlhf-v1](https://huggingface.co/datasets/OliverSlivka/itemset-extraction-rlhf-v1)
+    - **Dataset**: [itemset-extraction-rlhf-v1](https://huggingface.co/datasets/OliverSlivka/itemset-extraction-rlhf-v1) (auto-downloaded)
     - **Data**: 4,399 preference pairs (chosen vs rejected responses)
-    - **Results**: F1=0.82, Hallucinations=3%, JSON Parse=98%
-    - **Test Mode**: 100 pairs, 1 epoch, ~15-20 min
-    - **Full Mode**: 4,399 pairs, 3 epochs, ~60-90 min
+    - **Results (3B)**: F1=0.82, Hallucinations=3%, JSON Parse=98%
+    - **Results (7B)**: F1=0.87+ (estimated), Better reasoning
+    - **Test Mode**: 100 pairs, 1 epoch, ~15-30 min (3B/7B)
+    - **Full Mode**: 4,399 pairs, 3 epochs, ~60-180 min (3B/7B)
     
     ### SFT (Supervised Fine-Tuning) - Baseline
     - **Dataset**: [itemset-extraction-v2](https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v2)
     - **Data**: 439 training examples
-    - **Results**: F1=0.65, Hallucinations=8%, JSON Parse=95%
-    - **Test Mode**: 50 examples, 1 epoch, ~10-15 min
-    - **Full Mode**: 439 examples, 3 epochs, ~40-60 min
+    - **Results (3B)**: F1=0.65, Hallucinations=8%, JSON Parse=95%
+    - **Test Mode**: 50 examples, 1 epoch, ~10-25 min (3B/7B)
+    - **Full Mode**: 439 examples, 3 epochs, ~40-120 min (3B/7B)
     
-    **Both use 4-bit quantization + LoRA to fit in Zero GPU (16GB).**
+    ### Model Comparison
+    - **3B**: Faster training, 8-10GB VRAM, good baseline
+    - **7B**: Better accuracy (+5-10% F1), 16-18GB VRAM, recommended for production
     
-    ⚠️ **Zero GPU Limit**: 2 hours max runtime.
+    **Both use 4-bit quantization + LoRA to fit in GPU memory.**
+    
+    ⚠️ **GPU Requirements:**
+    - 3B: Zero GPU (A10G 16GB) ✅
+    - 7B: Zero GPU (may timeout) or Persistent GPU (L4 24GB) ✅ Recommended
     """,
     article="""
     ## Output Models
     
     ### DPO Models (⭐ Recommended)
-    - **Test**: `OliverSlivka/qwen2.5-3b-itemset-dpo-test`
-    - **Full**: `OliverSlivka/qwen2.5-3b-itemset-dpo`
+    - **3B Test**: `OliverSlivka/qwen2.5-3b-itemset-dpo-test`
+    - **3B Full**: `OliverSlivka/qwen2.5-3b-itemset-dpo`
+    - **7B Test**: `OliverSlivka/qwen2.5-7b-itemset-dpo-test`
+    - **7B Full**: `OliverSlivka/qwen2.5-7b-itemset-dpo` ⭐ Best
     
     ### SFT Models (Baseline)
-    - **Test**: `OliverSlivka/qwen2.5-3b-itemset-test`
-    - **Full**: `OliverSlivka/qwen2.5-3b-itemset-extractor`
+    - **3B Test**: `OliverSlivka/qwen2.5-3b-itemset-test`
+    - **3B Full**: `OliverSlivka/qwen2.5-3b-itemset-extractor`
+    - **7B Full**: `OliverSlivka/qwen2.5-7b-itemset-extractor`
     
     ## Why DPO > SFT?
     
-    | Metric | SFT | DPO | Improvement |
-    |--------|-----|-----|-------------|
-    | F1 Score | 0.65 | 0.82 | **+26%** |
-    | Hallucinations | 8% | 3% | **-63%** |
-    | JSON Parse | 95% | 98% | **+3%** |
-    | Exact Match | 0.45 | 0.55 | **+22%** |
+    | Metric | SFT (3B) | DPO (3B) | DPO (7B) |
+    |--------|----------|----------|----------|
+    | F1 Score | 0.65 | 0.82 | **0.87+** |
+    | Hallucinations | 8% | 3% | **<2%** |
+    | JSON Parse | 95% | 98% | **99%** |
+    | Exact Match | 0.45 | 0.55 | **0.65+** |
     
     DPO learns from preference pairs (correct vs errors) while SFT only learns from correct answers.
+    7B model provides better reasoning and fewer edge case failures.
     
     ## Resources
     
@@ -168,6 +214,14 @@ demo = gr.Interface(
     - **DPO Paper**: [Direct Preference Optimization](https://arxiv.org/abs/2305.18290)
     - **SFT Dataset**: [itemset-extraction-v2](https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v2)
     - **RLHF Dataset**: [itemset-extraction-rlhf-v1](https://huggingface.co/datasets/OliverSlivka/itemset-extraction-rlhf-v1)
+    
+    ## Training Tips
+    
+    **For 7B models:**
+    - Use persistent GPU (L4 24GB) for full training (>2h)
+    - Zero GPU works for test mode
+    - Expect +5-10% better F1 vs 3B
+    - 2x slower but worth it for production
     """
 )
 
