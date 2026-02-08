@@ -1,0 +1,6 @@
+item_1,item_2,item_3,item_4,item_5,item_6,item_7,item_8
+steak:1,beer:1,sandwich:0,pizza:0,soda:0,wine:1,fish:0,water:0
+steak:0,beer:1,sandwich:0,pizza:1,soda:0,wine:0,fish:0,water:0
+steak:0,beer:1,sandwich:1,pizza:0,soda:1,wine:1,fish:0,water:1
+steak:1,beer:0,sandwich:0,pizza:1,soda:1,wine:0,fish:0,water:0
+steak:1,beer:1,sandwich:1,pizza:1,soda:0,wine:0,fish:0,water:0

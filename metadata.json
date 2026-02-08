@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-02-03T11:43:35.682013+00:00",
+  "total_examples": 1001,
+  "csv_files": 1001,
+  "avg_f1_score": 0.12199875066608781,
+  "structure": {
+    "csv": "Original transaction data",
+    "apriori": "Ground truth frequent itemsets",
+    "llm_output": "LLM-extracted itemsets",
+    "human_feedback": "Automated feedback for RLHF (precision, recall, F1)"
+  },
+  "usage": "Use rlhf_data.jsonl for RLHF training. Each example contains reward signals."
+}

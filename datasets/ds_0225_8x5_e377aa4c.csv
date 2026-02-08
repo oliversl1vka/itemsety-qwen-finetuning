@@ -1,0 +1,9 @@
+item_1,item_2,item_3,item_4,item_5
+restaurant:0,cruise:1,museum:0,tour:1,flight:1
+restaurant:1,cruise:1,museum:0,tour:0,flight:1
+restaurant:0,cruise:1,museum:0,tour:1,flight:1
+restaurant:1,cruise:0,museum:1,tour:0,flight:0
+restaurant:1,cruise:0,museum:0,tour:1,flight:1
+restaurant:1,cruise:1,museum:0,tour:0,flight:0
+restaurant:0,cruise:1,museum:1,tour:0,flight:1
+restaurant:1,cruise:0,museum:0,tour:1,flight:1
