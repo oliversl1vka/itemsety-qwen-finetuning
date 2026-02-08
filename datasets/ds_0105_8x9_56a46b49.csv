@@ -1,9 +1,0 @@
-item_1,item_2,item_3,item_4,item_5,item_6,item_7,item_8,item_9
-steak:0,coffee:0,chicken:0,sandwich:0,rice:0,soda:1,fish:1,water:0,dessert:0
-steak:0,coffee:0,chicken:0,sandwich:0,rice:1,soda:0,fish:0,water:0,dessert:0
-steak:0,coffee:0,chicken:0,sandwich:0,rice:0,soda:0,fish:1,water:1,dessert:1
-steak:1,coffee:0,chicken:0,sandwich:0,rice:0,soda:1,fish:0,water:0,dessert:1
-steak:0,coffee:0,chicken:0,sandwich:1,rice:0,soda:1,fish:0,water:0,dessert:0
-steak:0,coffee:0,chicken:0,sandwich:0,rice:0,soda:1,fish:1,water:0,dessert:1
-steak:1,coffee:0,chicken:0,sandwich:0,rice:0,soda:1,fish:1,water:0,dessert:1
-steak:0,coffee:1,chicken:1,sandwich:1,rice:0,soda:1,fish:1,water:0,dessert:0

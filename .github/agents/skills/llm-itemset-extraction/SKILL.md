@@ -1,11 +1,11 @@
 ---
 name: llm-itemset-extraction
-description: Use Azure OpenAI to extract frequent itemsets from CSV data. Provides baseline LLM performance for comparison with fine-tuned models.
+description: Use OpenAI to extract frequent itemsets from CSV data. Provides baseline LLM performance for comparison with fine-tuned models.
 ---
 
 # LLM Frequent Itemset Extraction
 
-Call Azure OpenAI (GPT-4) to extract frequent itemsets from CSV transactions.
+Call OpenAI (GPT-4o / GPT-4.1-mini) to extract frequent itemsets from CSV transactions.
 
 ## Overview
 
@@ -16,15 +16,12 @@ LLM extraction provides:
 
 ## Prerequisites
 
-### Azure Credentials
-Create `azure.env` from template:
+### OpenAI Credentials
+Create `openai.env` from template:
 ```bash
-cp azure.env.template azure.env
-# Edit with your credentials:
-# AZURE_OPENAI_API_KEY=your_key
-# AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
-# AZURE_OPENAI_API_VERSION=2024-02-15-preview
-# AZURE_OPENAI_DEPLOYMENT=gpt-4
+cp openai.env.template openai.env
+# Edit with your API key:
+# OPENAI_API_KEY=sk-your-api-key-here
 ```
 
 ## Quick Start
@@ -79,7 +76,7 @@ See `extractor_system_prompt.md` for full prompt.
 
 ## Rate Limiting
 
-Azure OpenAI has rate limits. Mitigate with:
+OpenAI has rate limits. Mitigate with:
 
 ```bash
 # Smaller chunks
@@ -91,8 +88,8 @@ time.sleep(2)  # Between calls
 
 ### Error Codes
 - **429:** Rate limit exceeded — reduce chunk size, add delays
-- **401:** Invalid credentials — check azure.env
-- **404:** Deployment not found — verify deployment name
+- **401:** Invalid credentials — check openai.env
+- **404:** Model not found — verify model name
 
 ## Validation
 

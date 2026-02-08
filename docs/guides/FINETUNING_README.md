@@ -162,8 +162,8 @@ itemsety-qwen-finetuning/
 ## Security Notes
 
 - ✅ `.gitignore` protects all `.env` files
-- ✅ `azure.env` is **NOT** in repository
-- ✅ `azure.env.template` provided as safe template
+- ✅ `openai.env` is **NOT** in repository
+- ✅ `openai.env.template` provided as safe template
 - ✅ Repository is **PRIVATE** on GitHub
 - ✅ Training data, datasets, and database are gitignored
 
@@ -173,7 +173,7 @@ itemsety-qwen-finetuning/
 2. **Evaluate**: Compare fine-tuned model vs gpt_4_1 ground truth
 3. **Optimize**: Tune LoRA rank, learning rate, batch size
 4. **Deploy**: Push model to HuggingFace Hub
-5. **Integrate**: Replace Azure OpenAI with fine-tuned model in pipeline
+5. **Integrate**: Replace OpenAI API with fine-tuned model in pipeline
 
 ## Resources
 

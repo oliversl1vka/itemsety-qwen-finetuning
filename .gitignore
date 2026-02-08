@@ -3,7 +3,6 @@
 ##############################################
 
 # Environment & secrets (CRITICAL!)
-azure.env
 *.env
 .env
 *.key
@@ -46,6 +45,9 @@ dist/
 *.tmp
 *~
 
+# Obsidian vault config (track content, ignore app settings)
+obsidian-brain/.obsidian/
+
 # Logs & sqlite/db
 *.log
 *.sqlite
@@ -85,7 +87,6 @@ master_seed.txt
 ds_TEST.csv
 temp_*.csv
 scratch_*.py
-test_*.py
 
 # Caches
 .cache/

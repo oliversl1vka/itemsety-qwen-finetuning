@@ -1,6 +1,9 @@
 # AGENTS Guidelines for itemsety-qwen-finetuning
 
-This repository uses a **multi-agent orchestration system** to automate the frequent itemset extraction and LLM fine-tuning workflow.
+**Version:** 2.0 (Interactive Multi-Agent System)  
+**Last Updated:** 2026-02-03
+
+This repository uses an **interactive multi-agent orchestration system** where you switch between specialized agents in VS Code to execute the workflow.
 
 ---
 
@@ -10,7 +13,7 @@ This repository uses a **multi-agent orchestration system** to automate the freq
 
 **Approach:**
 1. Generate synthetic CSV datasets (500 datasets, 5-25 rows each)
-2. Run Apriori + Azure OpenAI GPT-4 to create ground truth
+2. Run Apriori + OpenAI GPT-4 to create ground truth
 3. Export validated runs as training data (ChatML format with CoT)
 4. Fine-tune Qwen2.5-3B using LoRA/QLoRA
 5. Evaluate on unseen datasets (target: 80% F1 vs Apriori)
@@ -18,58 +21,131 @@ This repository uses a **multi-agent orchestration system** to automate the freq
 
 ---
 
-## 🤖 Agent Architecture
+## 🤖 How It Works
 
-This project uses **7 specialized agents** coordinated by a master **Orchestrator**:
+### Multi-Agent Execution Model
 
-### 1. **Orchestrator Agent** [`.github/agents/orchestrator.md`](.github/agents/orchestrator.md)
-**Role:** Master workflow coordinator  
-**Responsibilities:** Task scheduling, dependency resolution, checkpoint management, error recovery  
-**Commands:** `python .github/agents/orchestrator.py run --workflow full-training`
+**You switch between 7 specialized agents** using VS Code Copilot Chat:
 
-### 2. **Dataset Agent** [`.github/agents/dataset-agent.md`](.github/agents/dataset-agent.md)
-**Role:** Synthetic dataset generation  
-**Responsibilities:** Generate CSV datasets, validate quality, log metadata  
-**Commands:** `python src/data_generation/generate_datasets_v2.py --count 500`
+```
+User → Orchestrator → Dataset Agent → Pipeline Agent → Training Agent → Deployment Agent → ⏸️ USER TRAINS → Training Agent → Monitoring Agent → Orchestrator
+  ↓        ↓             ↓               ↓                ↓                  ↓                                     ↓                ↓              ↓
+/help   /organize    /datasets      /pipeline        /export           /push          (Jupyter server)         /validate      /visualize    /finalize
+```
 
-### 3. **Pipeline Agent** [`.github/agents/pipeline-agent.md`](.github/agents/pipeline-agent.md)
-**Role:** Frequent itemset extraction (Apriori + LLM)  
-**Responsibilities:** Run Apriori, call Azure OpenAI, validate outputs, persist to SQLite  
-**Commands:** `python pipeline.py --data-dir data/datasets_v2 --llm-full --llm-model gpt_4_1`
+Each agent:
+1. **Reads its Obsidian memory note FIRST** from `obsidian-brain/Agents/` (never repeats past mistakes)
+2. **Reads** workflow state (`.github/agents_memory/workflow_state.json`)
+3. **Executes** its stage (runs Python scripts, validates outputs)
+4. **Updates** workflow state (marks stage complete, adds artifact counts)
+5. **Tells you** which agent to activate next
 
-### 4. **Training Agent** [`.github/agents/training-agent.md`](.github/agents/training-agent.md)
-**Role:** Model fine-tuning orchestrator  
-**Responsibilities:** Export training data, create HF datasets, fine-tune Qwen models, push to Hub  
-**Commands:** `python src/training/run_sft_full.py`
+**No automation** - you manually switch agents and run commands. This gives you full control and visibility.
 
-### 5. **Evaluation Agent** [`.github/agents/evaluation-agent.md`](.github/agents/evaluation-agent.md)
-**Role:** Model performance evaluation  
-**Responsibilities:** Generate eval datasets, compute P/R/F1 metrics, compare models, report results  
-**Commands:** `python src/evaluation/eval_finetuned_model.py --model-path OliverSlivka/qwen2.5-3b-itemset-extractor`
-
-### 6. **Deployment Agent** [`.github/agents/deployment-agent.md`](.github/agents/deployment-agent.md)
-**Role:** Model deployment & infrastructure  
-**Responsibilities:** Push models to Hub, deploy Gradio Spaces, health checks, rollbacks  
-**Commands:** `./scripts/deployment/deploy_to_hf_space.ps1`
-
-### 7. **Monitoring Agent** [`.github/agents/monitoring-agent.md`](.github/agents/monitoring-agent.md)
-**Role:** Observability & reporting  
-**Responsibilities:** Generate visualizations, compute metrics, alert on anomalies, create reports  
-**Commands:** `python src/utils/visualization.py --db runs.db --outdir visuals`
+**After Stage 5 (/push)**, the workflow PAUSES — the user trains & evaluates on their own Jupyter server. The `.ipynb` notebook + HF dataset are the only 2 things needed.
 
 ---
 
-## � Utility Agents
+## 📖 Quick Start
+
+See [.github/WORKFLOW_GUIDE.md](.github/WORKFLOW_GUIDE.md) for detailed step-by-step instructions.
+
+**TL;DR:**
+```bash
+# Stage 1: Initialize workflow
+@workspace /agents switch to orchestrator
+/organize
+
+# Stage 2: Generate training + evaluation datasets
+@workspace /agents switch to dataset-agent
+/datasets
+
+# Stage 3: Run pipeline
+@workspace /agents switch to pipeline-agent
+/pipeline
+
+# Stage 4: Export training data + generate versioned notebook
+@workspace /agents switch to training-agent
+/export
+
+# Stage 5: Push dataset + notebook to HuggingFace
+@workspace /agents switch to deployment-agent
+/push
+
+# ⏸️ PAUSE: User trains & evaluates on Jupyter server
+# (download notebook + dataset, run training, run eval, record metrics)
+
+# Stage 6: Validate eval results & write improvement notes
+@workspace /agents switch to training-agent
+/validate
+
+# Stage 7: Create comparison visuals (base vs fine-tuned vs Apriori)
+@workspace /agents switch to monitoring-agent
+/visualize
+
+# Stage 8: Finalize workflow
+@workspace /agents switch to orchestrator
+/finalize
+
+# 🔧 UTILITY (anytime): /cleanup, /maintain
+```
+
+---
+
+## 🤖 Agent Architecture
+
+This project uses **7 main workflow agents** + **2 utility agents** coordinated by the **Orchestrator**:
+
+### Main Workflow Agents
+
+### 1. **Orchestrator Agent** [`.github/agents/orchestrator.md`](.github/agents/orchestrator.md)
+**Role:** Master workflow coordinator (Stages 1 & 8)  
+**Responsibilities:** Initialize workflow, track progress, finalize workflow  
+**Commands:** `/organize`, `/status`, `/finalize`
+
+### 2. **Dataset Agent** [`.github/agents/dataset-agent.md`](.github/agents/dataset-agent.md)
+**Role:** Dataset generation (Stage 2)  
+**Responsibilities:** Generate training CSVs + **fixed evaluation datasets** (versioned, never change between models)  
+**Commands:** `/datasets`, `/analyze`
+
+### 3. **Pipeline Agent** [`.github/agents/pipeline-agent.md`](.github/agents/pipeline-agent.md)
+**Role:** Frequent itemset extraction (Stage 3)  
+**Responsibilities:** Run Apriori + LLM extraction, validate outputs, persist to SQLite  
+**Commands:** `/pipeline`, `/validate-run`
+
+### 4. **Training Agent** [`.github/agents/training-agent.md`](.github/agents/training-agent.md)
+**Role:** Training data preparation + result validation (Stages 4 & 6)  
+**Responsibilities:** Export training data, generate **versioned .ipynb notebooks**, receive eval results, write improvement notes to memory  
+**Commands:** `/export`, `/validate`
+
+### 5. **Deployment Agent** [`.github/agents/deployment-agent.md`](.github/agents/deployment-agent.md)
+**Role:** HuggingFace dataset & notebook deployment (Stage 5)  
+**Responsibilities:** Push ONLY training dataset + versioned notebook + eval kit to HuggingFace Hub  
+**Commands:** `/push`, `/deploy`
+
+### 6. **Monitoring Agent** [`.github/agents/monitoring-agent.md`](.github/agents/monitoring-agent.md)
+**Role:** Comparison visuals & reporting (Stage 7)  
+**Responsibilities:** Create comparison visuals (base model vs fine-tuned vs Apriori), compute metrics, generate reports  
+**Commands:** `/visualize`, `/report`
+
+### 7. **Evaluation Agent** [`.github/agents/evaluation-agent.md`](.github/agents/evaluation-agent.md)
+**Role:** Model performance evaluation (Support agent)  
+**Responsibilities:** Eval datasets generated upfront, eval script ready before training, compute P/R/F1 metrics  
+**Commands:** `/eval`, `/compare`
+
+---
+
+## 🔧 Utility Agents (Available Anytime)
 
 ### 8. **Maintainer Agent** [`.github/agents/maintainer-agent.md`](.github/agents/maintainer-agent.md)
-**Role:** Agent file maintenance & accuracy  
-**Responsibilities:** Audit agent files for drift, update documentation to match code, validate examples, ensure cross-references are correct  
-**Commands:** `python .github/agents/maintainer.py audit --full`
+**Role:** Documentation accuracy & git synchronization  
+**Responsibilities:** Review outputs, update documentation, push to git  
+**Commands:** `/maintain`
 
 ### 9. **Cleanup Agent** [`.github/agents/cleanup-agent.md`](.github/agents/cleanup-agent.md)
-**Role:** Repository organization & hygiene  
-**Responsibilities:** Remove obsolete files, consolidate duplicate docs, reorganize directory structure, archive historical files, enforce naming conventions  
-**Commands:** `python .github/agents/cleanup.py analyze --full`
+**Role:** Repository hygiene  
+**Responsibilities:** Verify SQLite records, clean artifacts, archive old files  
+**Commands:** `/cleanup`
 
 ---
 
@@ -106,9 +182,12 @@ itemsety-qwen-finetuning/
 │   └── db_maintenance/            # DB utilities
 │
 ├── agents/                        # Agent definitions
-├── agents_log/                    # Agent activity logs
-├── agents_memory/                 # Agent persistent memory
-├── notebooks/                     # Jupyter notebooks
+├── obsidian-brain/                # 🧠 Obsidian knowledge vault
+│   ├── Agents/                    # Agent memory notes (9 files)
+│   ├── References/                # API limits, model comparison, etc.
+│   ├── Logs/                      # Per-run activity logs
+│   ├── Experiments/               # Training experiment reports
+│   └── Decisions/                 # Architecture decisions
 ├── archive/                       # Archived files
 │
 ├── artifacts/                     # Pipeline outputs (gitignored)
@@ -119,12 +198,12 @@ itemsety-qwen-finetuning/
 ### Key Technologies
 - **Python 3.10+** (use `.venv` for environment isolation)
 - **SQLite** (runs.db) for metadata persistence
-- **Azure OpenAI** (GPT-4) for baseline LLM extraction
+- **OpenAI** (GPT-4o, GPT-4.1-mini) for baseline LLM extraction
 - **HuggingFace** (Transformers, PEFT, TRL) for fine-tuning
 - **PyTorch** with bitsandbytes (4-bit quantization)
 
 ### Essential Files
-- **`azure.env`**: Azure OpenAI credentials (NEVER commit, use `azure.env.template`)
+- **`openai.env`**: OpenAI API credentials (NEVER commit, use `openai.env.template`)
 - **`runs.db`**: SQLite database with all run metadata
 - **`requirements.txt`**: Python dependencies
 - **`.gitignore`**: Excludes secrets, artifacts, models
@@ -225,8 +304,8 @@ python -c "import transformers; print(f'Transformers: {transformers.__version__}
 # Check database
 sqlite3 runs.db "SELECT COUNT(*) FROM runs"
 
-# Check Azure credentials
-python -c "from dotenv import load_dotenv; import os; load_dotenv('azure.env'); print('OK' if os.getenv('AZURE_OPENAI_API_KEY') else 'MISSING')"
+# Check OpenAI credentials
+python -c "from dotenv import load_dotenv; import os; load_dotenv('openai.env'); print('OK' if os.getenv('OPENAI_API_KEY') else 'MISSING')"
 ```
 
 ---
@@ -262,7 +341,7 @@ except Exception as e:
 ```
 
 ### Configuration Management
-- Use **environment variables** for secrets (Azure keys, HF tokens)
+- Use **environment variables** for secrets (OpenAI keys, HF tokens)
 - Use **command-line arguments** for runtime params (min_support, batch_size)
 - Use **YAML/JSON configs** for workflow definitions (future enhancement)
 
@@ -287,9 +366,9 @@ except Exception as e:
 - Delete datasets used in training
 
 ### 🚫 Never Do
-- Commit `azure.env` or any file with API keys
+- Commit `openai.env` or any file with API keys
 - Modify historical DB records (data integrity)
-- Run pipeline without Azure credentials (will fail with exit code 3)
+- Run pipeline without OpenAI credentials (will fail with exit code 3)
 - Delete `runs.db` (primary data source)
 - Hardcode file paths (use args/config)
 - Deploy untested models to production
@@ -298,7 +377,7 @@ except Exception as e:
 
 ## 🔧 Troubleshooting
 
-### Issue: Azure API rate limit (429 errors)
+### Issue: OpenAI API rate limit (429 errors)
 **Solution:**
 - Reduce batch size: `--llm-chunk-size 25`
 - Add delays between calls
@@ -378,7 +457,7 @@ Each agent has a dedicated markdown file with:
 1. **Read this file** (you're here! ✅)
 2. **Read agent files** relevant to your task (e.g., `agents/training-agent.md` for training work)
 3. **Set up environment:** `python -m venv .venv && .venv\Scripts\Activate.ps1 && pip install -r requirements.txt`
-4. **Configure secrets:** Copy `azure.env.template` to `azure.env`, fill in Azure credentials
+4. **Configure secrets:** Copy `openai.env.template` to `openai.env`, fill in your OpenAI API key
 5. **Run tests:** `pytest tests/` to verify setup
 6. **Try a small workflow:** `python pipeline.py --data tests/fixtures/test_dataset_5x8.csv --llm-full`
 7. **Explore database:** `sqlite3 runs.db` and run some queries

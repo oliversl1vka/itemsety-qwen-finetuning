@@ -8,7 +8,7 @@ Skills are folders of instructions that agents use to complete specialized tasks
 |-------|-------------|---------------|
 | [csv-dataset-generation](csv-dataset-generation/) | Generate synthetic CSV datasets for training | Dataset Agent |
 | [apriori-extraction](apriori-extraction/) | Extract frequent itemsets using Apriori algorithm | Pipeline Agent |
-| [llm-itemset-extraction](llm-itemset-extraction/) | Extract itemsets using Azure OpenAI | Pipeline Agent |
+| [llm-itemset-extraction](llm-itemset-extraction/) | Extract itemsets using OpenAI | Pipeline Agent |
 | [validation-pipeline](validation-pipeline/) | Validate itemsets against 13 invariants | Pipeline Agent |
 | [sqlite-persistence](sqlite-persistence/) | Store and query run metadata | Pipeline Agent |
 | [training-data-export](training-data-export/) | Export validated runs as training examples | Training Agent |
@@ -63,7 +63,7 @@ Agents load skills dynamically when performing specialized tasks:
 1. Identify task type
 2. Load relevant skill(s)
 3. Follow skill instructions
-4. Log completion to agents_log/
+4. Log completion to obsidian-brain/Logs/
 
 ## Creating New Skills
 

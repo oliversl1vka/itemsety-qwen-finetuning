@@ -161,7 +161,7 @@ itemsety-qwen-finetuning/
 .
 ├── AGENTS.md                  # Agent system docs
 ├── README.md                  # Project overview (NEW)
-├── azure.env.template         # Credentials template
+├── openai.env.template        # Credentials template
 ├── openai.env.template        # OpenAI credentials template
 ├── extractor_system_prompt.md # LLM prompt
 ├── pipeline.py                # Core pipeline script

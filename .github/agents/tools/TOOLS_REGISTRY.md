@@ -22,7 +22,7 @@ Centrálny register nástrojov pre všetkých agentov v itemsety-qwen-finetuning
 | `python_exec` | orchestrator | training, evaluation | Code Interpreter |
 | `git_ops` | deployment-agent | cleanup, maintainer | Productivity |
 | `hf_hub_api` | deployment-agent | training | External API |
-| `azure_openai` | pipeline-agent | - | External API |
+| `openai` | pipeline-agent | - | External API |
 | `file_search` | maintainer-agent | cleanup | File Operations |
 | `md_writer` | monitoring-agent | maintainer | File Operations |
 | `log_writer` | orchestrator | všetci | File Operations |
@@ -63,12 +63,12 @@ toolkit:
       returns: {success: bool}
       
     - name: log_writer
-      description: Write activity log to agents_log/
+      description: Write activity log to obsidian-brain/Logs/
       params: {agent: str, action: str, details: dict}
       returns: {log_path: str}
       
     - name: memory_writer
-      description: Append insight to agents_memory/
+      description: Append insight to obsidian-brain/Agents/
       params: {agent: str, title: str, context: str, insight: str, application: str}
       returns: {success: bool}
       
@@ -161,11 +161,11 @@ toolkit:
       script: pipeline.py::apriori_frequent_itemsets
       
     # === LLM Extraction ===
-    - name: azure_openai_call
-      description: Call Azure OpenAI for itemset extraction
+    - name: openai_call
+      description: Call OpenAI API for itemset extraction
       params: {prompt: str, model?: str, chunk_size?: int}
       returns: {response: str, itemsets: list, tokens_used: int, duration_s: float}
-      requires: azure.env
+      requires: openai.env
       
     - name: llm_parse_response
       description: Parse LLM JSON response with error handling

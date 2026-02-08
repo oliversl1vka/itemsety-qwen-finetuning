@@ -1,9 +1,0 @@
-```json
-[
-    {
-        "itemset": ["galiyegi", "mefedaho", "nukoro"],
-        "proof": 1,
-        "explanation": "The itemsets are galiyegi and mefedaho, which appear together in the dataset as a single transaction with counts of 1 each."
-    },
-    {
-        "itemset": ["galiyegi", "mefedaho", "nukoro", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime", "murime

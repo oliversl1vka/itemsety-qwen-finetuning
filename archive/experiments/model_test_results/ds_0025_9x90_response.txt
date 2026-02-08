@@ -1,9 +1,0 @@
-```json
-[
-    {
-        "itemset": ["cesu", "cewu"],
-        "observed_support_count": 3,
-        "citation": "Citation from the dataset."
-    },
-    {
-        "itemset": ["sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "sodaxo", "

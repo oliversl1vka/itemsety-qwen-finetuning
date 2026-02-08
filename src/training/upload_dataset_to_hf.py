@@ -3,6 +3,7 @@
 Upload training dataset to HuggingFace Hub for fine-tuning.
 """
 
+import argparse
 import json
 from pathlib import Path
 from datasets import Dataset, DatasetDict
@@ -10,7 +11,7 @@ from huggingface_hub import HfApi
 
 # Configuration
 REPO_NAME = "OliverSlivka/itemset-extraction-v2"
-TRAINING_DATA_DIR = Path("training_data_v2")
+DEFAULT_TRAINING_DATA_DIR = Path("data/training_v2")
 
 def load_jsonl(path: Path) -> list[dict]:
     """Load JSONL file."""
@@ -21,14 +22,24 @@ def load_jsonl(path: Path) -> list[dict]:
     return examples
 
 def main():
+    parser = argparse.ArgumentParser(description="Upload training dataset to HuggingFace Hub")
+    parser.add_argument("--training-dir", type=Path, default=DEFAULT_TRAINING_DATA_DIR,
+                       help="Path to training data directory (default: data/training_v2)")
+    parser.add_argument("--dataset-path", type=Path, help="Alias for --training-dir (for backward compat)")
+    args = parser.parse_args()
+    
+    # Use dataset-path if provided, otherwise training-dir
+    training_dir = args.dataset_path if args.dataset_path else args.training_dir
+    
     print("📂 Loading training data...")
+    print(f"   Directory: {training_dir}")
     
     # Load simple format (clean JSON output - better for fine-tuning)
-    simple_examples = load_jsonl(TRAINING_DATA_DIR / "train_simple.jsonl")
+    simple_examples = load_jsonl(training_dir / "train_simple.jsonl")
     print(f"   Loaded {len(simple_examples)} simple examples")
     
     # Load CoT format (with reasoning - for comparison)
-    cot_examples = load_jsonl(TRAINING_DATA_DIR / "train_cot.jsonl")
+    cot_examples = load_jsonl(training_dir / "train_cot.jsonl")
     print(f"   Loaded {len(cot_examples)} CoT examples")
     
     # Split into train/validation (90/10)

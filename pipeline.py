@@ -12,7 +12,7 @@ Outputs:
 Optional persistence:
  - runs.db (SQLite table `runs`) unless --disable-db
 
-Environment variables (Azure OpenAI) are loaded from azure.env if present.
+Environment variables are loaded from openai.env if present.
 """
 from __future__ import annotations
 import os, json, re, csv, itertools, argparse, sys, sqlite3, time, hashlib, platform
@@ -460,14 +460,12 @@ def apriori_frequent_itemsets(transactions: List[List[str]], min_support: int = 
 def llm_extract_full(transactions: List[List[str]], min_support: int, system_prompt: str, chunk_size: int,
                      api_key: str, model: str) -> List[Dict[str, Any]]:
     """Extract frequent itemsets using OpenAI Chat Completions API directly."""
-    try:
-        from langchain_openai import ChatOpenAI
-        from langchain_core.prompts import ChatPromptTemplate
-        from langchain_core.output_parsers import StrOutputParser
-    except Exception:
-        return fallback_singletons(transactions, min_support)
+    from langchain_openai import ChatOpenAI
+    from langchain_core.prompts import ChatPromptTemplate
+    from langchain_core.output_parsers import StrOutputParser
+    
     if not api_key:
-        return fallback_singletons(transactions, min_support)
+        raise ValueError("Missing OPENAI_API_KEY - cannot proceed with LLM extraction")
     
     # Detect if this is a reasoning model (o-series, o1, o3, o4)
     # Reasoning models don't support temperature parameter
@@ -486,7 +484,7 @@ def llm_extract_full(transactions: List[List[str]], min_support: int, system_pro
     llm = ChatOpenAI(**llm_kwargs)
     template = (
         "{system}\nMin support count: {min_support}\nTransactions chunk rows {start}-{end}:\n{chunk_json}\n"
-        "Return ONLY JSON array: [{'itemset':[...],'count':n,'evidence_rows':[...]}] with count >= {min_support}."
+        "Return ONLY JSON array: [{{'itemset':[...],'count':n,'evidence_rows':[...]}}] with count >= {min_support}."
     )
     # Prompt & output parser already imported above
     prompt = ChatPromptTemplate.from_template(template)
@@ -496,16 +494,13 @@ def llm_extract_full(transactions: List[List[str]], min_support: int, system_pro
     for start in range(0, total_rows, chunk_size):
         end = min(start + chunk_size, total_rows)
         chunk = transactions[start:end]
-        try:
-            raw = chain.invoke({
-                'system': system_prompt,
-                'min_support': min_support,
-                'start': start + 1,
-                'end': end,
-                'chunk_json': json.dumps(chunk, ensure_ascii=False)
-            })
-        except Exception:
-            return fallback_singletons(transactions, min_support)
+        raw = chain.invoke({
+            'system': system_prompt,
+            'min_support': min_support,
+            'start': start + 1,
+            'end': end,
+            'chunk_json': json.dumps(chunk, ensure_ascii=False)
+        })
         try:
             parsed = json.loads(raw)
         except Exception:
@@ -541,18 +536,6 @@ def llm_extract_full(transactions: List[List[str]], min_support: int, system_pro
         rows_set = sorted(info['rows'])
         if len(rows_set) >= min_support:
             out.append({'itemset': list(its), 'count': len(rows_set), 'rows': rows_set})
-    return out
-
-def fallback_singletons(transactions: List[List[str]], min_support: int) -> List[Dict[str, Any]]:
-    freq: Dict[str, set] = {}
-    for idx, trans in enumerate(transactions):
-        row_label = f'Row {idx+1}'
-        for item in set(str(x).strip().lower() for x in trans if str(x).strip()):
-            freq.setdefault(item, set()).add(row_label)
-    out = []
-    for item, rows in freq.items():
-        if len(rows) >= min_support:
-            out.append({'itemset': [item], 'count': len(rows), 'rows': sorted(rows)})
     return out
 
     # (Removed legacy duplicate build_run_summary & persist_run_to_sqlite definitions; using enhanced versions above.)
@@ -591,7 +574,7 @@ def main():
     else:
         data_files = [args.data]
 
-    # OpenAI API credentials (direct, not Azure)
+    # OpenAI API credentials
     api_key = os.getenv('OPENAI_API_KEY', '')
     model = args.llm_model  # e.g. gpt-4o, gpt-4-turbo, gpt-3.5-turbo
     # Enforce presence of OpenAI API key

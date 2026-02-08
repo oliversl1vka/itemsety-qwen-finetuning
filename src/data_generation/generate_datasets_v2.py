@@ -2,19 +2,19 @@
 Semi-Human Dataset Generator for Frequent Itemset Mining Fine-tuning V2
 
 Generates 500 training datasets from 25 real-world datasets with:
-- Optimal size for LLM context window (based on V1 experiment findings)
+- Optimal size for DPO training (max 1024 tokens per sequence)
 - Preserved real-world patterns and item names
 - Diverse variations (subsampling, shuffling, format changes)
 
-Size Rationale (from V1 experiment):
-- ds_0001_5x53 (5 rows): 74s generation, worked well
-- ds_0006_28x100 (28 rows): 973s (16 min!), JSON errors
-- >30 rows: Skipped as too large for CPU inference
+Size Rationale (updated for DPO training):
+- DPO requires: prompt + chosen + rejected < 1024 tokens
+- Large datasets (25+ rows) exceed token limit
+- Truncation damages JSON quality and itemset completeness
 
-Optimal dimensions for LLM processing:
-- Rows: 5-25 (sweet spot for itemset mining + LLM context)
-- Cols: 5-20 (categorical columns only)
-- Max tokens: ~2000-3000 (safe for any LLM context window)
+Optimal dimensions for DPO training:
+- Rows: 5-12 (ensures sequences stay within token limit)
+- Cols: 5-15 (categorical columns only)
+- Max tokens: ~800-1000 (safe for DPO with prompt + 2 responses)
 """
 
 from __future__ import annotations
@@ -39,15 +39,15 @@ import numpy as np
 # =============================================================================
 
 CONFIG = {
-    # Dataset size constraints (based on V1 experiment findings)
+    # Dataset size constraints (optimized for DPO training - max 1024 tokens)
     "min_rows": 5,          # Minimum transactions
-    "max_rows": 25,         # Maximum transactions (was 30, reduced for safety)
-    "target_rows_small": (5, 10),    # 40% of datasets
-    "target_rows_medium": (10, 18),  # 40% of datasets  
-    "target_rows_large": (18, 25),   # 20% of datasets
+    "max_rows": 12,         # Maximum transactions (reduced for DPO training)
+    "target_rows_small": (5, 8),     # 40% of datasets
+    "target_rows_medium": (8, 10),   # 40% of datasets  
+    "target_rows_large": (10, 12),   # 20% of datasets
     
     "min_cols": 5,          # Minimum items/attributes
-    "max_cols": 20,         # Maximum items/attributes (reduced from 100!)
+    "max_cols": 15,         # Maximum items/attributes (reduced for shorter sequences)
     
     # Generation targets
     "total_datasets": 500,
@@ -63,7 +63,7 @@ CONFIG = {
     },
     
     # Output
-    "output_dir": "datasets_v2",
+    "output_dir": "data/datasets_v2",
     "random_seed": 42,
     
     # Itemset mining parameters (for ground truth)
@@ -121,13 +121,15 @@ def extract_transactions(df: pd.DataFrame, categorical_cols: List[str]) -> List[
     """
     Extract transactions from a DataFrame using categorical columns.
     Each row becomes a transaction with non-null categorical values as items.
+    OPTIMIZED: Uses vectorized operations instead of iterrows.
     """
     transactions = []
     
-    for _, row in df.iterrows():
+    # Use to_dict('records') which is much faster than iterrows
+    for row_dict in df[categorical_cols].to_dict('records'):
         items = []
         for col in categorical_cols:
-            val = row.get(col)
+            val = row_dict.get(col)
             if pd.notna(val):
                 # Canonicalize: lowercase, strip whitespace
                 item = str(val).strip().lower()
@@ -362,21 +364,32 @@ def generate_single_variation(
 
 def main():
     """Main generation pipeline."""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Generate training datasets from source CSVs")
+    parser.add_argument("--count", type=int, default=500,
+                       help="Number of datasets to generate (default: 500)")
+    args = parser.parse_args()
+    
     random.seed(CONFIG["random_seed"])
     np.random.seed(CONFIG["random_seed"])
     
     print("=" * 80)
     print("SEMI-HUMAN DATASET GENERATOR V2")
-    print("Generating 500 LLM-optimized datasets from 25 real-world sources")
+    print(f"Generating {args.count} LLM-optimized datasets from real-world sources")
     print("=" * 80)
     
     # Setup directories
     source_dir = Path("real_datasets")
     output_dir = Path(CONFIG["output_dir"])
     
-    if output_dir.exists():
-        shutil.rmtree(output_dir)
-    output_dir.mkdir(parents=True)
+    # Don't delete existing - append to them
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Check existing datasets
+    existing_count = len(list(output_dir.glob("ds_*.csv")))
+    if existing_count > 0:
+        print(f"\n📁 Found {existing_count} existing datasets - will continue generating")
     
     # Load all source datasets
     print("\n📂 Loading source datasets...")
@@ -394,12 +407,17 @@ def main():
     
     print(f"\n✅ Loaded {len(sources)} valid source datasets")
     
-    if len(sources) < 25:
-        print(f"⚠️ Warning: Only {len(sources)} sources available, adjusting generation count")
+    if len(sources) == 0:
+        print("❌ ERROR: No valid source datasets found!")
+        print(f"   Please ensure {source_dir}/ contains CSV files with categorical columns")
+        return []
+    
+    # Use the count from command line argument
+    total_datasets = args.count
     
     # Calculate datasets per source
-    datasets_per_source = CONFIG["total_datasets"] // len(sources)
-    remainder = CONFIG["total_datasets"] % len(sources)
+    datasets_per_source = total_datasets // len(sources)
+    remainder = total_datasets % len(sources)
     
     print(f"📊 Generating {datasets_per_source} datasets per source ({datasets_per_source * len(sources)} + {remainder} extra)")
     
@@ -412,7 +430,11 @@ def main():
     all_datasets = []
     generation_log = []
     
-    dataset_idx = 1
+    # Start from where we left off
+    dataset_idx = existing_count + 1
+    target_new = total_datasets - existing_count
+    
+    print(f"🎯 Target: Generate {target_new} new datasets (total will be {total_datasets})")
     
     for source_idx, source in enumerate(sources):
         # Determine how many datasets from this source
@@ -423,39 +445,45 @@ def main():
         print(f"\n[{source_idx + 1}/{len(sources)}] {source['file_path'].name}: generating {n_datasets} variations")
         
         for var_idx in range(n_datasets):
-            # Select variation type
-            variation_type = random.choices(variation_types, weights=variation_probs)[0]
-            
-            # Generate variation
-            csv_content, metadata = generate_single_variation(source, variation_type, var_idx)
-            
-            # Create filename
-            dataset_hash = calculate_dataset_hash(csv_content)
-            rows = metadata["actual_rows"]
-            cols = metadata["actual_cols"]
-            filename = f"ds_{dataset_idx:04d}_{rows}x{cols}_{dataset_hash[:8]}.csv"
-            
-            # Save dataset
-            output_path = output_dir / filename
-            output_path.write_text(csv_content, encoding='utf-8')
-            
-            # Log
-            metadata["filename"] = filename
-            metadata["dataset_idx"] = dataset_idx
-            metadata["hash"] = dataset_hash
-            generation_log.append(metadata)
-            
-            all_datasets.append({
-                "filename": filename,
-                "path": str(output_path),
-                "metadata": metadata
-            })
-            
-            # Progress indicator
-            if dataset_idx % 50 == 0:
-                print(f"    Generated {dataset_idx}/{CONFIG['total_datasets']} datasets...")
-            
-            dataset_idx += 1
+            try:
+                # Select variation type
+                variation_type = random.choices(variation_types, weights=variation_probs)[0]
+                
+                # Generate variation
+                csv_content, metadata = generate_single_variation(source, variation_type, var_idx)
+                
+                # Create filename
+                dataset_hash = calculate_dataset_hash(csv_content)
+                rows = metadata["actual_rows"]
+                cols = metadata["actual_cols"]
+                filename = f"ds_{dataset_idx:04d}_{rows}x{cols}_{dataset_hash[:8]}.csv"
+                
+                # Save dataset
+                output_path = output_dir / filename
+                output_path.write_text(csv_content, encoding='utf-8')
+                
+                # Log
+                metadata["filename"] = filename
+                metadata["dataset_idx"] = dataset_idx
+                metadata["hash"] = dataset_hash
+                generation_log.append(metadata)
+                
+                all_datasets.append({
+                    "filename": filename,
+                    "path": str(output_path),
+                    "metadata": metadata
+                })
+                
+                # Progress indicator
+                if dataset_idx % 50 == 0:
+                    print(f"    ✓ Generated {dataset_idx}/{total_datasets} datasets...")
+                
+                dataset_idx += 1
+                
+            except Exception as e:
+                print(f"    ⚠️  Error generating variation {var_idx}: {str(e)[:80]}")
+                # Continue with next variation
+                continue
     
     # Save generation log
     log_path = output_dir / "generation_log.json"
@@ -521,4 +549,29 @@ def main():
 
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Generate training datasets for DPO fine-tuning")
+    parser.add_argument("--count", type=int, default=500, help="Number of datasets to generate")
+    parser.add_argument("--max-rows", type=int, help="Maximum rows per dataset (default: 12 for DPO)")
+    parser.add_argument("--max-cols", type=int, help="Maximum columns per dataset (default: 15)")
+    args = parser.parse_args()
+    
+    # Override config with command line args
+    if args.max_rows is not None:
+        CONFIG["max_rows"] = args.max_rows
+        CONFIG["target_rows_large"] = (min(10, args.max_rows - 2), args.max_rows)
+        CONFIG["target_rows_medium"] = (8, min(10, args.max_rows - 2))
+        print(f"📏 Custom max_rows: {args.max_rows}")
+    
+    if args.max_cols is not None:
+        CONFIG["max_cols"] = args.max_cols
+        print(f"📐 Custom max_cols: {args.max_cols}")
+    
+    if args.count != 500:
+        CONFIG["total_datasets"] = args.count
+        CONFIG["datasets_per_source"] = args.count // 25
+        print(f"🔢 Custom count: {args.count}")
+    
+    print(f"\n🎯 FINAL CONFIG: {CONFIG['max_rows']} rows max, {CONFIG['max_cols']} cols max, {CONFIG['total_datasets']} total\n")
+    
     main()

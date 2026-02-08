@@ -1,6 +1,6 @@
 # Frequent Itemset Extraction + Qwen Fine-Tuning Pipeline
 
-A complete ML pipeline for extracting frequent itemsets from CSV datasets using Apriori algorithm + Azure OpenAI, then fine-tuning Qwen models to perform the same task without Apriori.
+A complete ML pipeline for extracting frequent itemsets from CSV datasets using Apriori algorithm + OpenAI, then fine-tuning Qwen models to perform the same task without Apriori.
 
 ## 🎯 Project Goal
 
@@ -17,11 +17,13 @@ itemsety-qwen-finetuning/
 │
 ├── src/                           # Source code modules
 │   ├── training/                  # Fine-tuning scripts
-│   │   ├── run_sft_full.py        # Production training (439 examples)
+│   │   ├── run_sft_full.py        # Supervised Fine-Tuning (439 examples)
 │   │   ├── run_sft_test.py        # Test training (50 examples)
-│   │   ├── create_training_data_v2.py
-│   │   ├── export_training_data.py
-│   │   ├── create_hf_dataset.py
+│   │   ├── run_dpo_training.py    # DPO (RLHF) training ⭐ NEW
+│   │   ├── export_training_data.py           # Export SFT data
+│   │   ├── export_rlhf_training_data.py      # Export RLHF pairs ⭐ NEW
+│   │   ├── create_hf_dataset.py              # Create SFT dataset
+│   │   ├── create_rlhf_hf_dataset.py         # Create RLHF dataset ⭐ NEW
 │   │   └── upload_dataset_to_hf.py
 │   ├── evaluation/                # Model evaluation
 │   │   └── eval_finetuned_model.py
@@ -65,8 +67,12 @@ itemsety-qwen-finetuning/
 │   └── sft_trl_lora_qlora.ipynb
 │
 ├── agents/                        # Agent system definitions
-├── agents_log/                    # Agent activity logs
-├── agents_memory/                 # Agent persistent memory
+├── obsidian-brain/                # 🧠 Obsidian knowledge vault
+│   ├── Agents/                    # Agent memory notes (9 files)
+│   ├── References/                # API limits, model comparison, etc.
+│   ├── Logs/                      # Per-run activity logs
+│   ├── Experiments/               # Training experiment reports
+│   └── Decisions/                 # Architecture decisions
 │
 ├── archive/                       # Archived/legacy files
 │   ├── legacy_scripts/            # Old script versions
@@ -91,11 +97,11 @@ source .venv/bin/activate  # or .venv\Scripts\Activate.ps1 on Windows
 pip install -r requirements.txt
 ```
 
-### 2. Configure Azure OpenAI
+### 2. Configure OpenAI
 
 ```bash
-cp azure.env.template azure.env
-# Edit azure.env with your credentials
+cp openai.env.template openai.env
+# Edit openai.env with your API key
 ```
 
 ### 3. Run Pipeline
@@ -110,12 +116,25 @@ python pipeline.py --data-dir data/datasets_v2 --min-support 3 --max-size 3 --ll
 
 ### 4. Train Model
 
+**Option A: Supervised Fine-Tuning (SFT)**
 ```bash
 # Test run (50 examples, ~15 min)
 python src/training/run_sft_test.py
 
 # Production training (439 examples, ~60 min)
 python src/training/run_sft_full.py
+```
+
+**Option B: RLHF with DPO (Recommended)** ⭐
+```bash
+# Export RLHF preference pairs
+python src/training/export_rlhf_training_data.py
+
+# Create HF dataset
+python src/training/create_rlhf_hf_dataset.py --format dpo
+
+# Train with DPO
+python src/training/run_dpo_training.py --use_4bit --use_lora
 ```
 
 ### 5. Evaluate
@@ -137,7 +156,7 @@ python src/evaluation/eval_finetuned_model.py --model-path OliverSlivka/qwen2.5-
 ### Pipeline (`pipeline.py`)
 - Loads CSV datasets (auto-detects format)
 - Runs Apriori algorithm for ground truth
-- Calls Azure OpenAI for LLM extraction
+- Calls OpenAI for LLM extraction
 - Validates outputs (13 invariants)
 - Persists results to SQLite
 
@@ -154,10 +173,14 @@ python src/evaluation/eval_finetuned_model.py --model-path OliverSlivka/qwen2.5-
 
 ## 📚 Documentation
 
-- [Fine-tuning Guide](docs/guides/FINETUNING_README.md)
-- [Training Quickstart](docs/guides/TRAINING_QUICKSTART.md)
-- [Deployment Guide](docs/guides/DEPLOYMENT_GUIDE.md)
-- [Evaluation Report](docs/reports/EVALUATION_REPORT.md)
+- **Training Methods:**
+  - [RLHF Training Guide](docs/guides/RLHF_TRAINING_GUIDE.md) ⭐ **NEW** - DPO preference optimization
+  - [SFT Fine-tuning Guide](docs/guides/FINETUNING_README.md) - Supervised fine-tuning
+  - [Training Quickstart](docs/guides/TRAINING_QUICKSTART.md)
+- **Deployment:**
+  - [Deployment Guide](docs/guides/DEPLOYMENT_GUIDE.md)
+- **Results:**
+  - [Evaluation Report](docs/reports/EVALUATION_REPORT.md)
 
 ## 🤖 Agent System
 

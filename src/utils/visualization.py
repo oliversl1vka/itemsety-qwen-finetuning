@@ -99,8 +99,9 @@ def parse_dimensions(df: pd.DataFrame) -> pd.DataFrame:
             cols_list.append(pd.NA)
     df["parsed_rows"] = rows_list
     df["parsed_cols"] = cols_list
-    with pd.option_context('mode.use_inf_as_na', True):
-        df["dataset_area"] = pd.to_numeric(df["parsed_rows"], errors='coerce') * pd.to_numeric(df["parsed_cols"], errors='coerce')
+    # Pandas 3.0+ handles inf values differently
+    area = pd.to_numeric(df["parsed_rows"], errors='coerce') * pd.to_numeric(df["parsed_cols"], errors='coerce')
+    df["dataset_area"] = area.replace([float('inf'), float('-inf')], pd.NA)
     return df
 
 
@@ -331,8 +332,9 @@ def compute_metrics(df: pd.DataFrame) -> pd.DataFrame:
     if {"apriori_itemset_count","llm_itemset_count"}.issubset(df.columns):
         apr = df["apriori_itemset_count"].replace(0, pd.NA)
         df["itemset_diff"] = df["llm_itemset_count"] - df["apriori_itemset_count"]
-        with pd.option_context('mode.use_inf_as_na', True):
-            ratio = df["llm_itemset_count"] / apr
+        # Pandas 3.0+ handles inf values differently
+        ratio = df["llm_itemset_count"] / apr
+        ratio = ratio.replace([float('inf'), float('-inf')], pd.NA)
         # Coerce to float, invalid divisions become NaN
         df["percent_match"] = pd.to_numeric(ratio, errors='coerce')
     return df

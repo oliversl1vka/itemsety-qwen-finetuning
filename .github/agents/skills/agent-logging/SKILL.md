@@ -1,41 +1,62 @@
 ---
 name: agent-logging
-description: Record agent activities to .github/agents_log/ and insights to .github/agents_memory/. Use after completing any significant task.
+description: Record agent activities to obsidian-brain/Logs/ and insights to obsidian-brain/Agents/. Use after completing any significant task.
 ---
 
-# Agent Logging & Memory
+# Agent Logging & Memory (Obsidian Brain)
 
-Record agent activities and persist useful insights for future reference.
+Record agent activities and persist useful insights using the **Obsidian vault** at `obsidian-brain/`.
 
 ## Overview
 
-Two logging mechanisms:
-- **Activity Logs** (`.github/agents_log/`): Record every significant action
-- **Persistent Memory** (`.github/agents_memory/`): Store curated insights
+All knowledge management uses the Obsidian vault with `[[backlinks]]` for cross-referencing:
+
+| Purpose | Location | Template |
+|---------|----------|----------|
+| Agent memory & insights | `obsidian-brain/Agents/{Agent Name}.md` | Memory Entry |
+| Activity logs | `obsidian-brain/Logs/{YYYY-MM-DD}_{agent}_{action}.md` | Run Log |
+| Training experiments | `obsidian-brain/Experiments/{experiment_name}.md` | Experiment |
+| Architecture decisions | `obsidian-brain/Decisions/{decision_name}.md` | Decision |
+| Reference docs | `obsidian-brain/References/` | — |
+
+## Vault Structure
+
+```
+obsidian-brain/
+├── Home.md                        # Navigation hub
+├── Agents/                        # Agent memory notes (9 files)
+│   ├── Orchestrator.md
+│   ├── Pipeline Agent.md
+│   ├── Dataset Agent.md
+│   ├── Training Agent.md
+│   ├── Evaluation Agent.md
+│   ├── Deployment Agent.md
+│   ├── Monitoring Agent.md
+│   ├── Cleanup Agent.md
+│   └── Maintainer Agent.md
+├── References/                    # Shared knowledge
+│   ├── API Limits.md
+│   ├── Model Comparison.md
+│   └── Pipeline Bug 2026-02-08.md
+├── Templates/                     # Note templates
+│   ├── Run Log.md
+│   ├── Decision.md
+│   ├── Memory Entry.md
+│   └── Experiment.md
+├── Logs/                          # Per-run activity logs
+├── Experiments/                   # Training experiment reports
+└── Decisions/                     # Architecture decisions
+```
 
 ## Activity Logs
 
-### Location
-```
-.github/agents_log/
-├── orchestrator/
-├── dataset/
-├── pipeline/
-├── training/
-├── evaluation/
-├── deployment/
-├── monitoring/
-├── maintainer/
-└── cleanup/
-```
-
 ### Log Naming Convention
 ```
-YYYY-MM-DD_HHMMSS_{action}.md
+obsidian-brain/Logs/{YYYY-MM-DD}_{agent}_{action}.md
 ```
-Example: `2026-02-01_143022_batch_generation.md`
+Example: `obsidian-brain/Logs/2026-02-08_pipeline_batch_run.md`
 
-### Log Template
+### Log Template (use Run Log template)
 ```markdown
 # {Action Title}
 
@@ -62,82 +83,43 @@ Brief description of what was done.
 
 ## Notes
 Any issues, warnings, or observations.
+
+## Links
+- Related agent: [[Agents/Pipeline Agent]]
+- Related reference: [[References/API Limits]]
 ```
 
-### Example Log Entry
-```markdown
-# Batch Pipeline Run
+**Key:** Always add `[[backlinks]]` to connect logs to related agents, references, experiments, and decisions.
 
-**Agent:** pipeline-agent
-**Date:** 2026-02-01 14:30:22
-**Duration:** 45 min 12 sec
-**Status:** ⚠️ Partial
-
-## Summary
-Processed 500 datasets through Apriori + LLM extraction pipeline.
-
-## Actions
-- Loaded 500 CSV files from data/datasets_v2/
-- Ran Apriori on all datasets
-- Called Azure OpenAI for LLM extraction
-- Validated outputs against 13 invariants
-- Persisted results to runs.db
-
-## Outputs
-- `artifacts/apriori_outputs/` (500 files)
-- `artifacts/extractor_outputs/` (487 files)
-- `artifacts/validation_reports/` (500 files)
-
-## Metrics
-- Datasets processed: 500
-- Validation passed: 439 (87.8%)
-- Validation failed: 61 (12.2%)
-- Avg Apriori time: 0.3s
-- Avg LLM time: 42s
-- Total duration: 45 min
-
-## Notes
-- 13 datasets failed due to Azure API rate limiting (429)
-- Retry with smaller chunk size recommended
-```
-
-## Persistent Memory
+## Agent Memory
 
 ### Location
-```
-.github/agents_memory/
-├── orchestrator_memory.md
-├── dataset_agent_memory.md
-├── pipeline_agent_memory.md
-├── training_agent_memory.md
-├── evaluation_agent_memory.md
-├── deployment_agent_memory.md
-├── monitoring_agent_memory.md
-├── maintainer_agent_memory.md
-└── cleanup_agent_memory.md
-```
+Each agent has a dedicated memory note at `obsidian-brain/Agents/{Agent Name}.md`.
 
 ### Memory Entry Format
+Append new entries to the agent's memory note:
+
 ```markdown
 ### [YYYY-MM-DD] Brief Title
 
 **Context:** Why this is worth remembering
 **Insight:** The actual knowledge/pattern/solution
 **Application:** When/how to use this in future
+
+Related: [[References/Relevant Reference]] | [[Logs/YYYY-MM-DD_agent_action]]
 ```
 
-### Example Memory Entry
-```markdown
-### [2026-02-01] Azure API Rate Limit Mitigation
-
-**Context:** Pipeline failed on batch of 500 datasets with 429 errors
-**Insight:** Chunk size 25 + 2 second delay between calls prevents rate limiting. Azure has 60 RPM limit for GPT-4.
-**Application:** Always use `--llm-chunk-size 25` for batches > 50 datasets. Add retry logic with exponential backoff.
-```
+### Tags
+Use Obsidian tags for discoverability:
+- `#bug` — Bug discoveries
+- `#insight` — Learnings & patterns
+- `#model/gpt-4o` `#model/gpt-4.1-mini` — Model-specific notes
+- `#experiment` — Training experiment references
+- `#decision` — Architecture decisions
 
 ## When to Log
 
-### Activity Logs (Always)
+### Activity Logs (Always → `obsidian-brain/Logs/`)
 - ✅ Completed batch processing
 - ✅ Training run finished
 - ✅ Deployment completed
@@ -145,7 +127,7 @@ Processed 500 datasets through Apriori + LLM extraction pipeline.
 - ✅ Cleanup operation done
 - ✅ Any failed operation
 
-### Memory (Selectively)
+### Memory (Selectively → `obsidian-brain/Agents/`)
 - ✅ Discovered non-obvious solution
 - ✅ Found environment-specific workaround
 - ✅ Learned user preference
@@ -154,87 +136,54 @@ Processed 500 datasets through Apriori + LLM extraction pipeline.
 - ❌ Temporary issues
 - ❌ Already documented information
 
-## Python Utilities
+### Experiments (→ `obsidian-brain/Experiments/`)
+- ✅ Training run with metrics
+- ✅ Hyperparameter comparisons
+- ✅ Model evaluation results
 
-### Write Log
-```python
-from datetime import datetime
-from pathlib import Path
+### Decisions (→ `obsidian-brain/Decisions/`)
+- ✅ Significant architecture changes
+- ✅ Tool/library choices
+- ✅ Breaking workflow changes
 
-def write_activity_log(agent: str, action: str, content: dict) -> str:
-    """Write activity log entry."""
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
-    log_dir = Path(f".github/agents_log/{agent}")
-    log_dir.mkdir(parents=True, exist_ok=True)
-    
-    log_path = log_dir / f"{timestamp}_{action}.md"
-    
-    log_content = f"""# {content['title']}
+## Cross-Referencing with Backlinks
 
-**Agent:** {agent}
-**Date:** {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-**Duration:** {content.get('duration', 'N/A')}
-**Status:** {content.get('status', '✅ Success')}
+Use `[[backlinks]]` to connect knowledge across notes:
 
-## Summary
-{content.get('summary', '')}
+```markdown
+# In a log entry:
+This run discovered the [[References/Pipeline Bug 2026-02-08]] which affected all prior data.
 
-## Actions
-{chr(10).join(f"- {a}" for a in content.get('actions', []))}
+# In agent memory:
+See [[Logs/2026-02-08_pipeline_batch_run]] for details. Updated [[References/Model Comparison]].
 
-## Outputs
-{chr(10).join(f"- `{o}`" for o in content.get('outputs', []))}
-
-## Notes
-{content.get('notes', 'None')}
-"""
-    
-    log_path.write_text(log_content)
-    return str(log_path)
+# In an experiment:
+Training used data from [[Logs/2026-02-03_training_export]]. Results tracked by [[Agents/Training Agent]].
 ```
 
-### Append Memory
-```python
-def append_memory(agent: str, title: str, context: str, insight: str, application: str) -> bool:
-    """Append insight to agent memory file."""
-    memory_path = Path(f".github/agents_memory/{agent}_memory.md")
-    
-    entry = f"""
-### [{datetime.now().strftime("%Y-%m-%d")}] {title}
+## Querying the Vault
 
-**Context:** {context}
-**Insight:** {insight}
-**Application:** {application}
-"""
-    
-    with open(memory_path, "a") as f:
-        f.write(entry)
-    
-    return True
-```
+### In Obsidian App
+- Use **graph view** to see relationships between notes
+- Use **search** to find across all notes
+- Click any `[[backlink]]` to navigate
 
-## Querying Logs
-
-### Find Recent Logs
+### From Terminal
 ```bash
-# Last 10 logs for pipeline agent
-ls -lt .github/agents_log/pipeline/ | head -10
+# Find recent logs
+ls -lt obsidian-brain/Logs/ | head -10
 
-# Search for specific action
-grep -r "rate limit" .github/agents_log/
-```
+# Search for specific topic
+grep -r "rate limit" obsidian-brain/
 
-### Count by Status
-```bash
-# Count successes
-grep -r "✅ Success" .github/agents_log/ | wc -l
-
-# Count failures
-grep -r "❌ Failed" .github/agents_log/ | wc -l
+# Count logs by status
+grep -r "✅ Success" obsidian-brain/Logs/ | wc -l
+grep -r "❌ Failed" obsidian-brain/Logs/ | wc -l
 ```
 
 ## Retention Policy
 
-- **Activity Logs:** Keep 90 days, then archive
-- **Memory:** Keep indefinitely, review quarterly
-- **Archive Location:** `.github/agents_log/archive/YYYY-MM/`
+- **Activity Logs:** Keep indefinitely (Obsidian handles large vaults well)
+- **Agent Memory:** Keep indefinitely, review quarterly
+- **Experiments:** Keep indefinitely (critical for model improvement history)
+- **Decisions:** Keep indefinitely (architectural record)

@@ -26,9 +26,9 @@ class WorkflowState:
         "2_pipeline",
         "3_export",
         "4_push",
-        "5_validate",
-        "6_cleanup",
-        "7_maintain",
+        "5_wait_for_user",
+        "6_validate",
+        "7_visualize",
         "8_finalize"
     ]
     

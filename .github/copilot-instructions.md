@@ -1,43 +1,125 @@
 # AI Coding Agent Instructions
 
+**Version:** 4.0 (Interactive Multi-Agent with Obsidian Knowledge Base)  
+**Last Updated:** 2026-02-08
+
 Concise guidance for working productively in this frequent itemset mining + LLM fine-tuning project.
 
-## Repository Structure (Updated 2026-02-01)
+## Multi-Agent Workflow System
+
+This project uses **interactive multi-agent orchestration** where users switch between specialized agents to execute workflow stages.
+
+### 🧠 Memory-First Rule (MANDATORY)
+
+**Every agent MUST read its memory file from the Obsidian vault before starting ANY task:**
+
+| Agent | Memory File (Obsidian) |
+|-------|------------------------|
+| Orchestrator | `obsidian-brain/Agents/Orchestrator.md` |
+| Dataset Agent | `obsidian-brain/Agents/Dataset Agent.md` |
+| Pipeline Agent | `obsidian-brain/Agents/Pipeline Agent.md` |
+| Training Agent | `obsidian-brain/Agents/Training Agent.md` |
+| Deployment Agent | `obsidian-brain/Agents/Deployment Agent.md` |
+| Evaluation Agent | `obsidian-brain/Agents/Evaluation Agent.md` |
+| Monitoring Agent | `obsidian-brain/Agents/Monitoring Agent.md` |
+| Cleanup Agent | `obsidian-brain/Agents/Cleanup Agent.md` |
+| Maintainer Agent | `obsidian-brain/Agents/Maintainer Agent.md` |
+
+**Activity logs** go to `obsidian-brain/Logs/` using the Run Log template.
+**Experiment reports** go to `obsidian-brain/Experiments/` using the Experiment template.
+**Decisions** go to `obsidian-brain/Decisions/` using the Decision template.
+**Reference docs** live in `obsidian-brain/References/` (API limits, model comparison, etc.).
+
+Use `[[backlinks]]` in Obsidian notes to connect related knowledge across agents.
+
+### How It Works
+
+1. **User activates agent:** `@workspace /agents switch to <agent-name>`
+2. **Agent reads memory FIRST** (never repeats past mistakes)
+3. **User runs command:** Slash command (e.g., `/datasets`, `/pipeline`)
+4. **Agent executes:** Runs scripts, validates outputs, updates workflow state
+5. **Agent tells user:** Which agent to activate next
+
+**See:** [.github/WORKFLOW_GUIDE.md](.github/WORKFLOW_GUIDE.md) for complete step-by-step guide
+
+### Workflow State
+
+**Location:** `.github/agents_memory/workflow_state.json`  
+**Purpose:** Coordinate sequential execution between agents
+
+**Python module:** `.github/agents_memory/workflow_state.py`
+
+```python
+from .github.agents_memory.workflow_state import load_workflow, complete_stage
+
+# Load state
+wf = load_workflow()
+print(wf.get_status_summary())
+
+# Complete stage
+complete_stage("1_datasets", {"datasets_count": 500})
+```
+
+### Agent List
+
+**Main Workflow Agents (8 stages):**
+
+| Agent | Activation | Slash Commands | Stage |
+|-------|-----------|---------------|-------|
+| Orchestrator | `@workspace /agents switch to orchestrator` | `/organize`, `/status`, `/finalize` | 1 & 8 |
+| Dataset Agent | `@workspace /agents switch to dataset-agent` | `/datasets`, `/analyze` | 2 |
+| Pipeline Agent | `@workspace /agents switch to pipeline-agent` | `/pipeline`, `/validate-run` | 3 |
+| Training Agent | `@workspace /agents switch to training-agent` | `/export`, `/validate` | 4 & 6 |
+| Deployment Agent | `@workspace /agents switch to deployment-agent` | `/push`, `/deploy` | 5 |
+| Monitoring Agent | `@workspace /agents switch to monitoring-agent` | `/visualize`, `/report` | 7 |
+| Evaluation Agent | `@workspace /agents switch to evaluation-agent` | `/eval`, `/compare` | Support |
+
+**🔧 Utility Agents (available anytime, not mandatory stages):**
+
+| Agent | Activation | Slash Commands |
+|-------|-----------|---------------|
+| Cleanup Agent | `@workspace /agents switch to cleanup-agent` | `/cleanup` |
+| Maintainer Agent | `@workspace /agents switch to maintainer-agent` | `/maintain` |
+
+### Workflow Flow
+
+```
+Orchestrator → Dataset Agent → Pipeline Agent → Training Agent → Deployment Agent
+  /organize      /datasets       /pipeline       /export          /push
+     │                                                              │
+     │          ⏸️ PAUSE: User trains & evaluates on Jupyter server    │
+     │                                                              │
+     └───────── Training Agent ← Monitoring Agent ← Orchestrator ───┘
+       /finalize     /validate       /visualize
+```
+
+**Key:** After Stage 5 (`/push`), the workflow PAUSES. The user trains and evaluates the model on their own Jupyter server. Then resume with `/validate` to continue.
+
+**See:** [AGENTS.md](../AGENTS.md) for detailed agent documentation
+
+## Repository Structure (Updated 2026-02-08)
 
 ```
 itemsety-qwen-finetuning/
 ├── pipeline.py                    # Core extraction pipeline (Apriori + LLM)
 ├── src/
 │   ├── training/                  # Fine-tuning scripts
-│   │   ├── run_sft_full.py        # Production training
-│   │   ├── run_sft_test.py        # Test training  
-│   │   ├── export_training_data.py
-│   │   ├── create_hf_dataset.py
-│   │   └── upload_dataset_to_hf.py
-│   ├── evaluation/
-│   │   └── eval_finetuned_model.py
-│   ├── data_generation/
-│   │   ├── generate_datasets_v2.py
-│   │   └── generate_eval_datasets_v2.py
-│   └── utils/
-│       ├── visualization.py
-│       ├── compute_stats.py
-│       └── inspect_training_data.py
+│   ├── evaluation/                # Model evaluation
+│   ├── data_generation/           # Dataset generation
+│   └── utils/                     # Utilities
 ├── data/
-│   ├── datasets_v2/               # CSV datasets (500)
-│   ├── training_v2/               # Training examples (ChatML)
-│   └── hf_dataset_v2/             # HuggingFace format
-├── docs/
-│   ├── guides/
-│   └── reports/
-├── scripts/
-│   ├── deployment/                # HF deployment scripts
-│   ├── colab/                     # Google Colab scripts
-│   └── db_maintenance/            # SQLite utilities
+│   └── datasets_v2/               # CSV datasets (500+)
+├── obsidian-brain/                # 🧠 Obsidian knowledge vault
+│   ├── Home.md                    # Vault navigation hub
+│   ├── Agents/                    # Agent memory notes (9 files)
+│   ├── References/                # API limits, model comparison, etc.
+│   ├── Logs/                      # Per-run activity logs
+│   ├── Experiments/               # Training experiment reports
+│   ├── Decisions/                 # Architecture decisions
+│   └── Templates/                 # Note templates
 ├── .github/
 │   ├── agents/                    # 9 agent definition files
-│   ├── agents_log/                # Agent activity logs
-│   ├── agents_memory/             # Agent persistent memory
+│   ├── agents_memory/             # workflow_state.json + workflow_state.py only
 │   └── copilot-instructions.md    # This file
 ├── artifacts/                     # Pipeline outputs (gitignored)
 ├── logs/                          # Execution logs (gitignored)
@@ -45,7 +127,7 @@ itemsety-qwen-finetuning/
 ```
 
 ## Project Essence
-- Pipeline (`pipeline.py`) runs Apriori (deterministic) + LLM extraction (Azure OpenAI via LangChain) over CSV datasets (single file or batch directory).
+- Pipeline (`pipeline.py`) runs Apriori (deterministic) + LLM extraction (OpenAI via LangChain) over CSV datasets (single file or batch directory).
 - Artifacts are hash-suffixed JSONs in `artifacts/` directory: `apriori_outputs/`, `extractor_outputs/`, `validation_reports/`, `db_prepared/` plus generation logs in `logs/<kind>/`.
 - SQLite persistence (`runs.db`) stores run metadata; auto-migrations add new columns (e.g. `llm_model`).
 
@@ -100,7 +182,7 @@ python src/utils/visualization.py --db runs.db --outdir visuals --bins 5
 - Duplicate evidence rows in LLM responses are deduplicated; counts must match unique rows or validation fails.
 
 ## What NOT To Do
-- Do not hardcode secrets; rely on env variables / `azure.env` (never commit real keys).
+- Do not hardcode secrets; rely on env variables / `openai.env` (never commit real keys).
 - Do not rename artifact directories within `artifacts/` structure; many scripts assume current organization.
 - Avoid modifying Apriori output schema (itemset/count/rows/support) unless you also adjust validation & visualization.
 
@@ -109,28 +191,35 @@ python src/utils/visualization.py --db runs.db --outdir visuals --bins 5
 - Record per-stage timing (Apriori vs LLM vs validation) into DB for longitudinal performance analysis.
 
 ## Security Rules
-- **NEVER** commit `azure.env`, `openai.env`, or any file with real API keys
+- **NEVER** commit `openai.env` or any file with real API keys
 - **NEVER** hardcode API keys, tokens, or credentials in code
 - **ALWAYS** use environment variables for secrets
 - Files to NEVER modify or read sensitive content from:
-  - `azure.env` (local only, gitignored)
   - `openai.env` (local only, gitignored)
   - `runs.db` (local only, gitignored)
-- Template files are safe: `azure.env.template`, `openai.env.template`
+- Template files are safe: `openai.env.template`
 
 ## Agent System
 This repo uses 9 specialized agents in `.github/agents/`:
-- **orchestrator.md** - Master workflow coordinator
-- **pipeline-agent.md** - Apriori + LLM extraction
-- **training-agent.md** - Model fine-tuning
-- **evaluation-agent.md** - Model evaluation
-- **deployment-agent.md** - HuggingFace deployment
-- **monitoring-agent.md** - Metrics & visualization
-- **dataset-agent.md** - Dataset generation
-- **maintainer-agent.md** - Documentation maintenance
-- **cleanup-agent.md** - Repository hygiene
 
-Skills are in `.github/agents/skills/`, logs in `.github/agents_log/`, memory in `.github/agents_memory/`.
+**Main Workflow Agents:**
+- **orchestrator.md** - Master workflow coordinator (Stages 1 & 8)
+- **dataset-agent.md** - Dataset generation + fixed eval datasets (Stage 2)
+- **pipeline-agent.md** - Apriori + LLM extraction (Stage 3)
+- **training-agent.md** - Export training data + versioned notebooks + receive eval results (Stages 4 & 6)
+- **deployment-agent.md** - Push dataset + notebook to HuggingFace (Stage 5)
+- **monitoring-agent.md** - Comparison visuals: base vs fine-tuned vs Apriori (Stage 7)
+- **evaluation-agent.md** - Eval datasets & scripts (ready before training)
+
+**🔧 Utility Agents (available anytime):**
+- **cleanup-agent.md** - Repository hygiene
+- **maintainer-agent.md** - Documentation maintenance
+
+Skills are in `.github/agents/skills/`.
+
+**Knowledge Base:** All agent memories, logs, experiments, and decisions are stored in the **Obsidian vault** at `obsidian-brain/`. Agents use `[[backlinks]]` to cross-reference related knowledge.
+
+**Critical:** Every agent reads its Obsidian memory note BEFORE any task. See `obsidian-brain/Agents/` for agent-specific notes, past mistakes, and improvement history.
 
 ---
 Provide feedback if model handling, synthetic log differentiation, or validation invariants need deeper clarification.

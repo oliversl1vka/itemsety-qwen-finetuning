@@ -60,10 +60,10 @@ class ScriptArguments:
     num_train_epochs: int = field(default=3, metadata={"help": "Number of epochs"})
     per_device_train_batch_size: int = field(default=1, metadata={"help": "Train batch size"})
     per_device_eval_batch_size: int = field(default=1, metadata={"help": "Eval batch size"})
-    gradient_accumulation_steps: int = field(default=8, metadata={"help": "Gradient accumulation"})
+    gradient_accumulation_steps: int = field(default=16, metadata={"help": "Gradient accumulation"})
     learning_rate: float = field(default=5e-5, metadata={"help": "Learning rate"})
-    max_length: int = field(default=2048, metadata={"help": "Max sequence length"})
-    max_prompt_length: int = field(default=1024, metadata={"help": "Max prompt length"})
+    max_length: int = field(default=1024, metadata={"help": "Max sequence length"})
+    max_prompt_length: int = field(default=512, metadata={"help": "Max prompt length"})
     
     # DPO-specific arguments
     beta: float = field(
@@ -263,6 +263,8 @@ def main():
         fp16=False,
         bf16=True,
         gradient_checkpointing=True,
+        gradient_checkpointing_kwargs={"use_reentrant": False},
+        max_grad_norm=0.3,
         
         # Logging & evaluation
         logging_steps=10,
@@ -289,8 +291,7 @@ def main():
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
-        processing_class=tokenizer,  # Updated API: use processing_class instead of tokenizer
-        beta=script_args.beta,
+        processing_class=tokenizer  # Updated API: use processing_class instead of tokenizer
     )
     
     # Train

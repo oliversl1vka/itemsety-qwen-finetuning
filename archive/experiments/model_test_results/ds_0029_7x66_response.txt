@@ -1,8 +1,0 @@
-[
-    {
-        "itemset": ["hufuponi", "hale", "hafujavu"],
-        "proof": "Observation support count (distinct rows/transactions): 12",
-        "explanation": "The dataset contains three transactions labeled 'hufuponi', 'hale', and 'hafujavu'. The itemsets are ['hufuponi'], ['hale'], and ['hafujavu']. Each transaction includes one of these items, making the observation count equal to 3."
-    },
-    {
-        "itemset": ["hufuponi", "hale", "hafujavu", "hale", "hafujavu", "hulama", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu", "hafujavu",
