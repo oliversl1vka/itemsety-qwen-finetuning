@@ -1,0 +1,757 @@
+Dataset: ds_0217_16x8_5a56500e.csv
+Size: 16×8
+Apriori itemsets: 57
+Prompt tokens: 1005
+New tokens: 4096
+Hit limit (4096): True
+Time: 121.2s
+Think: False
+JSON parsed: False (0 items)
+F1: 0.0
+Precision: 0.0
+Recall: 0.0
+Hallucinated items: 0
+repetition_penalty: 1.3
+no_repeat_ngram_size: 3
+
+======================================================================
+RAW MODEL OUTPUT (9339 chars):
+======================================================================
+
+<think>
+Dataset: 17 rows × 8 columns, min_support=3
+
+Scanning for frequent items and combinations... (49 total found)
+
+Singles (11 find):
+- ["battery_life_rating:battery_life_rating"]: Row 1 (+1 more) → 1 ✓
+- ["rating:not_1"]: Row +1 → 93 ✓
+  ("not_1"): Row 2 (+10 more) ✕ 19 ✓
+    - ["camera_rating:camera_rating"]:   Row  e+1 → b ✓
+      ("-1"):     Row  r+1 ✗ 18 ✓
+        - ["display_rating:display_rating"]:       Row  d+e+f+h+i+j+k+l+m+n+p+r+s+t+w+x+y+z+a+b+c+d+g+h+i*j*k*l*m*n*o*p*q*r*s*t*u+v+w*x*y*z+a*b*c*d*e*f*g*h*i*j*k_*l_m_n_o_p_q_r_s_t_u_v_w_x_y_z_a_b_c_d_e_f_g_h_i_j_k_l_m_n__p_q_r s_t_u*v*w x y z*a*b c*d e f g h i j k l mm n o p q r r s t u v w x y *z+a b c d e f _g h i i j j k k l mm m n n o o p p q q r s s t t u u v v w w x x y y z*z+a b cd ef gh hi ij kk ll mm nn oo pp qq rr ss tt uu vv ww xx yy zz→ 1✓
+          - ["performance_rating:performance_rating"]:         Row  a+e+g+i+j+l+m+q+r+s+u+v+w+x*y*z++a+b+c+e%f%h%i&j&o&q&r&s&t*u*v&w%x*y*z&a*b*c%d&e%f%g%h %i&k&m%n&p&q)r%s)t*u*v"w"x"%y%"z"a*b"c"d"f"g"h"in"k%m%n%p&q'r)s't'u'v''w''x'y'z'a'b 'c'dd'e'%f'h'i'k'l'm'n'o'p'q'sr'st'u've'w'x'y;z'+a'*b*'c '*d'e%'f'h'in'k'm'n'p[q]s[t]'u'[v][w][x'][y']z[a]*b*[c ]*d[e]%f[h]in[k]n[m]p[o]q[r}s[t]u[v]w[x]y[z]+a[b][c ][d][e][f][g][h][i][k][m][n][n[p][q][r][s][t][u][v][x][y][z]+a[*b[c[d[f[g[h[i[j[k[l)m[n)o)p?q)r[s)t[u)v[w)x[y[z+a*bcd.efghiklmno.pqrstu.vwx.y.zab.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.a.b.[b].c..d.e.f.h.in.k.m.n.p.q.&r.s.t,u,v,w,x,y,z.ab.*bc*.de.f.ghi.k.m.nn.op.prqs.truvwyza**bcd.defghiijkkllmmnnopqrstuvwxyzzabcdefghijklmnopqrstuvwxyzabcdefgihkmnopqrtuwxyzabcdedfgijklnoprstuxyzabcdefghklmnoppqqrrssttuuuvwxxyyzzabcdefghijklmnopqrstuvwxyzabcdefgiklmnpopqrstuyzwacdfeghinjklopqtuvwxyzabcdefgiimnooprstuwxyzacdfeigknorptuwzyxcbaefghilmnorpqtsujvyxzcbadefgilnmooorstuwvxycdaefhilmoornpsutvwzxycbadefilmonprsuvtwxzcabaedefglomnrpuvsxtwcdbaeifglmnonrsuptvwxdcaebflnomorsprsuvtxwdcbaefgnlorpuswtvcadbeflonmrupsztvdacbelfonrmuspztvbaceddlfnormuspvztwbacefdilormpnsutzwaecbfiloanpmrtswuzbacfiolnamprtwsuczbafioalmntpwscubafiolknpmtrszwudcafionmlorpustwczabdcefilompnuvrwxaecbdfoinlrmpsutcawdcbefonlpmsurtcwazbecdnforplmuasctewdbcenofrlmusatcxwebncofrluamspdtcvaxwncoerfluampdsctvaexncodfarumsltpdwavxncoerdfulmaptdsveaxndcorfuapmdtvsaecnordfaulmtspaecxnodfraulpdmstaencorfduaplsmtnvacdxneocrfadumplstmaencrfdoalpaumnstrvatcedxfonaclruptsvebxnaoclurfmastvpdexcnoraclfumsdpavnxeccnofarltsumpdvnxbecednfaoirltmunpxvasbwcdnemoaftlsrpvmuaexcodfanrupmvbscadenoftpurmualtcwenoxcfdrpanmutbvseadxnocfalurnpstevmbnxocaflrunptomsdvuepcedxancroflutmansdvpebxcandolfmunrasvetpbexcarnfloamuotwpvsnedeacfoulanrpmtsxvuedfcnoxacrufmalntsudpvoebxcanrolmfunsrvpetducfxanoelcrfpsdamnvtecxwanorcldfpamsnutervdecfaxnbocoalfpunrdsrmevtaxdocrcfelmasuntvedcpawnrxsbcmoeaufnlcsrnpatuevdcxobnalufsponremvataxcoxrbfacelnosptrvuwmdezfbcaoelruspfantmcxoweanblfsropnumtvauwdenrocxlapsfmtvenracouxlbnaprosfvuemtwcdfbaoelspnutfmxranovetlcwuadcboeslfputnavxmzebractsfuoavlmemznepxrwoytqaibjdckehlgjnksquwrtyvhgfizxypwvutsrqpojmhnogleidcabfhiqujlmyrzxswhvkgtbydzcuvelokmqnpisfygrthajeklzvnyiwqxopjuvgakhrjsnwtkozxeygbivuhqlmkpzoytfngpkjqlyrhixejdkzmynagwqcphojlkrytzsqvfugnirbmhwqeiyjtukvlmgskcydhjpqsoitnzlxwkrgaqezvyrwhtsxuqploicnjmfykbgdjeahkwpyzqtlcgxvjshuqnipzkgoymxraeojfkbzuwlvhydqsgnmiostvkrpgxchylqwzpkujiertvnhzdgyxwvutqmoplkgjhfidbasercywvuxgzqhxjnktoyslwqbhpiajkdolgcefmarzuiygktbhqvxpjwlzsyreoihsjfkdyguqzhciwjnayeqvbkxzlhmortpjkegsydhuqwiqbjkytgxzsyejrklaohviqjbpwkhgejyuqziwkvhljyxqtbdiwkpjyhgxqzliwvjbhkqyiwegsjxqbiwkcjhegvqdjkiwbtqhgwjxiqybkaiehgkjxqtiwkbhcjegvqiwikjhbqeiwgjxqbihcjegvikjwihbqiejxwigiqbakiwijxhqbiegjawikhjyqbitwcejrihgaqjwiekhibqjxiewgaihjwqietbahjwiegqhabiktjwbehjaqiwjhaekiwitjahgieqjakithbewjhaiqjwiehjabkitjwaghjieqkahjitwabhjgiaqjhitwajeighbakjwiteikehbiajwitheqjakhbijweiqajhkiebatwijaqjheitwajaqjheiwatibaqjhetwajiwakehjbagitaqjweitabiwajtekiahqjetwajihkatwajbekiatwajhekibtajwethikaqjhteawkjaitwajhketbaiqjhatwajbetkiaqjhtaewikajbtheawiqjatehwibajqhetwajwkteahiqjathwibeajqhtaweijaktwabejihatqjweatkibiawjthweajqtabwetaikjwheatjibqthaewjikbtaawejhikatwajbqeatwajkibeahtiawejbqthawjektibajwhtbeiakjwetajbwhetiakjbeatwajkehitiwajqbeawtajhiketawjbeawjhtiaeajwthbeaikjwatbajhetewajibkawejthawbajtetwajbeikawtjwbeahtiwajbekahtwajbeitwajhtwabeiwajtbeawajhettwajbethwajikbteaajwbeawijjthwetbajwetawajbhtewajbthewajbteawajtbehawjbetwajbewtajwhebatiwajbebawtjavjwteabjwabetajwteajwbbetajwttbeawajuwajbbeawtjejwattajwabbetajwwtbeajwaaejtatwajjwbetajwatabejwtaajwabetajjbetawaajwetatljwaatbjwetabajwetabjwbetajjwtbawajwetteajwajbabewajwatatwajjjwbetawajjwjbetajwjebbajwawetajwjtteajwbbbajwatteajwbbbbajwateeajwaaaaajwbetwadjwaaaajwbettajwattaajwattawajwwwbetajwwaabjwwwtawajwwaatbjwwtajwwtatbjwwtatwawajttwawjwwtwwtjwwtatwjwwttawajwwttawajwtawajwjwtaawajtatwaaajwwawtawjttawawajtwawajawttaawjwawawjwatwajawawawtwwajwwawawjawawawwawjawwawwajjawawwjawawwwawjawwwawajjawwwjawwwwwawjawsawawwwwwwwajwssasssssassaawwwwwwawwwwasawwwwawwwswawwwrwawwwfwawwwewawwwdawwwcawwwbazwwwwazzawwwzzawwwzawwwzaawwwyaawwwxawwwvawwwuatwwwwtddwwwwppwwwwonnwwwwmmmwwwwlllwwwwkkkwwwwjjjwwwwiiiiiwwwwhhhhhwwwwgggggwwwwfffffwwwweeeeewwwwdddddddwwwwcccccccwwwwbbbbbbbwwwwaaaaaaaaawww!@#$%^&*(+=|}{[]:/?.,;~`><+-×\|=^*&';:'\"/\\{}[],.:;!)(=*+_<>?" -> 1✗
+            - ["design_rating:design_rating"]:           Row  b+e+i+i+j+j+k+m+n+o+q+s+t+x+y+a+b+d+e+h+i+k+l+n+q+w+x-> 1 ✔
+              - ["exchange_rate_to_USD:exchange_rateToUSD"]: Row !+a+e+j+k+n+u+w+x→ 6 ✓
+                - ["word_count:wordCount"]:               Row  &+a+b+e+k+m+o+r+s+w+x+→ 7 ✓
+                  - ["rating:rating"]:                    Row  #+a+c+g+j+k+o+s+w+→11 ✓
+
+Pairs ( 1 + 1 ):
+- ["cameraRating:camera_rating", "-1"]:   row  e+f+h+j+k-l-m-n-o-p-q-r-s-t-u-v-w-x-y-z-a-b-c-d-e-f-g-h-i-j-k-*l*m*n*-o*p-q-r*s-t*u*v*w*x*y*"-row  a+b+c+%d%e%f#h$i&k$m$n&$o$p$q$r$s$t*u$v$x$y$z$a$b$c$d$f#g$h#i$k$l$m$n$o$p$q#r$s$t#u#v#w#x#y#z#a*$b#c$d#e#f#h#i$j$k_$l$t*u*v<w>x<y<z>a<b<c<d>e<f<g<h<i<j<k_<l<m<n<_o<p<q<r<s<t<u>v>w<x>y<z<a>b>c>d>f>h>i>j>k>m>n>_o>p>q>r>s>t>u>v>w>x>y>z>a*>b>*c*>d*>e*>f*>g*>h*>i*>j*>k_>l*_m*_n*_o*_p*_q*_r*_s*_t*_u*_v*_w*_x*_y*_z_*a_*b_*c_*d_*e_*f_*g_*h_*i_*j_*k_*l_*m_*n_*o_*p_*q_*r_*s_*t_*u_*v_*w_*x_*y_*z_*+a_*+b_*+c_*+d_*+e_*+f_*+g_*+h_*+i_*+j_*+k_*+l_*+m_*+n_*+o_*+p_*+q_*+r_*+s_*+t_*+u_*+v_*+w_*+x_*+y_*+z_*+[a_]_[b_]_[c_]_[d_]_[e_]_[f_]_[g_]_[h_]_[i_]_[j_]_[k_]_[l_]_[m_]_[n_]_[o_]_[p_]_[q_]_[r_]_[s_]_[t_]_[u_]_[v_]_[w_]_[x_]_[y_]_[z_]_-> 1✔
+  (-1): Row  f+h+j-k-l-m--n-o-p--q-r-s--t-u-v--w-x-y--a-b-c--d-e-f--g-h-i--j-k-_l_-m_-n_-o_-p_-q_-r_-s_-t_-u_-v_-w_-x_-y_-a_-b_-c_-d_-e_-f_-g_-h_-i_-j_-k_-l_-l_->_m_>-n_>-o_>-p_>-q_>-r_>-s_>-t_>-u_>-v_>-w_>-x_>-y_>+a_>+b_>+c_>+d_>+e_>+f_>+g_>+h_>+i_>+j_>+k_>+l_>+m_>+n_>+o_>+p_>+q_>+r_>+s_>+t_>+u_>+v_>+w_>+x_>+y_)+a_)>b_)>c_)>d_)>e_)>f_)>g_)>h_)>i_)>j_)>k_)>l_)>m_)>n_)>o_)>p_)>q_)>r_)>s_)>t_)>u_)>v_)>w_)>x_)>y_)*a_)*b_)*c_)*d_)*e_)*f_)*g_)*h_)*i_)*j_)*k_)*l_)*m_)*n_)*o_)*p_)*q_)*r_)*s_)*t_)*u_)*v_)*w_)*x_)*y_)*(a_)_(b_)_(c_)_(d_)_(e_)_(f_)_(g_)_(h_)_(i_)_(j_)_(k_)_(l_)_(m_)_(n_)_(o_)_(p_)_(q_)_(r_)_(s_)_(t_)_(u_)_(v_)_(w_)_(x_)_(y_)_(z_)_-> 21✗
+
+Found 1 unique pair(s).
+
+Triples ( 2 + 2 ):
+- ["/-", "/-"]: Row e+f+j+k--l-m-n--o-p-q--r-s-t--u-v-w--x-y-a--b-c-d--e-f-g--h-i-j--k-l-m--> 1 ✖
+  ("/-"): Row e+j+k--+f+m+n--o+p-q--s+t-u--v+w+x--a+b-c--e+f+g--h+i+j--k+l+m--n+o+p--q+r-s--u+v:w--x+y+a--b+c+d--e:f:g--h:i:j--k:l:m--n:o:p--q:r:s--s:t:v--u:w:x--y:a:b--c:d:e--f:h+:i--j:k:+l--m:n:-o--p:q--r:s--t:u--v:w--w:y:a--b:c:d--e::f--g:h--i:j--j:l--k:m--m:no--o:p--p;q--q;r--r;s--s;t--t=u--u:v--v=w--w=x--a:b--b;c--c;d--d:e--e?f--f:g--g:i--i;j--j;k--k;l--l;m--m;n--n;o--o;p--p--;q--q--;r--r--;s--s--;t--t--;u--u--;v--v--;w--w--;x--x--;y--y;a--a;b--b;;c--c;;d--d;;e--e;;f--f;;g--g;;h--h;;i--i;;j--j;;k--k;;l--l;;m--m;;n--n;;o--o;;p--p;;q--p--r--s--t--u--w--v--w---a--b--c--d--e--f--h--g--i--k--j--k----l--n--m--o--q--s-----a--a--c------b--b-------c--e--------d---------e----------f-----------g------------h-------------h--------------i---------------j----------------k--------------------l----------------------------m--------------------------------n------------------------------o------------------------------------------------p-----------------------------------------------------------------q---------------------------------------------------------------------------------r-------------------------------------------------------------------------------s------------------------------------------------------------------------------------------------t----------------------------------------------------------------------u--------------------------------------------------------------------------v---------------------------------------------------------------------------w-----------------------------------------------------------------------------x-----------------------------------------------------------------------------y-----------------------------------------------------------------------------a-----------------------------------------------------------------------------b-----------------------------------------------------------------------------c-----------------------------------------------------------------------------d-----------------------------------------------------------------------------e-----------------------------------------------------------------------------f
+
+======================================================================
+APRIORI GROUND TRUTH (57 itemsets):
+======================================================================
+
+[
+  {
+    "itemset": [
+      "exchange_rate_to_usd:0.78"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 6",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:3"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 1",
+      "Row 3",
+      "Row 4",
+      "Row 5",
+      "Row 7",
+      "Row 13"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:5"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 6",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 3",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "rating:2"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 2",
+      "Row 7",
+      "Row 9",
+      "Row 10",
+      "Row 12",
+      "Row 14"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 9",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 4",
+      "Row 5"
+    ]
+  },
+  {
+    "itemset": [
+      "performance_rating:1"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 2",
+      "Row 8",
+      "Row 10",
+      "Row 12",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:2"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 2",
+      "Row 5",
+      "Row 9",
+      "Row 10",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "display_rating:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 2",
+      "Row 8",
+      "Row 10",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "word_count:10"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 2",
+      "Row 6",
+      "Row 11",
+      "Row 12",
+      "Row 14"
+    ]
+  },
+  {
+    "itemset": [
+      "rating:4"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 11",
+      "Row 13",
+      "Row 16"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:3"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 3",
+      "Row 9",
+      "Row 13",
+      "Row 16"
+    ]
+  },
+  {
+    "itemset": [
+      "display_rating:4"
+    ],
+    "count": 7,
+    "rows": [
+      "Row 3",
+      "Row 9",
+      "Row 11",
+      "Row 12",
+      "Row 13",
+      "Row 14",
+      "Row 16"
+    ]
+  },
+  {
+    "itemset": [
+      "performance_rating:4"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 4",
+      "Row 6",
+      "Row 11",
+      "Row 16"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:3"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 4",
+      "Row 6",
+      "Row 13",
+      "Row 16"
+    ]
+  },
+  {
+    "itemset": [
+      "display_rating:3"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "word_count:11"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 7",
+      "Row 16"
+    ]
+  },
+  {
+    "itemset": [
+      "exchange_rate_to_usd:0.93"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 5",
+      "Row 12",
+      "Row 16"
+    ]
+  },
+  {
+    "itemset": [
+      "performance_rating:2"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 5",
+      "Row 7",
+      "Row 9",
+      "Row 14"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 7",
+      "Row 8",
+      "Row 10",
+      "Row 12",
+      "Row 14",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 7",
+      "Row 8",
+      "Row 12",
+      "Row 14"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 8",
+      "Row 10",
+      "Row 14",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "exchange_rate_to_usd:3.67"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 9",
+      "Row 11",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:1",
+      "rating:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 7",
+      "Row 12",
+      "Row 14"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:2",
+      "rating:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 9",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:1",
+      "display_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 8",
+      "Row 10",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "display_rating:1",
+      "performance_rating:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 2",
+      "Row 8",
+      "Row 10",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:3",
+      "display_rating:4"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 3",
+      "Row 9",
+      "Row 13",
+      "Row 16"
+    ]
+  },
+  {
+    "itemset": [
+      "display_rating:4",
+      "rating:4"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 3",
+      "Row 11",
+      "Row 13",
+      "Row 16"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "design_rating:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 7",
+      "Row 8",
+      "Row 12",
+      "Row 14"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:1",
+      "performance_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 8",
+      "Row 10",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:2",
+      "rating:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 9",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:3",
+      "rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 13"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "rating:2"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 7",
+      "Row 10",
+      "Row 12",
+      "Row 14"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:3",
+      "display_rating:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 5",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "display_rating:4",
+      "word_count:10"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 11",
+      "Row 12",
+      "Row 14"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:3",
+      "rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 13",
+      "Row 16"
+    ]
+  },
+  {
+    "itemset": [
+      "performance_rating:1",
+      "rating:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 10",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:2",
+      "display_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 10",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "display_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 8",
+      "Row 10",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:3",
+      "rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 13",
+      "Row 16"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:1",
+      "camera_rating:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 8",
+      "Row 10",
+      "Row 14",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:3",
+      "performance_rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 6",
+      "Row 16"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:2",
+      "performance_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 10",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "performance_rating:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 8",
+      "Row 10",
+      "Row 12",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "display_rating:4",
+      "rating:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 9",
+      "Row 12",
+      "Row 14"
+    ]
+  },
+  {
+    "itemset": [
+      "rating:2",
+      "word_count:10"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 12",
+      "Row 14"
+    ]
+  },
+  {
+    "itemset": [
+      "performance_rating:4",
+      "rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 11",
+      "Row 16"
+    ]
+  },
+  {
+    "itemset": [
+      "performance_rating:2",
+      "rating:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 7",
+      "Row 9",
+      "Row 14"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:1",
+      "camera_rating:1",
+      "performance_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 8",
+      "Row 10",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:2",
+      "display_rating:1",
+      "performance_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 10",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:3",
+      "display_rating:4",
+      "rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 13",
+      "Row 16"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:1",
+      "camera_rating:1",
+      "display_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 8",
+      "Row 10",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "design_rating:1",
+      "rating:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 7",
+      "Row 12",
+      "Row 14"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "display_rating:1",
+      "performance_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 8",
+      "Row 10",
+      "Row 15"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:1",
+      "display_rating:1",
+      "performance_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 8",
+      "Row 10",
+      "Row 15"
+    ]
+  }
+]

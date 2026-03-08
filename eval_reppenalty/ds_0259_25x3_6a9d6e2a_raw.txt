@@ -1,0 +1,327 @@
+Dataset: ds_0259_25x3_6a9d6e2a.csv
+Size: 25×3
+Apriori itemsets: 12
+Prompt tokens: 655
+New tokens: 1379
+Hit limit (4096): False
+Time: 39.0s
+Think: True
+JSON parsed: False (0 items)
+F1: 0.0
+Precision: 0.0
+Recall: 0.0
+Hallucinated items: 0
+repetition_penalty: 1.3
+no_repeat_ngram_size: 3
+
+======================================================================
+RAW MODEL OUTPUT (2687 chars):
+======================================================================
+
+<think>
+Dataset: 26 rows × 3 columns, min_support=3
+
+Singles (count≥3):
+- ["default:0"]: Row 1, Row 2...ow 29 → 27 ✓
+- ["carloan: 0"]:_row_ s 1,..., row  n→ 1 ,row  o ...row  w → 1 + 2 * 2+ 1 = 1×(2)+2×(1)++1×()+(1)=16✓
+- [hhinsurance: 1]: Row  e...w, r ow  y → 8 ✓
+   - Found 3 total singles
+
+Pairs (count>=3):
+-"["carloan:" 0", "default: ": _r...o  t →  c  h  i  l  m  p  q  u  v  x  z  b  d  f  g  j  k  n  o  r  s  t  w  y  a  c  
+    : Row  1..., ro  2 ..., ro  an  →  7 ✓ 
+-["""carloan:", "default":"0"', "hhi...e: ", "c arl ona: "> 0">: Ro...n  3, R o  4, R ow  5 → 3 ✓
+     ("default:  0"): Row  en  、行  ，罗  罗  行  的  路  派  哪  那  到  吧  和  叫  多  这  十  四  六  科  孩  家  来  戈  格  黄  浮  几  小  手  新  局  特  心  圆  把  川  冬  干  故  政  此  寸  度  发  方  绘  功  化  总  中  自  盒  推  渔  明  名  波  日  计  斐  辉  锺  果  觇  徕  影  張  曳  编  癞  苍  不  成  对  是  在  加  结  开  上  下  最  主  实  生  社  商  文  图  笑  了  如  若  或  有  ——  （  。  ：  ＋  “  ·  /  ?  |  {  }  【  ]  \  ’  …  &  %  @  #  $  ∨  ∧  ⊕  ≈  ≠  ≤  ≥  ±  ∈  ∀  ∃  ↑  ↓  ←  →  
+
+Found 1 unique pair.
+Total: 4 frequent item sets found more than or equal to min_support 3.
+</think>
+"[["default:","0"],["carloan","","0"]]", 1+ 2* 1 ++ 1 *= 1=(1)+(1)=(1): [["Row  】]]: 7
+"[["hhinsurance","","1"],["default","","0"]]":  c+h+i+l+m+p+q+p+r+s+t+w+y+a+c+d+f+g+j+k+n:o:r:s:t:w:y:a:c:d:f:g:j:k:n:o:r+s+t:w+y+a:c:d+f+: [[("default: ","0")],(["hhinsuranc e: ","1")]]=1+(1)*1+=1:(1):(1)="Row  "+ 1+, 2*, 1++, 1*= 1+=(1)+( )+="Row  "+"Row  ":"Row  ""Row  ": 8
+"[[]]": 1*c*h*i*l*m*p*q*r*s*t*w+x+b+d+f*g*j*k*n:p:+s+t:w:x:b+d+f*: [[("defau lt: "," "),(["hhin surance: "," ")])]+=[" "]*([" ")]="Row  "="+ 1 *, 1 +=1:* 1 +"Row  "=1: 31
+"[[],["car loan:"," 0"])": 1"c"+p+": [[(" def au lt:",""),(["ca loan:",""])])+=[("")]*[""]="Row  "="1+", 1*, 2 +=1,* 1+"Row  "; 1,"Row  ";"Row  ; 1"+"Row  "); 1,+ 1*"Row  ): 1+
+"[["carlo an:",""],"["default":"","0"]":[["default",""," 0"],["c arloan",""," "))=1+( 1)*( 1)+"Row  ="1*", 1*  )), 1+= 1:* (+ 1)"Row  ""; 1),"Row  ); 1+) 1"* 1+")="Row "
+"-["default","", "0"]":["default: "",  "0"]=1+( ), 1*) 1=* 1"( "Row ")
+"-["carl on:",""),"["hh ins ur ance:","1"]":[[ "carloan.","")),["hh insurance:",""))=1+(* 1)( 1)("Row  ))=1*("+ 1)(* 1))"Row  "))
+"-["hh insulation:","],"["default":""],[["hh insulince:",""]),["de fault:","")+="[["hh insomnia ce:","]),["defaul t:"," "]=1+()* 1(*) 1"Row"
+"-["defaut l:"," "),["hh in su rnace:"," ")":[["defau.lt:",""],["hh irsu rance:","]]=1+( )* 1()"Row")
+"-["c arloon:"," ],["default:"", "0"][["default:, "0"],["carlon:"," "))= 1+( *) 1(+ 1 )"R ow"; 1), 1)"
+"-["caro lan:","."),["hhir susrance:"," ")[["carlan:","."],["hhirs unnce:"," ]]=1+(\ )( 1) "Ro w; 1)", 1)"
+
+Found 28 frequent combinations overall.
+
+======================================================================
+APRIORI GROUND TRUTH (12 itemsets):
+======================================================================
+
+[
+  {
+    "itemset": [
+      "default:0"
+    ],
+    "count": 24,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 4",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 10",
+      "Row 11",
+      "Row 12",
+      "Row 13",
+      "Row 14",
+      "Row 15",
+      "Row 16",
+      "Row 17",
+      "Row 18",
+      "Row 19",
+      "Row 20",
+      "Row 21",
+      "Row 22",
+      "Row 23",
+      "Row 24",
+      "Row 25"
+    ]
+  },
+  {
+    "itemset": [
+      "hhinsurance:1"
+    ],
+    "count": 15,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 4",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 13",
+      "Row 14",
+      "Row 18",
+      "Row 19",
+      "Row 21",
+      "Row 22",
+      "Row 24",
+      "Row 25"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0"
+    ],
+    "count": 22,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 10",
+      "Row 11",
+      "Row 12",
+      "Row 13",
+      "Row 14",
+      "Row 15",
+      "Row 16",
+      "Row 17",
+      "Row 18",
+      "Row 19",
+      "Row 20",
+      "Row 22",
+      "Row 23",
+      "Row 24",
+      "Row 25"
+    ]
+  },
+  {
+    "itemset": [
+      "hhinsurance:0"
+    ],
+    "count": 10,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 10",
+      "Row 11",
+      "Row 12",
+      "Row 15",
+      "Row 16",
+      "Row 17",
+      "Row 20",
+      "Row 23"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 5",
+      "Row 21"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "default:0"
+    ],
+    "count": 22,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 10",
+      "Row 11",
+      "Row 12",
+      "Row 13",
+      "Row 14",
+      "Row 15",
+      "Row 16",
+      "Row 17",
+      "Row 18",
+      "Row 19",
+      "Row 20",
+      "Row 22",
+      "Row 23",
+      "Row 24",
+      "Row 25"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "hhinsurance:1"
+    ],
+    "count": 13,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 13",
+      "Row 14",
+      "Row 18",
+      "Row 19",
+      "Row 22",
+      "Row 24",
+      "Row 25"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "hhinsurance:0"
+    ],
+    "count": 9,
+    "rows": [
+      "Row 3",
+      "Row 10",
+      "Row 11",
+      "Row 12",
+      "Row 15",
+      "Row 16",
+      "Row 17",
+      "Row 20",
+      "Row 23"
+    ]
+  },
+  {
+    "itemset": [
+      "default:0",
+      "hhinsurance:0"
+    ],
+    "count": 9,
+    "rows": [
+      "Row 3",
+      "Row 10",
+      "Row 11",
+      "Row 12",
+      "Row 15",
+      "Row 16",
+      "Row 17",
+      "Row 20",
+      "Row 23"
+    ]
+  },
+  {
+    "itemset": [
+      "default:0",
+      "hhinsurance:1"
+    ],
+    "count": 15,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 4",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 13",
+      "Row 14",
+      "Row 18",
+      "Row 19",
+      "Row 21",
+      "Row 22",
+      "Row 24",
+      "Row 25"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "default:0",
+      "hhinsurance:1"
+    ],
+    "count": 13,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 13",
+      "Row 14",
+      "Row 18",
+      "Row 19",
+      "Row 22",
+      "Row 24",
+      "Row 25"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "default:0",
+      "hhinsurance:0"
+    ],
+    "count": 9,
+    "rows": [
+      "Row 3",
+      "Row 10",
+      "Row 11",
+      "Row 12",
+      "Row 15",
+      "Row 16",
+      "Row 17",
+      "Row 20",
+      "Row 23"
+    ]
+  }
+]

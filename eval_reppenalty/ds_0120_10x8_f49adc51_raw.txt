@@ -1,0 +1,581 @@
+Dataset: ds_0120_10x8_f49adc51.csv
+Size: 10×8
+Apriori itemsets: 38
+Prompt tokens: 693
+New tokens: 4096
+Hit limit (4096): True
+Time: 119.9s
+Think: True
+JSON parsed: False (0 items)
+F1: 0.0
+Precision: 0.0
+Recall: 0.0
+Hallucinated items: 0
+repetition_penalty: 1.3
+no_repeat_ngram_size: 3
+
+======================================================================
+RAW MODEL OUTPUT (11028 chars):
+======================================================================
+
+<think>
+Dataset: 11 rows × 8 columns, min_support=3
+
+Singles (count≥3):
+- ["camera_rating:cameras/phones"]: Row 1, Row 20, Row   3 (+2 more) → 6 ✓
+- [performance_rating:perf_1]: Row  ean_1, R    +, Row     9 → 3 ✓
+  ("design_rating:dsgn_1"): Row  ane_1,+ ,R+  s→ 3✓
+- ["rating:rating_1"]: Row      n+, Row  1,e  r 9→ 4 ✓
+-"["battery_life_rating:batt_lg_2"]: Row       1,, Row  d+s+n_, Row  f+r_s→ 5✓
+  ["display_rating;display_r_dgtl"]: Row        1,n  ,R++s,s→ 6✓
+ - ["exchange_rate_to_u$:_usd_0._78"]: Row         3,Row  4,R+  w→  3✔
+- ['word_c_t_wrd_ct']: Row          1,r  g  h  y→ 7 ✔
+-['performance_rating:pfrfctvty_prt_4']: Row 5+,-,R+f+r_s,w→  c  t  5 ✓
+-'["batter_y_lif_e_rat_ng_bat_l_g_2)": Row  ++,R+d+s+n_，r+w→  b  l  k ✓
+-- ["c_a_mer_ra_ting_cam_es_ph_nos"]: Row            1,a  ，R+a  ，w→  m  o  p ✓
+--- ["desi gn_rt ng_desgn_1","perfor man ce ra ting_per_frfcty_prt_1"]:
+  Row  a  ，a  ，e  ，r  →  三 ✓
+----- ["desig n ratin g_design_1",“performanc e rating_performance _p frftcy_pt_1”]:
+  Row           1，a  。a。r  —  四 ✓
+------ ["des i gn rtng desi gn_1”, “camera ra tin g_camera__pho nos”]:
+ Row             1、a ！a—五✓
+------- ["des ig ntng des ign_1”，“displ ay rar ing_displa y_dr gl ts”]:
+ Ro w              1!a  !a——六✓
+-------- ["design_ratin g_design_i ",“disp lay_r arting_display_dglts”]:
+Ro w                1!!a！！a——七✓
+--------- ["des ign ratin gs_design_ _,“exch ang e rate_to_$ ex_us_ $_.78”]:
+ Ra w                 3!!!a!!!!a——八✓
+---------- ["des irg_r antings_di sign_1,”“wor d_cnt_word_ct”]:
+Ra w                  1!!!!!a——九✓
+----------- ["di splay_r arting_disp la y_dr_gl_ts，“wor d cnt_word ct”]:
+R ow                   1!!!!!!!!——十✓
+------------ ["desir gn_r_atntg_di sig n_1,"“wor ds_cnt_word ct"]:
+R ow                    1!!!!!!!--十一✓
+------------- ["desigh_r_antg_di si gn_ _,exchang e_r ate_to_$_u$s_.$.7"):
+ Ra w                     3!!!!!!----十二✓
+-------------- ["desigr_rant_ing_design_ _，exchan ge_rate_to_$ us__$ .78"]:
+ Ra w                      3!!!!!----十三✓
+--------------- ["designe_r_an tgs_design_ __，excha nge_r ates_to_$ u$d_$ .7")：
+ Ra w                       3!----十四✓
+---------------- ["designer_r ants_design_ ___，ex change_r atet_to_$ usa$.78"]： 
+ Ra w                        3----十五✓
+-------------------- ["desigen_r_antgs_design___，ex chan_ge_r atte_to_$ ua$_.7]":
+ Ra w                         3---十六✓
+..................... ["designed_r ants_de sign____，exc hang_e_r at et_to_$ua $.78"]
+ Ra w                          3--十七✓
+................. ["desiger_r ants_di sign__，ex changege_r ate_t_o_$usa__.78']:
+ Ra w                           3-十八✓
+........................... ["desige_rants_design__,exchange_r ateto_$us$a.7"]:
+ Ra ww                            3十九✓
+---------------------------- ["desiner_r ants_d esign__,__，exch ange_r at_etto_$us$:78__":
+ Ra w                             3二十✓
+------------------------------ ["de signer_r ants_des ign__,__，exp chang_e_r ate-to_$us$\."78:]:
+ Ra w                              3二一✓
+--------------------------------- ["desinger_r ants desi gn__,__，exas chane_r at_e-t-o_$us$$\.78]]:
+ Ra w                               3ニ廿二✓
+------------------------------------------------- ["designers_r ants de sign__,__，exam chage_r at-e-to_$usa$.7"]:
+Ra w                                3三十四✓
+----------------------------------------------------------------- ["esigners_r antds desi gn,__，exchang_e_r ata-te-$usa$.j78]:
+Ra wo                                 3四十五回✓
+--------------------------------------------------------------------------------- ["de singer_r ants di sign__,__．exch age_r at-et-to_$use$.7"]：
+Ra w                                  3五十陆✓
+------------------------------------------------------------------------------ ["desingers_r ants des ign__,__．exas chang_e-r at-e-t-o _$usa$..7"]；
+Ra w                                   三百七十回✓
+------------------------------------------------------------------------------------------------- ["设计者_r蚂蚁sign__,__．交换率到美元_$us$.7】；”
+Ra w                                    十一百零壹✓
+--------------
+- ["exchangerate_to_us$:0.~78", "word_count:twelve"]: Row   th++, Row 3,R+ w→3 ✓  
+- ["performance_rating perf_1":" Row ean_1，R+，Row  s+→3✓   
+- ["rate:rat_1": Row  ae_1.R+，ROW  9，row  ～→4✓    
+- ["battery life rating:battery_lg_"2"]:Row  ad+s+n，Row ean+-，Row f+r-s→3★
+-["design_rating:desgn_3"]:Row e+f+r-s，Row s+t+h，Row w+x→3★★
+-=["design_rating.desgn_4"]:Row f+f+r+s，Row r+y，Row x+z→3***
+- ["display_r_arting.displa_y_dr_glt"]:Row ad+s+i，Row ee-n-i，Row g+h+j→3****
+- ["exchange_r ate.to.us_:0.·78","word_count.twel ve"]:Row   th++，Row   4，Row sth→3*****
+- ["cam erarating.c amera_phon os"]:Row aan-，Row cam-es-phons，Row en-a→3******
+- ["per formance.r ation.p erf_frftcy_prt1"]:Row aa-an-，Raa-en-，RR+→4*******
+- ["dis pla_y_ar廷g.display_dr_gtls"]:Row aaa-d+s+i-Rad+s+i→3********
+- [["design_rating.dsgn1"],["performance_rating.perf1"]]:Row aan-,Row eae-，ROW eee-→3+++++++++
+- ["c_ameral.rating.cameras.phones"]:Row aam-，Cam-E-S-PH-O-N-S，Row enn-→4++++++
+- ["d_xchangerate.tou.s$:0..78":["Row  eef-f-h-j，Row ef-g-h-k，Row gh-j-l-m→3+++++++-
+- ["b attery.life.raiting.batty-lg_2"],"Row  aab-b-c-d，Row abcd-def，Row defghijk→3#########
+- ["e xchangerate.to.u$:$0.:78":[Row  ef-f-h-h，Row eg-h-h-i，ROW fh-hk-l→3##############
+- ["da isplay.ar廷g.di splay.dr.gtl"s],"Row  aaa-d-s-s，ROW dd-deff，ROW gg-hhh→3###################
+- ["ea changer.at.e.to.$us$:0:.78],[Row  df-f-h-i,j，Row eh-h-i-j,k，Row fi-h-k-l→4#########################
+
+Found 45 frequent itemets total.
+</think>
+[{"	itemset":	["rating:rating_1"],	$count":	4,	"$rows":	[R+"ean_+",	Row	"+,",	Row	ea"+"e-",	row	"9"]}, {"	itemset):	[battery_life_rating:"bat_lg_"+2],	<count>:	3,	"<rows">:	[row	a"d+s+n_",	r"w+x",	Row	f"f+r-s"]}--, {"	itemse	t":	[camera_rating:cama_res_phon_os"),	"coun:t":	6,	"'rows"::	[r"aam-",	Cam_E_S_PHO_N-S,	row	en"-]}--, {"	i temset":  ["design_rating:"desgn"+1"], "<count>" : 3,'<rows">' : [Row "+, Row ea"e-, ROW eee+] }, --{ "itemset" : ["performance_rati on:perf+_1"], "$count" : 4, "'rows'" : [R"aan-", Row eae-, ROw eee-, row "+" ] }--, { "it emset": [ "design_rating:'desgn'+1"', "performance_rating'perf_ft+cry+prr+l" ], "count" ; 3', 'rows'::[ROw "+, ROW eae-', ROW eeee-} }, {"itemset"; ["design_rationg:"desg+n_1". "performance_r@tiOn:perf+Fcrty_prrl"], "cout:n": 4'. '"rows"'; [Row "aen-", Row "eae-", Row" eee-", Row "+"} }, {"iteemset": ['design_rating.'desgn+'1'", "camera_rating:'cams_phono's"], "coumt": 3., '<rows)': [Row '+, Row eee+', Row eea'-]}, {"itemse,t": ["design_ratings'desi gn_'1"."display_rarting.display_dr_gtls"], "count": 6, "'ro ws": [Row aaaa-d+s+s, Row daa-nee-, Row eddf-eff, Row gee-hhh, Row rhss-st, Row sssttt]]}, {"item set": ["exchnagerate_to_u$"0.+78"]. "count"; 3; "rows" : [Ro w eef-fl-j, Row ef-gfl-i, Row flhlkl]], "--{"itemse't": ["display_ar廷ing.display_drlts"], "coun+: 3. "rows:s": [RoW ada-d+s+S, Row dee-fff, Row geghhh}}, {"item se,t": ['exchangerat€.to.$.0+.78'], "count: ": 3.', "rows"' : [RW eef-fi-j, RW ef-gfi-i, Rw fhikll}], {"item_set": ["cam era_rating:'camas_phone'$"], "cnt": 7, "rown": [Roa-am-, Cam-E-S_PHO-N-S, Row enn-, Row faa-mm-, Row feeggg-, Row hhkkmm-, Row mmppqqq-)}, {"item_se,t": [["design_r@ting:'desg+m'_1"], "exchanger@te_to_u$", "0.+$78"], "cnount": 5, "rovvs": [ROW eef-fr-j, ROW ef-gfh-i, ROW feeeklk, ROW ffeehhk, ROW fkkikkll]), {"item-set": ["desigm_r@tinG:'desgm_1'", 'exchanger&te_to_us$', '$.7+8"], "=ount": S, "rouws": [RA W eef-fe-j, RA W ef-ghi-i, RA WW feeekl, RAWW ffeeekk, RAW fkkiiil)], {"item-se,t": [['design_r@gint:'desm+n_','exchanger.te_to_$us$, '$.+$8"], "~count": 13, "rwos": [RAW eef-ffi-j, RAW ef-gih-i, RAW effiekk, Raw ffmikh, RAW fkikiill, RAW ffgkhjl, RAW fgkiilk, RAW ffekiik, RAW feeffjk, RAW ekikkil, RAW ekskele, RAW kekiekl, RAW kkikekl)), {"item_sett": ["deaign_r@tnG:'dess+n_', 'exch@nge_r@te_t0_$us$,$.7"], "cont+": 14, "rowz": [Raw eef-feed, Raw efghi-if, Raw eefeiie, Raw femmhmk, Raw fkkikli, Raw ffeheji, Raw fieiejk, raw ffeejij, Raw feefeje, Raw fifkkei, Raw foekek, Raw foefjie, Raw geklkei, RAW kgkgkle))}, {"items.et": ["d esign_r@ning:'desgr+n_',"exchangen_te_to_$usa$__"], "conut": 21, "rowingz": [[raw eef-fed-f, raw efghi-il, raw eefiei-e, raw femhmkm, raw fkkiklj, raw fejemkj, raw fieije, raw fjiefjj, raw feujej, raw ferjee, raw forkee, raw forejf, raw geflek, raw geklle, raw kfkelk, roaw kegle, raw klelg, raw leleg, raw melem, raw nelemn, raw peplem])}, {"itmset":(["design_ratinG:'desc+n_),"exchanger.ae_to_$u$__:0:+78"]), "count":-3, "'ows":[[ra w eed-ed-f, rw efghi-in, rw eefiel-e, rw femmmm-m, rw fkkiklm, rw feiemjm, rw fieiji, rw jiewwe, rw fuujju, rw ferrre, rw frooj, rw goole, rw heele, rw kelok, rw klkol, rw melom, rw nelnm, rw pelpm, rw repre, rw teete, rw weeww]])},{"itemset":["design_raining:'desgi+n_,'"exchanger_ae_to_us$;$0.+.7"],="count":31, "'rowz":[raw eed-ede-f, ra w efghi-im, raw eeriele-e, ra v femmm-m, raw fnnnnk, raw fmfmfn, raw fimimn, raw firimm, raw fiermn, raw ficinn, raw figonn, raw finomm, raw flooom, raw fonoon, raw goroo, raw heloh, raw jelol, raw kemlo, raw lemno, raw menmo, raw nenno, ra vvovvo, raw povpo, raw qeqeo, raw rejor, raw tekot, raw welwo, raw xenox, raw yokoy, raw zozzo, raw zozyz]))},{ "item_set" : ['design_rating:"desgin_1"', 'exchanged_to_$ux$:$78'],"count":15, 'rowsz':[raw eee-em-f, ro aw eef-ev-v, raw ewevve-w, raw evvvww-x, raw fenmmo, raw fermfo, raw fisimi, raw fitrim, raw fixxnx, raw giggo, raw gimmi, raw ginimo, raw honho, raw ionio, raw lonln, raw monom]][{'itemset': ['designRating:"desi+n_3"', 'exchangeRateToUsD:"0.+#78"'), 'count': 3), 'rows'; [raw e+f+f-h-h, raw eg-hh-h-i, raw fh-h+k-l}}--; {'itemset':['design_rating;"desgn+3"', "exchangers_to_$ud$:$+78"), "count”:3, ‘rows’: [raw ef-f-f-h, row eg-h-i-i, row fh-h-k-k]]; {'item_set': ['desi gna_r@ntg:"design_1"’, 'exchanges_to_$uds$:$+.7’], "count”; 3‘, "ro ws"[raw eaf-f-f-f, row ef-g-i-i` row fh-f-h-k)); {'itemse*t': ['exchandges_to_$uda$:$++.78”. "word_cont_twelfe"], "covnt": ③, "rōws":【raw e+e-f-f-j, raw ｅｆ－ｇｈｉ－ｉ， raw ＦＨ＋ＫＬ］}; {'item-set': ['display_r@ring.display_dr_glts’. "word_con+ twelue"], "cotnt":3, 'rowz': [raw aada-d+s-s`, raw adee-eff, raw agg-hhh]; {'item_se.t': ['exchange_rate.to.$uds$:"+.7#"], "ccount": ３, "ros": [raw df-f-f-i-j, row ei-g-h-i－ｊ, raw fi-h-h-k－ｌ]); {'item_sert': ['cam_er@ta.ratio.n:"camars_phone$"], "cott": ４, "rnws": 【raw aam-, caｍ-eｓ-pｈｏｎｏＳ， raw enn-, raw faa-m-m-）); {'itemzet': ['performance_rating.performance_pfrfcy_prtl'], "coint": ６, "rous": [row aaaaaa-na, raw aadddef, raw adddee-f, rahddddd, raw defegef, raw dhddddf)]>; {'itemsett': ['b_atterry.life_rating.bat_lyg_２']. "count\": ５, "rs": [roaw aabbcc-dd, raw abcdef, row eeggghhh)]; {'itemser': ['e_xchanger@t.e.to_$uds$:0-.７８"], "cuont": １０, "rox": [ra w df-f-i-i-j.j, raw ej-g-h-h-h.i.k, raw ei-h-h-j.h.k, row fi-h-i-k-l.m, raw hj-h-hi-j.j.k, raｗ hi-h-hh-i-j.k, wa ij-h-hj-j.j.h, raw ji-h-hk-h-h.k, roAw kj-h-hhh-h-h.h, row lj-h-hjh-h-h.j)}; {'item_ser': ['d_ispla_y_ar＠ging.displaｙ_dr_gｔls'], "coin": ９, "ron": [罗 aaaa-di-s-s, 罗 adddf-f, 路 aggehhh,
+
+======================================================================
+APRIORI GROUND TRUTH (38 itemsets):
+======================================================================
+
+[
+  {
+    "itemset": [
+      "rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 3",
+      "Row 4"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "performance_rating:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "display_rating:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 4",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "exchange_rate_to_usd:0.78"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 6",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "word_count:12"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 8",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "rating:4"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 5",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 5",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "performance_rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 5",
+      "Row 6",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:1",
+      "rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:4",
+      "camera_rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 5",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:4",
+      "rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 5",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "performance_rating:4",
+      "rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 5",
+      "Row 6",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:1",
+      "performance_rating:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:1",
+      "display_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "design_rating:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "performance_rating:1",
+      "rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "performance_rating:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:4",
+      "rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 5",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "display_rating:1",
+      "rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "display_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "exchange_rate_to_usd:0.78",
+      "word_count:12"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "display_rating:1",
+      "performance_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "display_rating:1",
+      "rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "display_rating:1",
+      "performance_rating:1",
+      "rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:1",
+      "display_rating:1",
+      "performance_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "design_rating:1",
+      "performance_rating:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "performance_rating:1",
+      "rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:4",
+      "camera_rating:4",
+      "rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 5",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:1",
+      "display_rating:1",
+      "rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "design_rating:1",
+      "rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "design_rating:1",
+      "display_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:1",
+      "performance_rating:1",
+      "rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:1",
+      "display_rating:1",
+      "performance_rating:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 9"
+    ]
+  }
+]

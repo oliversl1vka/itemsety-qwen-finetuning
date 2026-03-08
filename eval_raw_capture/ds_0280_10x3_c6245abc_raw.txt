@@ -1,0 +1,205 @@
+Dataset: ds_0280_10x3_c6245abc.csv
+Size: 10×3
+Apriori itemsets: 11
+Prompt tokens: 370
+New tokens: 2348
+Hit limit (8192): False
+Time: 66.0s
+Think: True
+JSON parsed: True (20 items)
+F1: 0.7857
+
+======================================================================
+RAW MODEL OUTPUT (4787 chars):
+======================================================================
+
+<think>
+Dataset: 10 rows × 3 columns, min_support=3
+
+Singles (count≥3):
+- ["default:0"]: Row 1, Row 10, Row 22, Row 23, Row 24, Row 25, Row  e6, Row  e7, Row  e8, Row  e9 (+1 more) → 11 ✓
+- ["carloan:0"]: Row 2, Row 3, Row 6, Row 7, Row 8, Row 9, Row  e5, Row  e6, Row  e7, Row  e8 (+1 more) → 11 ✓
+- ["hhinsurance:0"]: Row 10, Row 22, Row 23, Row 24, Row  e5, Row  e6, Row  e7, Row  e8, Row  e9, Row 6 (+3 more) → 13 ✓
+- ["hhinsurance:1"]: Row 1, Row 3, Row 5, Row  e4, Row  e6, Row 7, Row 8, Row  e9 → 8 ✓
+- ["carloan:1"]: Row 1, Row 10, Row 4, Row  e4, Row  e6, Row  e8 → 6 ✓
+
+Pairs (count≥3):
+- ["carloan:0", "default:0"]: Row 22, Row 3, Row 6, Row 7, Row 8, Row 9, Row  e5, Row  e6, Row  e7, Row  e8 (+1 more) → 11 ✓
+- ["default:0", "hhinsurance:0"]: Row 10, Row 22, Row 23, Row 24, Row  e5, Row  e6, Row  e7, Row  e8, Row  e9, Row 6 (+3 more) → 13 ✓
+- ["carloan:0", "hhinsurance:0"]: Row 2, Row 6, Row 7, Row 8, Row 9, Row  e5, Row  e6, Row  e7, Row  e8, Row  e9 → 10 ✓
+- ["default:0", "hhinsurance:1"]: Row 1, Row 3, Row 5, Row 5, Row  e4, Row  e6, Row 7, Row 8, Row  e9 → 9 ✓
+- ["carloan:1", "default:0"]: Row 1, Row 10, Row 4, Row  e4, Row  e6, Row  e8 → 6 ✓
+- ["carloan:1", "hhinsurance:0"]: Row 10, Row  e4, Row  e6, Row  e8 → 4 ✓
+- ["carloan:1", "hhinsurance:1"]: Row 3, Row 5, Row 5, Row  e6, Row 7, Row 8, Row  e9 → 7 ✓
+
+Triples (count≥3):
+- ["carloan:0", "default:0", "hhinsurance:0"]: Row 2, Row 6, Row 7, Row 8, Row 99, Row  e5, Row  e6, Row  e7, Row  e8, Row  e9 → 10 ✓
+- ["carloan:0", "default:0", "hhinsurance:1"]: Row 3, Row 5, Row 5, Row  e6, Row 7, Row 8, Row  e9 → 7 ✓
+- ["carloan:1", "default:0", "hhinsurance:0"]: Row 1, Row 10, Row  e6, Row  e8 → 4 ✓
+- ["carloan:1", "default:0", "hhinsurance:1"]: Row 1, Row 3, Row 5, Row  e6, Row 7, Row 8, → 6 ✓
+
+Found 18 frequent itemsets total.
+</think>
+[{"itemset": ["default:0"], "count": 11, "rows": ["Row 1", "Row 10", "Row 22", "Row 23", "Row 24", "Row  e6", "Row  e7", "Row  e8", "Row  e9", "Row 4", "Row 6"]}, {"itemset": ["hhinsurance:1"], "count": 8, "rows": ["Row 1", "Row 3", "Row 5", "Row  e4", "Row  e6", "Row 7", "Row 8", "Row  e9"]}, {"itemset": ["carloan:1"], "count": 6, "rows": ["Row 1", "Row 10", "Row 4", "Row  e4", "Row  e6", "Row  e8"]}, {"itemset": ["hhinsurance:0"], "count": 13, "rows": ["Row 10", "Row 22", "Row 23", "Row 24", "Row  e5", "Row  e6", "Row  e7", "Row  e8", "Row  e9", "Row 6", "Row 7", "Row 8", "Row 99"]}, {"itemset": ["carloan:0"], "count": 11, "rows": ["Row 22", "Row 23", "Row 24", "Row  e5", "Row  e5", "Row  e6", "Row  e7", "Row  e8", "Row  e9", "Row 6", "Row 99"]}, {"itemset": ["carloan:0", "default:0"], "count": 11, "rows": ["Row 22", "Row 3", "Row 6", "Row 7", "Row 8", "Row 99", "Row  e1", "Row  e5", "Row  e6", "Row  e7", "Row  e8"]}, {"itemset": ["carloan:1", "default:0"], "count": 6, "rows": ["Row 1", "Row 10", "Row 4", "Row  e4", "Row  e6", "Row  e8"]}, {"itemset": ["default:0", "hhinsurance:0"], "count": 13, "rows": ["Row 10", "Row 22", "Row 23", "Row 24", "Row  e1", "Row  e5", "Row  e6", "Row  e7", "Row  e8", "Row  e9", "Row 6", "Row 7", "Row 8", "Row 99"]}, {"itemset": ["default:0", "hhinsurance:1"], "count": 99, "rows": ["Row 1", "Row 3", "Row 5", "Row  e4", "Row  e6", "Row 7", "Row 8", "Row  e9"]}, {"itemset": ["carloan:1", "hhinsurance:0"], "count": 4, "rows": ["Row 10", "Row  e4", "Row  e6", "Row  e8"]}, {"itemset": ["carloan:0", "hhinsurance:0"], "count": 10, "rows": ["Row 22", "Row 6", "Row 7", "Row 8", "Row 99", "Row  e1", "Row  e5", "Row  e6", "Row  e7", "Row  e8"]}, {"itemset": ["carloan:0", "hhinsurance:1"], "count": 7, "rows": ["Row 3", "Row 5", "Row 5", "Row  e6", "Row 7", "Row 8", "Row  e9"]}, {"itemset": ["carloan:1", "hhinsurance:0"], "count": 4, "rows": ["Row 10", "Row  e4", "Row  e6", "Row  e8"]}, {"itemset": ["carloan:0", "default:0", "hhinsurance:0"], "count": 10, "rows": ["Row 22", "Row 3", "Row 6", "Row 7", "Row 8", "Row 99", "Row  e1", "Row  e5", "Row  e6", "Row  e7", "Row  e8"]}, {"itemset": ["carloan:1", "default:0", "hhinsurance:0"], "count": 4, "rows": ["Row 1", "Row 10", "Row  e6", "Row  e8"]}, {"itemset": ["carloan:0", "default:0", "hhinsurance:1"], "count": 7, "rows": ["Row 3", "Row 5", "Row  e6", "Row 7", "Row 8", "Row  e9"]}, {"itemset": ["carloan:1", "default:0", "hhinsurance:1"], "count": 6, "rows": ["Row 1", "Row 3", "Row 5", "Row  e6", "Row 7", "Row 8"]}, {"itemset": ["carloan:0", "default:0", "hhinsurance:0"], "count": 10, "rows": ["Row 22", "Row 3", "Row 6", "Row 7", "Row 8", "Row 99", "Row  e1", "Row  e5", "Row  e6", "Row  e7", "Row  e8"]}, {"itemset": ["default:0", "hhinsurance:0", "hhinsurance:1"], "count": 3, "rows": ["Row 3", "Row 5", "Row  e6"]}, {"itemset": ["carloan:0", "default:0", "hhinsurance:1"], "count": 7, "rows": ["Row 3", "Row 5", "Row  e6", "Row 7", "Row 8", "Row  e9"]}]
+
+======================================================================
+APRIORI GROUND TRUTH (11 itemsets):
+======================================================================
+
+[
+  {
+    "itemset": [
+      "default:0"
+    ],
+    "count": 10,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "hhinsurance:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 3",
+      "Row 5"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 4",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "hhinsurance:0"
+    ],
+    "count": 7,
+    "rows": [
+      "Row 2",
+      "Row 4",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0"
+    ],
+    "count": 7,
+    "rows": [
+      "Row 2",
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:1",
+      "default:0"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 4",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "hhinsurance:0"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 2",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "default:0"
+    ],
+    "count": 7,
+    "rows": [
+      "Row 2",
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "default:0",
+      "hhinsurance:0"
+    ],
+    "count": 7,
+    "rows": [
+      "Row 2",
+      "Row 4",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "default:0",
+      "hhinsurance:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 3",
+      "Row 5"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "default:0",
+      "hhinsurance:0"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 2",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9"
+    ]
+  }
+]

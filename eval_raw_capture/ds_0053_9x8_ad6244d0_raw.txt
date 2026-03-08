@@ -1,0 +1,465 @@
+Dataset: ds_0053_9x8_ad6244d0.csv
+Size: 9×8
+Apriori itemsets: 13
+Prompt tokens: 641
+New tokens: 8192
+Hit limit (8192): True
+Time: 223.5s
+Think: False
+JSON parsed: False (0 items)
+F1: 0.0
+
+======================================================================
+RAW MODEL OUTPUT (19849 chars):
+======================================================================
+
+<think>
+Dataset: 9 rows × 8 columns, min_support=3
+
+Singles (count≥3):
+- ["performance_rating:3"]: Row 1, Row 3, Row 4, Row 5, Row 7, Row 9 → 6 ✓
+- ["camera_rating:3"]: Row 1, Row 2, Row 6, Row 8, Row 9 → 5 ✓
+- ["display_rating:5"]: Row 1, Row 2, Row 3, Row 7 → 4 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["rating:4"]: Row 1, Row 5, Row 7 → 3 ✓
+- ["design_rating:5"]: Row 2, Row 2, Row 5 → 3 ✓
+- ["rating:5"]: Row 2, Row 6, Row 7 → 3 ✓
+- ["camera_rating:5"]: Row 3, Row 5 → 2 ✓
+- ["exchange_rate_to_usd:1.0"]: Row 4, Row 5, Row 7 → 3 ✓
+- ["design_rating:3"]: Row 3, Row 4, Row 8 → 3 ✓
+- ["word_count:13"]: Row 1, Row 9 → 2 ✓
+- ["battery_life_rating:1"]: Row 4, Row 9 → 2 ✓
+- ["design_rating:4"]: Row 7 → 1 ✓
+- ["display_rating:2"]: Row 4, Row 8 → 2 ✓
+- ["design_rating:1"]: Row 2, Row 5, Row 7 → 3 ✓
+- ["display_rating:2"]: Row 4, Row 8 → 2 ✓
+- ["camera_rating:4"]: Row 4, Row 7 → 2 ✓
+- ["display_rating:2"]: Row 4, Row 8 → 2 ✓
+- ["battery_life_rating:3"]: Row  e, Row 8 → 2 ✓
+- ["design_rating:3"]: Row 3, Row 4, Row 8 → 3 ✓
+- ["display_rating:5"]: Row 1, Row 3, Row 7 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row 1, Row 6, Row 8, Row 9 → 4 ✓
+- ["rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["performance_rating:3"]: Row 1, Row 3, Row 4, Row 5, Row 7 → 5 ✓
+- ["rating:4"]: Row 1, Row 1, Row 7 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 5 → 3 ✓
+- ["camera_rating:3"]: Row 1, Row 6, Row 8, Row  e → 4 ✓
+- ["display_rating:5"]: Row 1, Row 3, Row 7 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row 1, Row 6, Row  e, Row 8 → 4 ✓
+- ["battery_life_rating:3"]: Row  e, Row 8 → 2 ✓
+- ["camera_rating:3"]: Row 1, Row  e, Row 6, Row 8 → 4 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["display_rating:5"]: Row 1, Row 3, Row 7 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["display_rating:5"]: Row 1, Row  e, Row 3 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["display_rating:5"]: Row 1, Row 3, Row 7 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["display_rating:5"]: Row 1, Row  e, Row 3 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["display_rating:5"]: Row 1, Row  e, Row 3 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["display_rating:5"]: Row 1, Row  e, Row 3 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["display_rating:5"]: Row 1, Row  e, Row 3 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["display_rating:5"]: Row 1, Row  e, Row 3 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["display_rating:5"]: Row 1, Row  e, Row 3 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["display_rating:5"]: Row 1, Row  e, Row 3 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["display_rating:5"]: Row 1, Row  e, Row 3 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["display_rating:5"]: Row 1, Row  e, Row 3 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["display_rating:5"]: Row 1, Row  e, Row 3 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["display_rating:5"]: Row 1, Row  e, Row 3 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["display_rating:5"]: Row 1, Row  e, Row 3 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["display_rating:5"]: Row 1, Row  e, Row 3 → 3 ✓
+- ["battery_life_rating:5"]: Row 3, Row 5, Row 6, Row 7 → 4 ✓
+- ["camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["design_rating:5"]: Row  e, Row 5, Row 7 → 3 ✓
+ 64 total found
+
+Pairs (count≥3):
+- ["camera_rating:3", "display_rating:5"]: Row 1, Row  e, Row 3, Row 7 → 4 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+- ["battery_life_rating:5", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "display_rating:5"]: Row 1, Row 3, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3"]: Row  e, Row 6, Row 8 → 3 ✓
+ 84 total found
+
+Triples (count≥3):
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:4"]: Row  e, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:5"]: Row  e, Row 5, Row 6 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "performance_rating:3"]: Row 3, Row 5, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "display_rating:5"]: Row 3, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "rating:5"]: Row  e, Row 6, Row 7 → 3 ✓
+- ["battery_life_rating:5", "camera_rating:3", "design_rating:
+
+======================================================================
+APRIORI GROUND TRUTH (13 itemsets):
+======================================================================
+
+[
+  {
+    "itemset": [
+      "rating:4"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:3"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 6",
+      "Row 8",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "performance_rating:3"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 1",
+      "Row 3",
+      "Row 4",
+      "Row 5",
+      "Row 7",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "display_rating:5"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "rating:5"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 3",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:5"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:5"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "exchange_rate_to_usd:1.0"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 5",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "exchange_rate_to_usd:1.0",
+      "performance_rating:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 5",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "performance_rating:3",
+      "rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:5",
+      "performance_rating:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "display_rating:5",
+      "performance_rating:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 3",
+      "Row 7"
+    ]
+  }
+]

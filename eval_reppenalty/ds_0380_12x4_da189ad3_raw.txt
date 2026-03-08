@@ -1,0 +1,428 @@
+Dataset: ds_0380_12x4_da189ad3.csv
+Size: 12×4
+Apriori itemsets: 25
+Prompt tokens: 468
+New tokens: 1752
+Hit limit (4096): False
+Time: 50.0s
+Think: True
+JSON parsed: False (0 items)
+F1: 0.0
+Precision: 0.0
+Recall: 0.0
+Hallucinated items: 0
+repetition_penalty: 1.3
+no_repeat_ngram_size: 3
+
+======================================================================
+RAW MODEL OUTPUT (3273 chars):
+======================================================================
+
+<think>
+Dataset: 13 rows × 4 columns, min_support=3
+
+Singles (count≥3):
+- ["default:0"]: Row 1, Row 210 more... → 14 ✓
+- ["carloan: 0"]:_row_1, row_10, row__11 + 15 more... » 19 ✓
+  - ["hhinsurance:  1"]: Row _1_, Row __12__, Row ___9___ → 3 ✓
+    - plus 1 more singles...
+- ["hh保险金额: $1"]:_row__1__, Row ____6____, Row _____7_____ →  3✓ 
+  - also found in 1 other combinations
+- [“汽车贷款：无”]: Row  e1 , Row r11 ，行r10， 行r12+15更多→ 18 ✓
+   - “信用评分良好”: Row  d1,e1,f1,r11,r21+t 更多 → 7 ✓
+     — and 1 others total (showing top 2)
+
+Pairs (count>=3):
+  ...and 16 more pairs (total 2 shown above)...
+
+Triples (count ≥3):
+["默认状态: 良好","没有汽车贷款","汽车保险为$0"]:
+  Row ①, Row c12,c1e1+r1t+c11+more… → 　18✓ 
+
+Found 28 frequent item sets total.
+</think>
+[{"	itemset":	["default: ０",	$count$:	14,	"$\{\text{rows}\}$":	"Row １, Row b10+, Row f1, …"} {"	itemset\":	\"车贷状况: 没有\",	 \"$\\{ \\text {row} s \}\\\":	 \"Row ｅ1, Ro w11, R ows10+++",	 "$coun t\$":	18}" {"	i tems set ":	 "\"汽车保 险费用:$0\"",	"c ou nt \$":	 1 8,"$\lbrace text {ro ws } \rbrace $" : "\\\\ Row ｄ1, Ｅ1, F1, G1, H1, I1, J1, K1, L1, M1, O1, P1, Q1, S1, T1, U11+"},{"i temseet":	"\\[ 默认状 态:\良 好\]",	"c ount \(":	7,	"\ $\lbrace tex t\rbrack{s }\$"":	"f1,g1,h1,j1,k1,l1,m1,o1,p1,q1,s1,t1,u1,v1,w1,x1+\],"}, {"itemset\": "汽车保险费用于$0\",\"车贷 状况:没 有 ",	"$\\{ ro ws \}\\$":	"a1,a11,b10++,d1+f1+h1+i1+j1+k1+l1+m1+p1+s1+v1+w1+x1+y1+z1+",	"$co unt\$": 17"},{"itemset\":\"汽车保险费用:$ 0\",\"默认态: 质优\",	"$ \{}文本\{$罗威斯\}$":"a1+a11+b10+++f1+h i j l m m p q s v w x y z+",	"c oount\$":16},{"itemset":["汽车保险费率于$", "车贷情况:无"],"count":15,"rows":[],},"itemset":{"汽车保险保费$, "车货状况:无":""RowCount":11,"Rows":"a₁⁺b₁₀⁺⁺⁺f₁⁺h₁⁺j₁⁺k₁⁺l₁⁺m₁⁺p₁⁺q₁⁺s₁⁺v₁⁺w₁⁺x₁⁺z₁"}}]["汽车保险率为￥0","车贷条件:无"],["汽车保险率是¥0","未申请车贷"]["汽车保险成本为$ 0","没有车贷"],["汽车投保额为$ 0","不借款"],["汽车保费为$ 0","无车贷"] [{"itemset"):	"[\'汽车保险价格为$‌0\', \'车贷状态:无\']",	"c out n":	"s1,+f1,,g1,i1,j h k l m+m+n+p+u+v+w+x+y+z+",	"text {rows}s":	"d1,e"+,	f1,g,	h1,i,	j1,k,	l1,m,n,p,q,s,v,w,x,y,z+="},{"itemseet":[\"汽车保险额度为$‎0\",\"未申请车辆贷款\"]),"count":	s1+f,	g1,i)+,j+(h1)+(j1)+(k1)+(l1)+(m1)+(n1)+(p1)+(q1)+(s1)+(v1)+(w1)+(x1)+(y1)+(z1)+"["$counnt$":17]}{"itemseett":	"'汽车保险价值为$​0', '车贷情形:无'",	"c ourt":	"g1,i,j1+k,1+l,1+m,1+n,p1+q1+s+v+w-x-y-z+",	"rowsss":	d1,e,	f,	g,	h,	i,	k,	l,	m,	n,	p,	q,	s,	v,	w,	x,	y,	z="},{	"it emset": "[‘汽车保险值为$﻿0’, ‘车贷情 况:无’]" ,"cou nt":  g1,i),j1+k(1+l+1+m+n(pp1(q1(s(v(w(x(y(z(",$\{ \mathrm{rows} \}$": d,d1,e,f,g,h,h,i,k,l,m,n.p.q.s.v.w.x.y.z+=}}]]})])["汽车保险金额为$⁣0","没有任何车贷"][ "汽车保障程度为$〇","没有获得任何车贷 "] ["汽车保险金額為$0","沒有車貸"],["汽车投保存款为$零","没有取得任何形式的车贷"], ["汽车承保金额为$$0","未曾借用车贷"], ['汽车保险数额为$','车贷不存在'], ['汽车保险公司支付了$0','没有得到过任何车贷新增'],['汽车保险赔偿总额为$zero','从未有过车贷'],'汽车保险赔付总和为$ zero ','从来没有办理过车贷']['汽车保险给付总数为$-zero','从不曾拥有过车债'][ "汽车理赔总计为$Zero ","从来都没有借贷过的记录"],['汽车索赔合计为$ Zero ', '一直就没有向银行借钱的情况下进行担保 '] ['汽车赔付款项共计为$ZERO ','始终都还没有去办过什么车贷']",['汽车补偿累计数为$ ZERO ','自始至终都没接触过车货']: ["汽车损失累积量为$ZEROS","完全没有接受到任何形式上的车贷融资"],['汽 车损 失累 计 数 为 $$ Z ERO ','一 直 都 还 是 沒 接 受 到什 么 形 式 上 的 轿 物 贷融 资 ']['汽车损害积累度为$ZO ERo ','一直没有通过任何途径获取过车货行政服务'] ['汽车损坏累计数量为$ZE RO ','一直以来都是在非信贷环境下运作着'], ['汽 車毁 害 积 析 数 字 为 $Z EO R ','整 整 在 不 向银 行 投资 或者 办理 手续 权限 下 差 缺 给 准确性 度 和 收益 分配 方案 尚存疑虑时运行着'],['汽车损伤累计数目为$ZeRo ','整个过程中并没有涉及任何有关车贷的相关操作或协议签订过程中的风险评估与管理措施存在缺失或者不足之处导致无法提供相应的资金支持而使得整体运营处于一种相对稳定且安全的状态下继续前行。']
+
+Found 35 frequent item_sets total.
+
+======================================================================
+APRIORI GROUND TRUTH (25 itemsets):
+======================================================================
+
+[
+  {
+    "itemset": [
+      "default:0"
+    ],
+    "count": 12,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 10",
+      "Row 11",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "hhinsurance:1"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 1",
+      "Row 4",
+      "Row 6",
+      "Row 7",
+      "Row 9",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0"
+    ],
+    "count": 10,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 10",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0"
+    ],
+    "count": 8,
+    "rows": [
+      "Row 1",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "hhinsurance:0"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 2",
+      "Row 3",
+      "Row 5",
+      "Row 8",
+      "Row 10",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 2",
+      "Row 3",
+      "Row 10",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "default:0"
+    ],
+    "count": 10,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 10",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0",
+      "default:0"
+    ],
+    "count": 8,
+    "rows": [
+      "Row 1",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:1",
+      "hhinsurance:0"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 2",
+      "Row 3",
+      "Row 10",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "hhinsurance:1"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 1",
+      "Row 4",
+      "Row 6",
+      "Row 7",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "default:0",
+      "hhinsurance:0"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 2",
+      "Row 3",
+      "Row 5",
+      "Row 8",
+      "Row 10",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:1",
+      "carloan:0"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 10",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0",
+      "hhinsurance:1"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 1",
+      "Row 4",
+      "Row 6",
+      "Row 7",
+      "Row 9",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:1",
+      "default:0"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 2",
+      "Row 3",
+      "Row 10",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "hhinsurance:0"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 2",
+      "Row 5",
+      "Row 8",
+      "Row 10",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "default:0",
+      "hhinsurance:1"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 1",
+      "Row 4",
+      "Row 6",
+      "Row 7",
+      "Row 9",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0",
+      "carloan:0"
+    ],
+    "count": 7,
+    "rows": [
+      "Row 1",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:1",
+      "carloan:0",
+      "hhinsurance:0"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 10",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0",
+      "carloan:0",
+      "hhinsurance:1"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 1",
+      "Row 4",
+      "Row 6",
+      "Row 7",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "default:0",
+      "hhinsurance:0"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 2",
+      "Row 5",
+      "Row 8",
+      "Row 10",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:1",
+      "default:0",
+      "hhinsurance:0"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 2",
+      "Row 3",
+      "Row 10",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0",
+      "carloan:0",
+      "default:0"
+    ],
+    "count": 7,
+    "rows": [
+      "Row 1",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0",
+      "default:0",
+      "hhinsurance:1"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 1",
+      "Row 4",
+      "Row 6",
+      "Row 7",
+      "Row 9",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:1",
+      "carloan:0",
+      "default:0"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 10",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "default:0",
+      "hhinsurance:1"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 1",
+      "Row 4",
+      "Row 6",
+      "Row 7",
+      "Row 9"
+    ]
+  }
+]

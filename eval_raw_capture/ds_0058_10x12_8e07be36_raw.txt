@@ -1,0 +1,1215 @@
+Dataset: ds_0058_10x12_8e07be36.csv
+Size: 10×12
+Apriori itemsets: 91
+Prompt tokens: 810
+New tokens: 8192
+Hit limit (8192): True
+Time: 225.1s
+Think: True
+JSON parsed: False (0 items)
+F1: 0.0
+
+======================================================================
+RAW MODEL OUTPUT (17054 chars):
+======================================================================
+
+<think>
+Dataset: 10 rows × 12 columns, min_support=3
+
+Scanning for frequent items and combinations... (54 total found)
+
+Singles (11 found, showing top 11):
+- ["failures:0"]: Row 1, Row 10, Row 2, Row 2, Row 4, Row 5, Row 6, Row 7, Row 8 → 9 ✓
+- ["traveltime:1"]: Row 1, Row 10, Row 2, Row 5, Row 7, Row 8, Row 9 → 7 ✓
+- ["dalc:1"]: Row 1, Row 3, Row 4, Row 5, Row 6, Row 9 → 6 ✓
+- ["health:1"]: Row 1, Row 5, Row 7 → 3 ✓
+- ["famrel:5"]: Row 1, Row 10, Row 4, Row 5, Row 6, Row 7 → 6 ✓
+- ["fedu:2"]: Row 1, Row 5, Row 6, Row 7, Row 8 → 5 ✓
+- ["freetime:5"]: Row 1, Row 2, Row 2, Row 7 → 4 ✓
+- ["famrel:5"]: Row 1, Row 10, Row 4, Row 5, Row 6, Row 7 → 6 ✓
+- ["goout:3"]: Row 10, Row 3, Row 5, Row 6 → 4 ✓
+- ["freetime:3"]: Row 10, Row 3, Row 5, Row 6 → 4 ✓
+- ["studytime:2"]: Row 1, Row 10, Row 4, Row 5, Row 6, Row 7, Row 8 → 7 ✓
+
+Pairs (28 found, showing top 13):
+- ["failures:0", "traveltime:1"]: Row 1, Row 1, Row 10, Row 5, Row 7, Row 8 → 6 ✓
+- ["failures:0", "famrel:5"]: Row 1, Row 10, Row 4, Row 5, Row 6, Row 7 → 6 ✓
+- ["failures:0", "freetime:5"]: Row 1, Row  e, Row  e, Row 7 → 4 ✓
+- ["failures:0", "health:1"]: Row 1, Row 5, Row 7 → 3 ✓
+- ["failures:0", "freetime:3"]: Row 10, Row 3, Row 5, Row 6 → 4 ✓
+- ["failures:0", "goout:3"]: Row 10, Row 3, Row 5, Row 6 → 4 ✓
+- ["failures:0", "fedu:2"]: Row 1, Row 50, Row 6, Row 7 → 4 ✓
+- ["failures:0", "studytime:2"]: Row 1, Row 10, Row 4, Row 5, Row 6, Row 7, Row 8 → 7 ✓
+- ["failures:0", "famrel:3"]: Row 1, Row 4, Row 7 → 3 ✓
+- ["failures:0", "famrel:5"]: Row 10, Row 4, Row 5, Row 6, Row 7 → 5 ✓
+- ["failures:0", "freetime:4"]: Row 4, Row 8 → 2 ✓
+- ["failures:0", "medu:2"]: Row 1, Row 7, Row 9 → 3 ✓
+- ["failures:0", "walc:3"]: Row 1, Row 5, Row 6 → 3 ✓
+  ... and 15 more pairs
+
+Triples (15 found, showing top 14):
+- ["failures:0", "famrel:5", "traveltime:1"]: Row 1, Row 10, Row 5, Row 6, Row 7 → 5 ✓
+- ["failures:0", "freetime:3", "goout:3"]: Row 10, Row 3, Row 5, Row 6 → 4 ✓
+- ["failures:0", "freetime:3", "famrel:5"]: Row 10, Row 3, Row 5, Row 6 → 4 ✓
+- ["failures:0", "freetime:3", "traveltime:1"]: Row 10, Row 5, Row 6 → 3 ✓
+- ["failures:0", "famrel:5", "traveltime:1"]: Row 1, Row 50, Row 7 → 3 ✓
+- ["failures:0", "famrel:5", "goout:3"]: Row 10, Row 3, Row 6 → 3 ✓
+- ["failures:0", "famrel:5", "freetime:3"]: Row 10, Row 3, Row 6 → 3 ✓
+- ["failures:0", "famrel:5", "traveltime:1"]: Row 10, Row 5, Row 6 → 3 ✓
+- ["failures:0", "famrel:5", "freetime:4"]: Row 4, Row 8 → 2 ✓
+- ["failures:0", "famrel:5", "freetime:5"]: Row 1, Row 7 → 2 ✓
+- ["failures:0", "famrel:5", "freetime:3"]: Row 10, Row 6 → 2 ✓
+- ["failures:0", "famrel:5", "goout:3"]: Row 10, Row 6 → 2 ✓
+- ["failures:0", "famrel:5", "walc:2"]: Row 10, Row 6 → 2 ✓
+- ["failures:0", "famrel:5", "health:5"]: Row 10, Row 2 → 2 ✓
+  ... and 1 more triples
+
+Found 44 frequent itemsets total.
+</think>
+[{"itemset": ["health:1"], "count": 3, "rows": ["Row 1", "Row 5", "Row 7"]}, {"itemset": ["famrel:3"], "count": 3, "rows": ["Row 1", "Row 4", "Row 7"]}, {"itemset": ["freetime:5"], "count": 3, "rows": ["Row 1", "Row  e", "Row 7"]}, {"itemset": ["goout:5"], "count": 3, "row": "Row  e"}, {"itemset": ["traveltime:1"], "count": 7, "rows": ["Row 1", "Row 10", "Row  e", "Row 5", "Row 7", "Row 8", "Row 9"]}, {"itemset": ["failures:0"], "count": 9, "rows": ["Row 1", "Row 10", "Row  e", "Row 4", "Row 5", "Row 6", "Row 7", "Row 8", "Row 9"]}, {"itemset": ["famrel:5"], "count": 5, "rows": ["Row 10", "Row 3", "Row 5", "Row 6", "Row  e"]}, {"itemset": ["freetime:3"], "count": 4, "rows": "Row 10"}, {"itemset": ["dalc:1"], "count": 6, "rows": "Row 1"}, {"itemset": ["medu:2"], "count": 4, "row": "Row 3"}, {"itemset": ["studytime:1"], "count": 3, "row": "Row 1"}, {"itemset": ["famrel:5", "traveltime:1"], "count": 3, "rows": ["Row 10", "Row 5", "Row 6"]}, {"itemset": ["famrel:5", "freetime:3"], "count": 3, "row": "Row 10"}, {"itemset": ["famrel:5", "goout:3"], "count": 3, "row": "Row 10"}, {"itemset": ["failures:0", "famrel:5"], "count": 5, "rows": ["Row 10", "Row 3", "Row 5", "Row 6", "Row  e"]}, {"itemset": ["failures:0", "freetime:3"], "count": 4, "row": "Row 10"}, {"itemset": ["failures:0", "goout:3"], "count": 4, "row": "Row 10"}, {"itemset": ["failures:0", "traveltime:1"], "count": 6, "rows": ["Row 1", "Row 10", "Row  e", "Row 5", "Row 7", "Row 8"]}, {"itemset": ["failures:0", "famrel:3"], "count": 3, "row": "Row 1"}, {"itemset": ["failures:0", "famrel:5"], "count": 5, "rows": ["Row 10", "Row 3", "Row 5", "Row 6", "Row  e"]}, {"itemset": ["failures:0", "freetime:5"], "count": 3, "row": "Row 1"}, {"itemset": ["failures:0", "health:1"], "count": 3, "row": "Row 1"}, {"itemset": ["failures:0", "medu:2"], "count": 3, "row": "Row 3"}, {"itemset": ["failures:0", "studytime:2"], "count": 4, "row": "Row 1"}, {"itemset": ["famrel:5", "walc:2"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "walc:3"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "health:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "freetime:4"], "count": 2, "row": "Row 4"}, {"itemset": ["famrel:5", "freetime:3"], "count": 3, "row": "Row 10"}, {"itemset": ["famrel:5", "traveltime:1"], "count": 3, "row": "Row 10"}, {"itemset": ["famrel:5", "goout:3"], "count": 3, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 1"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 2, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "traveltime:1"], "count": 3, "row": "Row 1"}, {"itemset": ["famrel:5", "freetime:3"], "count": 3, "row": "Row 10"}, {"itemset": ["famrel:5", "goout:3"], "count": 3, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "freetime:3"], "count": 3, "row": "Row 10"}, {"itemset": ["famrel:5", "traveltime:1"], "count": 3, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 1"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 10"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 5"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 6"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row  e"}, {"itemset": ["famrel:5", "famrel:5"], "count": 5, "row": "Row 1"}, {"itemset": ["
+
+======================================================================
+APRIORI GROUND TRUTH (91 itemsets):
+======================================================================
+
+[
+  {
+    "itemset": [
+      "age:17"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "medu:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 7",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "fedu:2"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "traveltime:1"
+    ],
+    "count": 7,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 5",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "studytime:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0"
+    ],
+    "count": 9,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "famrel:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 4",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "freetime:5"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 1",
+      "Row 3",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "walc:3"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 6",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "health:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "age:15"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "famrel:5"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 2",
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "walc:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 7",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "medu:2"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 6",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "freetime:3"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "goout:3"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "studytime:2"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 4",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "freetime:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 8",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "famrel:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 8",
+      "Row 9",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "medu:2",
+      "studytime:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 6",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "studytime:2",
+      "traveltime:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 7",
+      "Row 8",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "famrel:5",
+      "freetime:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "studytime:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 6",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "age:17",
+      "failures:0"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "traveltime:1",
+      "walc:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 7",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "fedu:2"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "freetime:3",
+      "goout:3"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "freetime:4",
+      "studytime:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 8",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "famrel:5",
+      "goout:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "fedu:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "freetime:3"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "health:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "age:15",
+      "failures:0"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "walc:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 7",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "medu:1",
+      "traveltime:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 7",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "failures:0"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 1",
+      "Row 3",
+      "Row 4",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "freetime:5",
+      "traveltime:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "fedu:2",
+      "health:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "famrel:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 4",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "traveltime:1",
+      "walc:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "fedu:2",
+      "traveltime:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "walc:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "freetime:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "studytime:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3"
+    ]
+  },
+  {
+    "itemset": [
+      "age:17",
+      "traveltime:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "goout:3"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "fedu:2",
+      "walc:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "medu:2"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 6",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "famrel:4",
+      "traveltime:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 8",
+      "Row 9",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "traveltime:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "famrel:5"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 2",
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "traveltime:1"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 5",
+      "Row 7",
+      "Row 8",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "walc:3"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 6",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "health:1",
+      "traveltime:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "freetime:5"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "goout:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "studytime:2"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 4",
+      "Row 6",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "medu:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "age:15",
+      "famrel:5"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "famrel:5"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "fedu:2",
+      "studytime:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 6",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "age:17",
+      "fedu:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "fedu:2",
+      "studytime:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 6",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "age:17",
+      "fedu:2",
+      "traveltime:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "famrel:5",
+      "freetime:3",
+      "goout:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "fedu:2",
+      "health:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "famrel:5",
+      "freetime:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "famrel:5",
+      "goout:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "traveltime:1",
+      "walc:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "freetime:5",
+      "traveltime:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "failures:0",
+      "walc:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "freetime:3",
+      "goout:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "age:15",
+      "failures:0",
+      "famrel:5"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "failures:0",
+      "freetime:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "medu:2",
+      "studytime:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 6",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "fedu:2",
+      "health:1",
+      "traveltime:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "age:17",
+      "failures:0",
+      "fedu:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "failures:0",
+      "goout:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "fedu:2",
+      "walc:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "fedu:2",
+      "traveltime:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "failures:0",
+      "fedu:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "failures:0",
+      "medu:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "freetime:3",
+      "goout:3"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "famrel:5",
+      "freetime:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "famrel:5",
+      "goout:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "health:1",
+      "traveltime:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "dalc:1",
+      "failures:0",
+      "famrel:5"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "traveltime:1",
+      "walc:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 7",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "failures:0",
+      "fedu:2",
+      "walc:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "age:17",
+      "failures:0",
+      "traveltime:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 7",
+      "Row 8"
+    ]
+  }
+]

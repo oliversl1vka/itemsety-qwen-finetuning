@@ -1,0 +1,281 @@
+Dataset: ds_0303_21x3_456eb4fd.csv
+Size: 21×3
+Apriori itemsets: 11
+Prompt tokens: 579
+New tokens: 8192
+Hit limit (8192): True
+Time: 223.7s
+Think: True
+JSON parsed: False (0 items)
+F1: 0.0
+
+======================================================================
+RAW MODEL OUTPUT (13820 chars):
+======================================================================
+
+<think>
+Dataset: 21 rows × 3 columns, min_support=3
+
+Singles (count≥3):
+- ["default:0"]: Row 1, Row 10, Row 11, Row 12, Row 13, Row 14, Row 15, Row 16, Row 17, Row 18, Row 19, Row 2, Row 220, Row 221 (+7 more) → 29 ✓
+- ["carloan:0"]: Row 1, Row 10, Row 11, Row 12, Row 13, Row 15, Row 16, Row 18, Row 19, Row 220, Row 21, Row 221, Row 2, Row 3 (+5 more) → 19 ✓
+- ["hhinsurance:1"]: Row 11, Row 13, Row 14, Row 15, Row 15, Row 15, Row 15, Row 17, Row 18, Row 19, Row 221, Row 21, Row 5, Row 55, Row 55 (+1 more) → 16 ✓
+- ["hhinsurance:0"]: Row 1, Row 10, Row 12, Row 12, Row 12, Row 12, Row 12, Row 16, Row 220, Row 221, Row 2, Row 22, Row 22, Row 4, Row 8 (+1 more) → 16 ✓
+
+Pairs (count≥3):
+- ["carloan:0", "default:0"]: Row 1, Row 10, Row 11, Row 12, Row 13, Row 115, Row 115, Row 15, Row 15, Row 15, Row 11, Row 11, Row 111, Row 111, Row 111 (+10 more) → 25 ✓
+- ["default:0", "hhinsurance:1"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 (+14 more) → 18 ✓
+- ["carloan:0", "hhinsurance:1"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 (+14 more) → 18 ✓
+- ["default:0", "hhinsurance:0"]: Row 1, Row 10, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 1, Row 11, Row 11, Row 11 (+14 more) → 18 ✓
+- ["carloan:0", "hhinsurance:0"]: Row 1, Row 10, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 (+14 more) → 18 ✓
+
+Triples (count≥3):
+- ["carloan:0", "default:0", "hhinsurance:1"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 (+14 more) → 18 ✓
+- ["carloan:0", "default:0", "hhinsurance:0"]: Row 1, Row 10, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 (+14 more) → 18 ✓
+
+Found 11 frequent itemsets total.
+</think>
+[{"itemset": ["default:0"], "count": 29, "rows": ["Row 1", "Row 10", "Row 11", "Row 11", "Row 12", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 13", "Row 14", "Row 15", "Row 15", "Row 15", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11", "Row 11
+
+======================================================================
+APRIORI GROUND TRUTH (11 itemsets):
+======================================================================
+
+[
+  {
+    "itemset": [
+      "default:0"
+    ],
+    "count": 21,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 10",
+      "Row 11",
+      "Row 12",
+      "Row 13",
+      "Row 14",
+      "Row 15",
+      "Row 16",
+      "Row 17",
+      "Row 18",
+      "Row 19",
+      "Row 20",
+      "Row 21"
+    ]
+  },
+  {
+    "itemset": [
+      "hhinsurance:0"
+    ],
+    "count": 8,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 4",
+      "Row 8",
+      "Row 10",
+      "Row 12",
+      "Row 16",
+      "Row 20"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0"
+    ],
+    "count": 19,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 10",
+      "Row 11",
+      "Row 12",
+      "Row 13",
+      "Row 15",
+      "Row 16",
+      "Row 18",
+      "Row 19",
+      "Row 20",
+      "Row 21"
+    ]
+  },
+  {
+    "itemset": [
+      "hhinsurance:1"
+    ],
+    "count": 13,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 9",
+      "Row 11",
+      "Row 13",
+      "Row 14",
+      "Row 15",
+      "Row 17",
+      "Row 18",
+      "Row 19",
+      "Row 21"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "hhinsurance:0"
+    ],
+    "count": 8,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 4",
+      "Row 8",
+      "Row 10",
+      "Row 12",
+      "Row 16",
+      "Row 20"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "hhinsurance:1"
+    ],
+    "count": 11,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 9",
+      "Row 11",
+      "Row 13",
+      "Row 15",
+      "Row 18",
+      "Row 19",
+      "Row 21"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "default:0"
+    ],
+    "count": 19,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 10",
+      "Row 11",
+      "Row 12",
+      "Row 13",
+      "Row 15",
+      "Row 16",
+      "Row 18",
+      "Row 19",
+      "Row 20",
+      "Row 21"
+    ]
+  },
+  {
+    "itemset": [
+      "default:0",
+      "hhinsurance:0"
+    ],
+    "count": 8,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 4",
+      "Row 8",
+      "Row 10",
+      "Row 12",
+      "Row 16",
+      "Row 20"
+    ]
+  },
+  {
+    "itemset": [
+      "default:0",
+      "hhinsurance:1"
+    ],
+    "count": 13,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 9",
+      "Row 11",
+      "Row 13",
+      "Row 14",
+      "Row 15",
+      "Row 17",
+      "Row 18",
+      "Row 19",
+      "Row 21"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "default:0",
+      "hhinsurance:1"
+    ],
+    "count": 11,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 9",
+      "Row 11",
+      "Row 13",
+      "Row 15",
+      "Row 18",
+      "Row 19",
+      "Row 21"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "default:0",
+      "hhinsurance:0"
+    ],
+    "count": 8,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 4",
+      "Row 8",
+      "Row 10",
+      "Row 12",
+      "Row 16",
+      "Row 20"
+    ]
+  }
+]

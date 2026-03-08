@@ -1,0 +1,637 @@
+Dataset: ds_0328_13x5_4b42d618.csv
+Size: 13×5
+Apriori itemsets: 31
+Prompt tokens: 497
+New tokens: 8192
+Hit limit (8192): True
+Time: 223.7s
+Think: False
+JSON parsed: False (0 items)
+F1: 0.0
+
+======================================================================
+RAW MODEL OUTPUT (16105 chars):
+======================================================================
+
+<think>
+Dataset: 13 rows × 5 columns, min_support=3
+
+Singles (count≥3):
+- ["default:0"]: Row 1, Row 10, Row 11, Row 12, Row 13, Row 22, Row 23, Row 24, Row 25, Row  e6, Row  e7, Row  e8 (+1 more) → 13 ✓
+- ["carloan:0"]: Row 1, Row 11, Row 12, Row 13, Row 22, Row 23, Row 25, Row  e6, Row  e7, Row  e9 → 11 ✓
+- ["carinsurance:0"]: Row 1, Row 11, Row 13, Row 22, Row 23, Row 24, Row  e7, Row  e9 → 8 ✓
+- ["hhinsurance:1"]: Row 1, Row 10, Row 13, Row  e7, Row  e9 → 5 ✓
+- ["hhinsurance:0"]: Row 10, Row 11, Row 12, Row 12, Row 24, Row  e6, Row  e8 → 7 ✓
+- ["carinsurance:1"]: Row 10, Row 12, Row 12, Row 12, Row 25, Row 25, Row  e8, Row  e9 → 8 ✓
+- ["carloan:1"]: Row 10, Row 10, Row 4, Row 8, Row  e6 → 5 ✓
+
+Pairs (count≥3):
+- ["carloan:0", "default:0"]: Row 1, Row 11, Row 12, Row 13, Row 13, Row 21, Row 11, Row 13, Row 25, Row  e6, Row  e7, Row  e9 → 12 ✓
+- ["carinsurance:0", "default:0"]: Row 1, Row 11, Row 13, Row 13, Row 22, Row 23, Row  e7, Row  e9 → 8 ✓
+- ["default:0", "hhinsurance:0"]: Row 11, Row 11, Row 14, Row 12, Row 12, Row 12, Row 12, Row 12, Row 12, Row  e6, Row  e8 → 11 ✓
+- ["default:0", "hhinsurance:1"]: Row 1, Row 10, Row 13, Row  e7, Row  e9 → 5 ✓
+- ["carinsurance:0", "carloan:0"]: Row 1, Row 11, Row 13, Row 11, Row 13, Row 13, Row  e7, Row  e9 → 8 ✓
+- ["carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 12, Row 12, Row 12, Row 12, Row 12, Row  e6, Row  e8 → 90 ✓
+- ["carinsurance:0", "hhinsurance:1"]: Row 1, Row 13, Row  e7 → 3 ✓
+- ["carinsurance:1", "default:0"]: Row 10, Row 11, Row 11, Row 11, Row 12, Row 12, Row 12, Row 12, Row 21, Row  e8, Row  e9 → 11 ✓
+- ["carinsurance:1", "carloan:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 11 ✓
+- ["carloan:0", "hhinsurance:1"]: Row 1, Row 13, Row  e7, Row  e9 → 4 ✓
+- ["carinsurance:1", "hhinsurance:0"]: Row 10, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 11 ✓
+- ["carinsurance:1", "hhinsurance:1"]: Row 10, Row 10, Row  e9, Row  e9 → 4 ✓
+- ["carloan:1", "default:0"]: Row 10, Row 10, Row 4, Row 8 → 4 ✓
+- ["carinsurance:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 8 ✓
+- ["carloan:1", "hhinsurance:0"]: Row 10, Row 10, Row 4 → 3 ✓
+- ["carinsurance:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 8 ✓
+- ["carinsurance:1", "hhinsurance:0"]: Row 10, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 11 ✓
+- ["carloan:1", "hhinsurance:1"]: Row 10, Row 10 → 2 ✓
+- ["carinsurance:0", "hhinsurance:1"]: Row 1, Row 13, Row  e7 → 3 ✓
+- ["carinsurance:1", "carloan:1"]: Row 10, Row 10, Row 8 → 3 ✓
+
+Triples (count≥3):
+- ["carinsurance:0", "carloan:0", "default:0"]: Row 1, Row 11, Row 13, Row 13, Row 13, Row 13, Row 13, Row 13, Row 13, Row 13, Row 13, Row 13 → 13 ✓
+- ["carinsurance:1", "carloan:0", "default:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 11 ✓
+- ["carloan:0", "default:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 11 ✓
+- ["carinsurance:0", "default:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 8 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 8 ✓
+- ["carinsurance:1", "default:0", "hhinsurance:0"]: Row 10, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 11 ✓
+- ["carinsurance:0", "default:0", "hhinsurance:1"]: Row 1, Row 13, Row 13, Row 13, Row 13 → 5 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 11 ✓
+- ["carinsurance:1", "default:0", "hhinsurance:1"]: Row 10, Row 10, Row 10, Row 10 → 4 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:1"]: Row 1, Row 13, Row 13, Row 13 → 4 ✓
+- ["carloan:0", "default:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 11 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 8 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:1"]: Row 10, Row 10, Row 10 → 3 ✓
+- ["carinsurance:1", "carloan:1", "default:0"]: Row 10, Row 10, Row 8 → 3 ✓
+- ["carinsurance:1", "default:0", "hhinsurance:0"]: Row 10, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 11 ✓
+- ["carinsurance:0", "default:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 7 ✓
+- ["carloan:1", "default:0", "hhinsurance:0"]: Row 10, Row 10, Row 4 → 3 ✓
+- ["carinsurance:0", "default:0", "hhinsurance:1"]: Row 1, Row 13, Row 13 → 3 ✓
+- ["carinsurance:1", "carloan:0", "default:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 11 ✓
+- ["carinsurance:0", "carloan:1", "default:0"]: Row 10, Row 10, Row 4 → 3 ✓
+- ["carinsurance:1", "carloan:1", "hhinsurance:0"]: Row 10, Row 10, Row 10 → 3 ✓
+- ["carinsurance:0", "carloan:1", "hhinsurance:0"]: Row 10, Row 10, Row 10 → 3 ✓
+- ["carinsurance:0", "carloan:1", "hhinsurance:1"]: Row 10, Row 10 → 2 ✓
+- ["carinsurance:1", "carloan:1", "hhinsurance:1"]: Row 10, Row 10 → 2 ✓
+- ["carinsurance:0", "carloan:0", "default:0"]: Row 1, Row 11, Row 13, Row 13, Row 13, Row 13, Row 13, Row 13, Row 13, Row 13, Row 13 → 13 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 11 ✓
+- ["carinsurance:0", "default:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:1"]: Row 1, Row 13, Row 13 → 3 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 11 ✓
+- ["carinsurance:1", "default:0", "hhinsurance:0"]: Row 10, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 8 ✓
+- ["carinsurance:0", "carloan:1", "hhinsurance:0"]: Row 10, Row 10, Row 4 → 3 ✓
+- ["carinsurance:0", "carloan:1", "hhinsurance:1"]: Row 10, Row 10 → 2 ✓
+- ["carinsurance:1", "default:0", "hhinsurance:0"]: Row 10, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 11 ✓
+- ["carinsurance:0", "default:0", "hhinsurance:1"]: Row 1, Row 13, Row 13 → 3 ✓
+- ["carloan:0", "default:0", "hhinsurance:1"]: Row 1, Row 13, Row  e7 → 3 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:1"]: Row 10, Row 10, Row 10 → 3 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 7 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 7 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:1"]: Row 1, Row 13, Row 13 → 3 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:1", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11, Row 11, Row 11, Row 11 → 6 ✓
+- ["carinsurance:0", "carloan:0", "hhinsurance:0"]: Row 11, Row 11, Row 11
+
+======================================================================
+APRIORI GROUND TRUTH (31 itemsets):
+======================================================================
+
+[
+  {
+    "itemset": [
+      "default:0"
+    ],
+    "count": 13,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 8",
+      "Row 9",
+      "Row 10",
+      "Row 11",
+      "Row 12",
+      "Row 13"
+    ]
+  },
+  {
+    "itemset": [
+      "hhinsurance:1"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 7",
+      "Row 9",
+      "Row 10",
+      "Row 13"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0"
+    ],
+    "count": 10,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 9",
+      "Row 11",
+      "Row 12",
+      "Row 13"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0"
+    ],
+    "count": 7,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 4",
+      "Row 7",
+      "Row 11",
+      "Row 13"
+    ]
+  },
+  {
+    "itemset": [
+      "hhinsurance:0"
+    ],
+    "count": 8,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 8",
+      "Row 10",
+      "Row 11",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 8",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:1"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 5",
+      "Row 6",
+      "Row 8",
+      "Row 9",
+      "Row 10",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:1",
+      "default:0"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 8",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0",
+      "carloan:0"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 7",
+      "Row 11",
+      "Row 13"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:1",
+      "carloan:0"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 5",
+      "Row 6",
+      "Row 9",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "default:0",
+      "hhinsurance:0"
+    ],
+    "count": 8,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 5",
+      "Row 6",
+      "Row 8",
+      "Row 10",
+      "Row 11",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "default:0",
+      "hhinsurance:1"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 7",
+      "Row 9",
+      "Row 10",
+      "Row 13"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "hhinsurance:0"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 11",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "hhinsurance:1"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 7",
+      "Row 9",
+      "Row 13"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "default:0"
+    ],
+    "count": 10,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 7",
+      "Row 9",
+      "Row 11",
+      "Row 12",
+      "Row 13"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0",
+      "hhinsurance:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 7",
+      "Row 13"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0",
+      "hhinsurance:0"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:1",
+      "hhinsurance:0"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 5",
+      "Row 6",
+      "Row 8",
+      "Row 10",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:1",
+      "hhinsurance:0"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 8",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:1",
+      "default:0"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 5",
+      "Row 6",
+      "Row 8",
+      "Row 9",
+      "Row 10",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0",
+      "default:0"
+    ],
+    "count": 7,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 4",
+      "Row 7",
+      "Row 11",
+      "Row 13"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:1",
+      "carloan:0",
+      "default:0"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 5",
+      "Row 6",
+      "Row 9",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:1",
+      "default:0",
+      "hhinsurance:0"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 8",
+      "Row 10"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "default:0",
+      "hhinsurance:0"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 11",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "carloan:0",
+      "default:0",
+      "hhinsurance:1"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 7",
+      "Row 9",
+      "Row 13"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0",
+      "carloan:0",
+      "hhinsurance:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 7",
+      "Row 13"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0",
+      "carloan:0",
+      "default:0"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 7",
+      "Row 11",
+      "Row 13"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0",
+      "default:0",
+      "hhinsurance:0"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 11"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:1",
+      "carloan:0",
+      "hhinsurance:0"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 5",
+      "Row 6",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:1",
+      "default:0",
+      "hhinsurance:0"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 5",
+      "Row 6",
+      "Row 8",
+      "Row 10",
+      "Row 12"
+    ]
+  },
+  {
+    "itemset": [
+      "carinsurance:0",
+      "default:0",
+      "hhinsurance:1"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 7",
+      "Row 13"
+    ]
+  }
+]

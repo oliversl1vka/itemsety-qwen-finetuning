@@ -1,0 +1,211 @@
+Dataset: ds_0053_9x8_ad6244d0.csv
+Size: 9×8
+Apriori itemsets: 13
+Prompt tokens: 641
+New tokens: 1243
+Hit limit (4096): False
+Time: 35.1s
+Think: True
+JSON parsed: False (0 items)
+F1: 0.0
+Precision: 0.0
+Recall: 0.0
+Hallucinated items: 0
+repetition_penalty: 1.3
+no_repeat_ngram_size: 3
+
+======================================================================
+RAW MODEL OUTPUT (3187 chars):
+======================================================================
+
+<think>
+Dataset: 9 rows × 8 columns, min_support=3
+
+Singles (count≥3):
+- [performance_rating: 3]: Row 1, Row 3, Row        4, Row      5, Row    7 → 5 ✓
+- [camera_rating:   3"]: Row       1     , Row         2, Row          e, Row           h → 4 ✓
+  - With [rating: ≤4]: Row            f, Row             i, Row              j + 1 more → 3 ✓
+    - With ['exchange_rate_to_...≤1']: Row               d, Row                g, Row                 n → 2 ✓
+      - With 'design_rating': Row                  c, Row                    m, Row                     o → 1 ✓
+        - With ‘display_rati’: Row                   b, Row                      p, Row                       q → 0✓
+    + More combinations...
+- [battery_life_rating : ≥55]: Row                        3 ... Row                         k → 6 ✓
++ Other singles (found 11 total)
+
+Pairs (count>=3):
+  - [camera_rat..., performance_rai...]: Row                          1 ... Row                            r → 7 ✓
++- Found 13 pairs total
+
+Triples (count≧3):
+[- [camer..., perfomance_prai...], batterylife_ratin...]:
+  Row                           1 ..., Row                             s →  &c.
+  Row                              ., Row                               t →  ...
+  Row                                 .., Row                                u →  ...
+
+Found 2 triple(s).
+
+Total: 14 frequent item sets across 1 types.
+</think>
+[{"	itemset":	["['camera_rating': 3'", "'performance_rating': '3'"],	$count$:	55,	"rows":	[]{"Row 　1",	"Row  e",	"Srow  h"}}, {"itemset):	["'"exchangetge_rate_tou_sud':='1. 0"',	"$ount$":	3,	"'ows":	:["Rov 4",	"Iow 5",	"Ew 7"]}, {"itenset":	[],	"counr":	9,	"sroesas":	[]}, {"itemsct":	"['desig_n_rating': '"5']",	<count>:	1,	<rows">:	["Ro w9"]), {"itemseet": [],	"<ount”:	3),	“rows”:[“Row ①”, “Row ￥”，“ROW E”)]}, {"itemzet":	"[‘perforamnce_rating': ‘3’]",	<court":	5，	"ros":	["$oW I",	"Wo W",	"wO 7")}}, {"itemsett":	[,“batterv_lif_e_ration': '>＝55']".	<sunt":	6,	"frawss":	{。“罗3”。	“罗k”)), {"itemstet": "",	"cunnt":	2,	"xrows":	s[]}>, {"itemzett":	[“displav_rating': '5'],	"coutn":	4,	<rws":	[$oW l”.	"ROw S",	“RW 7。]], {"itemsect":	['caamer_cata_g': 'a',	'<outunt":	a,	<faws":	{}]}’, {"itemsec":	[camera_caingg_: '3'),	<perrormce_peratiaon': 'p'>],	<$ount**:	4.	"rwos":	[Roo 1。	"Ro wE",	'Ror e)}, {"itemsee":	[echnage_rete_u.s_d': '=1. O"),	"coumt":	：3,	r"rows";	["Row 、4",	Rwo 5。}], {"itemsset":	camear_cattag:'3'.	"court":	："3,	fawrs":	{'Row ．e"}, {"item_set":	[battery_life_ralion': '<=5'].	"coant":	：“6,	fraws": [{"Row ；3",	<Ro v5)，	"Roa 7"])}, {"iteemsset":	camaera_catag:"3".	"cntunt":　3,	trows":　["Row 。e",　"Ro we",　“Row e)")), {"item_seet":　[pervformance_pratio:n': 'P').	battey life ratin;':'<=5"].	"cont":　2,	fraows":　{}, {"item-set":	[dsgign raition': '1").	"count":　1,	frows":(["Row ）9))}), {"item-seet":	pereformancenratian': '～3).	bateery lifefration': '＞＝5].	"conut":　5,	frowns":　{"Row ，5"))]), {"item-sct":　[perfornmace_ratie'n': '％3）。	exchange rate tu usd':「1·0]。	"COUNT":　∶3,　"FROWS":　{，“Ro w4），　"Row ：5"，　"Rov ［7］}}》， {"item-zet":["设计评分: 2"): Ro w1)): 1 }, {"item_zet": ["电池寿命评级: >=","相机评分: ">=","性能评分: "="],"count": 6, "row": ["行 3","行 5","行 网","行 岳","行 江","行 老"]}]]
+
+======================================================================
+APRIORI GROUND TRUTH (13 itemsets):
+======================================================================
+
+[
+  {
+    "itemset": [
+      "rating:4"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 7",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "camera_rating:3"
+    ],
+    "count": 5,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 6",
+      "Row 8",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "performance_rating:3"
+    ],
+    "count": 6,
+    "rows": [
+      "Row 1",
+      "Row 3",
+      "Row 4",
+      "Row 5",
+      "Row 7",
+      "Row 9"
+    ]
+  },
+  {
+    "itemset": [
+      "display_rating:5"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 3",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "rating:5"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 3",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:5"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:5"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 6",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "design_rating:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 8"
+    ]
+  },
+  {
+    "itemset": [
+      "exchange_rate_to_usd:1.0"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 5",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "performance_rating:3",
+      "rating:4"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 5",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "exchange_rate_to_usd:1.0",
+      "performance_rating:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 4",
+      "Row 5",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "display_rating:5",
+      "performance_rating:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 3",
+      "Row 7"
+    ]
+  },
+  {
+    "itemset": [
+      "battery_life_rating:5",
+      "performance_rating:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 5",
+      "Row 7"
+    ]
+  }
+]

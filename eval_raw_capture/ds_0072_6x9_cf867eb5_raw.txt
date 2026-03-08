@@ -1,0 +1,514 @@
+Dataset: ds_0072_6x9_cf867eb5.csv
+Size: 6×9
+Apriori itemsets: 11
+Prompt tokens: 483
+New tokens: 8192
+Hit limit (8192): True
+Time: 223.5s
+Think: False
+JSON parsed: False (0 items)
+F1: 0.0
+
+======================================================================
+RAW MODEL OUTPUT (14343 chars):
+======================================================================
+
+<think>
+Dataset: 6 rows × 9 columns, min_support=3
+
+Singles (count≥3):
+- ["famrel:5"]: Row 1, Row 3, Row 5, Row 6 → 4 ✓
+- ["traveltime:22"]: Row 1, Row 2, Row 4, Row 6 → 4 ✓
+- ["age:16"]: Row 1, Row 2, Row 5 → 3 ✓
+- ["medu:22"]: Row 1, Row 2, Row 6 → 3 ✓
+- ["studytime:1"]: Row 2, Row 3, Row 6 → 3 ✓
+- ["walc:22"]: Row 3, Row 4, Row 6 → 3 ✓
+- ["freetime:3"]: Row 1, Row 2, Row 4 → 3 ✓
+- ["fedu:1"]: Row 2, Row 3, Row 6 → 3 ✓
+- ["goout:3"]: Row 4, Row 6 → 2 ✓
+- ["fedu:22"]: Row 1, Row 5 → 2 ✓
+- ["freetime:22"]: Row 3 → 1 ✓
+- ["freetime:21"]: Row 1 → 1 ✓
+- ["traveltime:21"]: Row 5, Row 6 → 2 ✓
+- ["studytime:22"]: Row 1, Row 4 → 2 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 6 → 3 ✓
+- ["freetime:2"]: Row 3 → 1 ✓
+- ["famrel:4"]: Row 4 → 1 ✓
+- ["freetime:4"]: Row 5 → 1 ✓
+- ["famrel:3"]: Row 2 → 1 ✓
+- ["freetime:24"]: Row 4 → 1 ✓
+- ["famrel:52"]: Row 1 → 1 ✓
+- ["famrel:53"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:5"]: Row 1 → 1 ✓
+- ["famrel:55"]: Row 5 → 1 ✓
+- ["famrel:35"]: Row 2 → 1 ✓
+- ["famrel:56"]: Row 6 → 1 ✓
+- ["famrel:57"]: Row 1 → 1 ✓
+- ["famrel:58"]: Row 1 → 1 ✓
+- ["famrel:59"]: Row 5 → 1 ✓
+- ["famrel:35"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 5 → 1 ✓
+- ["famrel:35"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 5 → 1 ✓
+- ["famrel:5"]: Row 1 → 1 ✓
+- ["famrel:35"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 5 → 1 ✓
+- ["famrel:31"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 5 → 1 ✓
+- ["famrel:31"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 1 → 1 ✓
+- ["famrel:31"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 5 → 1 ✓
+- ["famrel:5"]: Row 1 → 1 ✓
+- ["famrel:31"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 1 → 1 ✓
+- ["famrel:31"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 5 → 1 ✓
+- ["famrel:31"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 5 → 1 ✓
+- ["famrel:31"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 1 → 1 ✓
+- ["famrel:31"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 5 → 1 ✓
+- ["famrel:31"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 5 → 1 ✓
+- ["famrel:31"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 1 → 1 ✓
+- ["famrel:31"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 5 → 1 ✓
+- ["famrel:31"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 1 → 1 ✓
+- ["famrel:31"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 5 → 1 ✓
+- ["famrel:31"]: Row 3 → 1 ✓
+- ["famrel:54"]: Row 4 → 1 ✓
+- ["famrel:55"]: Row 1 → 1 ✓
+- ["famrel:31"]: Row 3 → 1 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 6 → 2 ✓
+- ["famrel:3"]: Row 2, Row 3 → 2 ✓
+- ["famrel:5"]: Row 1, Row 6 → 2 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5"]: Row 1, Row 3, Row 5 → 3 ✓
+- ["famrel:5
+
+======================================================================
+APRIORI GROUND TRUTH (11 itemsets):
+======================================================================
+
+[
+  {
+    "itemset": [
+      "age:16"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 5"
+    ]
+  },
+  {
+    "itemset": [
+      "medu:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 5"
+    ]
+  },
+  {
+    "itemset": [
+      "traveltime:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 4"
+    ]
+  },
+  {
+    "itemset": [
+      "famrel:5"
+    ],
+    "count": 4,
+    "rows": [
+      "Row 1",
+      "Row 3",
+      "Row 5",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "freetime:3"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 4"
+    ]
+  },
+  {
+    "itemset": [
+      "studytime:1"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 2",
+      "Row 3",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "age:17"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "walc:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "age:16",
+      "medu:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 5"
+    ]
+  },
+  {
+    "itemset": [
+      "age:17",
+      "walc:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 3",
+      "Row 4",
+      "Row 6"
+    ]
+  },
+  {
+    "itemset": [
+      "freetime:3",
+      "traveltime:2"
+    ],
+    "count": 3,
+    "rows": [
+      "Row 1",
+      "Row 2",
+      "Row 4"
+    ]
+  }
+]
