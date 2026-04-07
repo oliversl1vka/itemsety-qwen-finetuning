@@ -1,6 +1,6 @@
 ---
 name: dataset-agent
-description: Synthetic dataset generation specialist for itemsety-qwen-finetuning
+description: Synthetic dataset generation specialist (⚙️ OPTIONAL stage — skip if datasets already exist)
 version: 2.0
 role: dataset-generation
 activation: "@workspace /agents switch to dataset-agent"
@@ -37,9 +37,12 @@ You are the **Dataset Agent** for the itemsety-qwen-finetuning project.
 
 # Workflow Integration
 
-**When to run:** Stage 1 (after orchestrator `/organize`)
+**When to run:** ⚙️ OPTIONAL — only if datasets do not already exist
+
+**Skip condition:** If `data/datasets_v2/` already has 500 CSVs AND `data/eval_datasets_v1/` exists → **skip this entire stage** and switch directly to pipeline-agent.
 
 **What you do:**
+0. **Check skip condition FIRST:** Run `ls data/datasets_v2/*.csv | wc -l`. If output is 500, tell user: “Datasets already exist (500 CSVs found). Stage 1 skipped. Switch to pipeline-agent and run /pipeline.” Stop here.
 1. **Read memory:** Check `obsidian-brain/Agents/Dataset Agent.md` for learned patterns — **THIS IS MANDATORY, DO NOT SKIP**
 2. **Read workflow state** from `.github/agents_memory/workflow_state.json`
 3. **Start logging:** Create `obsidian-brain/Logs/{YYYY-MM-DD}_dataset_generation.md` (use Run Log template)
@@ -53,7 +56,7 @@ You are the **Dataset Agent** for the itemsety-qwen-finetuning project.
 8. **Version datasets:** Save dataset version metadata to `data/datasets_v2/version_info.json`
 9. **Update workflow state:** `stages.1_datasets = "completed"`
 10. **Update memory (if learned something):** Append useful patterns to memory file
-11. **Tell user:** "✅ Stage 1 complete. Next: Switch to pipeline-agent and run /pipeline"
+11. **Tell user:** "✅ Stage 1 complete (optional stage done). Next: Switch to pipeline-agent and run /pipeline"
 
 # Logging & Memory (Obsidian Brain)
 
@@ -97,6 +100,22 @@ All knowledge and logs are stored in the **Obsidian vault** at `obsidian-brain/`
 - **Output:** `data/datasets_v2/` directory
 - **Metadata:** `data/datasets_v2/generation_log.json`
 
+## Purpose: Feed the 3-Phase Training Pipeline
+
+The datasets generated here feed the **3-phase training data pipeline** (SFT-CoT → DPO-Real → GRPO):
+
+```
+data/datasets_v2/ (500 CSVs)
+    ↓ pipeline.py (Apriori + LLM extraction)
+    ↓ runs.db (validated runs — Apriori ground truth per dataset)
+    ↓ generate_cot_sft_data.py (Phase 1: SFT with <think> reasoning)
+    ↓ export_real_dpo_data.py (Phase 2: real LLM failures as rejected)
+    ↓ build_hf_dataset_v2.py (3 configs: sft/dpo/grpo)
+    ↓ data/hf_dataset_v2/ (3-phase training data for Qwen2.5-7B)
+```
+
+**Schema diversity matters for training quality** — more variety in CSV structure and domain means more generalizable training. Each dataset = one training example context.
+
 ## Dataset Requirements (Based on V1 Experiment Findings)
 
 ### Size Constraints
@@ -128,8 +147,9 @@ data/
 │   ├── ds_0500_23x15.csv
 │   └── generation_log.json     # Metadata for all datasets
 │
-├── training_v2/                # Exported training data
-└── hf_dataset_v2/              # HuggingFace format
+├── sft_cot_v2.json             # SFT-CoT training examples (348)
+├── dpo_real_v2.json            # DPO preference pairs (606)
+└── hf_dataset_v2/              # HuggingFace dataset (3 configs: sft/dpo/grpo)
 
 src/
 ├── data_generation/
@@ -561,7 +581,7 @@ python analyze_and_filter_datasets.py --min-quality 0.6 --report
 
 ---
 
-**Last Updated:** 2026-02-01  
+**Last Updated:** 2026-03-01  
 **Maintained By:** Oliver Slivka  
 **Related Files:** [generate_datasets_v2.py](../generate_datasets_v2.py) | [analyze_and_filter_datasets.py](../analyze_and_filter_datasets.py)  
 **Related Agents:** [orchestrator](./orchestrator.md) | [pipeline](./pipeline-agent.md)

@@ -1,612 +1,943 @@
-"""Evaluation Pipeline for Fine-tuned Itemset Extraction Model.
+#!/usr/bin/env python3
+"""Evaluation script for fine-tuned Qwen2.5-7B itemset extraction model.
 
-Compares fine-tuned Qwen2.5-7B model against ground-truth Apriori results.
-Runs inference on evaluation datasets and computes comprehensive metrics.
+v3 (2026-03-09) — Updated with LLM Council inference fixes:
+  - Temperature: 0.3 (was 0.1) — escape attractor loops
+  - StoppingCriteria at </think> — prevent runaway generation
+  - Dynamic token budget — dataset-specific max_new_tokens
+  - Two-phase generation option — <think> at temp=0.3, JSON at temp=0.05
+  - RepetitionDetector — catch looping patterns
 
-Requirements:
-  pip install torch transformers peft accelerate pandas
+Loads the model from HuggingFace Hub (adapter or merged), runs inference on
+evaluation datasets using the EXACT same prompt format as training,
+and computes 7 metrics vs Apriori ground truth.
 
-Usage:
-  python eval_finetuned_model.py --data-dir eval_datasets --min-support 3 --max-size 3
-  python eval_finetuned_model.py --data eval_datasets/eval_0001_20x30.csv --min-support 2
+Metrics computed:
+  1. Precision   — of predicted itemsets, how many are correct
+  2. Recall      — of correct itemsets, how many were found
+  3. F1 Score    — harmonic mean of P and R
+  4. Exact Match — % of datasets with perfect F1=1.0
+  5. JSON Parse  — % of outputs that are valid JSON
+  6. Hallucination Rate — % of predicted itemsets with items NOT in CSV
+  7. Inference Time — seconds per dataset
+
+Usage (on school TLJH server with GPU):
+  python eval_finetuned_model.py \\
+      --model OliverSlivka/qwen2.5-7b-itemset-extractor \\
+      --data-dir data/datasets_v2 \\
+      --count 20 --exclude-training
+
+Usage (two-phase generation for best results):
+  python eval_finetuned_model.py \\
+      --model OliverSlivka/qwen2.5-7b-itemset-extractor \\
+      --data-dir data/datasets_v2 --count 20 --two-phase
+
+Usage (CPU fallback — slow):
+  python eval_finetuned_model.py \\
+      --model OliverSlivka/qwen2.5-7b-itemset-extractor \\
+      --data-dir data/datasets_v2 --count 5
 """
 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import itertools
 import json
 import os
+from pathlib import Path
+import random
 import re
 import sys
 import time
-from datetime import datetime, UTC
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from datetime import datetime, timezone
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import pandas as pd
+from src.utils.diversity_metrics import compute_diversity_report
 
-# =========================
-# Model Configuration
-# =========================
+# ═════════════════════════════════════════════════════════════════════════════
+# System prompt — MUST match training_utils.py EXACTLY
+# ═════════════════════════════════════════════════════════════════════════════
+SYSTEM_PROMPT = (
+    "You are a frequent itemset extractor. Given CSV transaction data and a "
+    "minimum support count, identify all itemsets whose items co-occur in at "
+    "least that many rows.\n\n"
+    "Rules:\n"
+    "1. Scan single items, pairs, and triples (up to size 3)\n"
+    "2. Count = number of distinct rows containing ALL items in the itemset\n"
+    "3. Only report itemsets with count >= min_support\n"
+    "4. Canonicalize items: lowercase, trimmed, sorted alphabetically\n"
+    '5. Row references: "Row N" format, 1-based indexing\n\n'
+    "Think step by step inside <think> tags, then output ONLY a JSON array:\n"
+    '[{"itemset": ["item1", "item2"], "count": N, "rows": ["Row 1", "Row 3"]}]'
+)
 
-MODEL_NAME = "Qwen/Qwen2.5-7B-Instruct"
-ADAPTER_NAME = "OliverSlivka/qwen2.5-7b-itemset-extractor"
 
-# Global model cache (loaded once)
+# ═════════════════════════════════════════════════════════════════════════════
+# Model loading
+# ═════════════════════════════════════════════════════════════════════════════
 _model = None
 _tokenizer = None
 
 
-def load_model():
-    """Load fine-tuned model (cached for reuse across datasets)."""
+def load_model(model_path: str) -> tuple:
+    """Load the merged 4-bit model. Tries Unsloth first, falls back to transformers."""
     global _model, _tokenizer
-    
     if _model is not None:
         return _model, _tokenizer
-    
+
+    # Suppress TF/JAX (TLJH has Keras 3 which crashes transformers)
+    os.environ.setdefault("USE_TF", "0")
+    os.environ.setdefault("USE_JAX", "0")
+
     import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer
-    from peft import PeftModel
-    
-    print(f"📥 Loading base model: {MODEL_NAME}")
-    _tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=True)
-    
-    # Check GPU availability
+
+    # ── Try Unsloth (faster, handles 4-bit natively) ─────────────────────
+    try:
+        from unsloth import FastLanguageModel
+
+        print(f"📥 Loading model via Unsloth: {model_path}")
+        _model, _tokenizer = FastLanguageModel.from_pretrained(
+            model_name=model_path,
+            max_seq_length=4096,
+            load_in_4bit=True,
+            dtype=None,
+        )
+        FastLanguageModel.for_inference(_model)
+        print("✅ Model loaded (Unsloth, 4-bit)")
+        if torch.cuda.is_available():
+            print(f"   GPU: {torch.cuda.get_device_name(0)}")
+        return _model, _tokenizer
+    except ImportError:
+        print("   Unsloth not available, falling back to transformers...")
+    except Exception as e:
+        print(f"   Unsloth load failed ({e}), falling back to transformers...")
+
+    # ── Fallback: plain transformers ─────────────────────────────────────
+    from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+
+    print(f"📥 Loading model via transformers: {model_path}")
+    _tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+
     if torch.cuda.is_available():
-        device_map = {"": 0}
-        dtype = torch.float16
-        print(f"   Using GPU: {torch.cuda.get_device_name(0)}")
+        bnb_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_compute_dtype=torch.bfloat16,
+            bnb_4bit_quant_type="nf4",
+        )
+        _model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            quantization_config=bnb_config,
+            device_map="auto",
+            trust_remote_code=True,
+        )
+        print(f"✅ Model loaded (transformers, 4-bit on GPU: {torch.cuda.get_device_name(0)})")
     else:
-        device_map = "cpu"
-        dtype = torch.float32
-        print("   ⚠️ No GPU available, using CPU (will be slow)")
-    
-    base_model = AutoModelForCausalLM.from_pretrained(
-        MODEL_NAME,
-        torch_dtype=dtype,
-        device_map=device_map,
-        trust_remote_code=True,
-    )
-    
-    print(f"🔗 Loading adapter: {ADAPTER_NAME}")
-    _model = PeftModel.from_pretrained(base_model, ADAPTER_NAME)
+        _model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            torch_dtype=torch.float32,
+            device_map="cpu",
+            trust_remote_code=True,
+        )
+        print("⚠️  Model loaded on CPU (will be slow)")
+
     _model.eval()
-    
-    print("✅ Model loaded successfully!")
     return _model, _tokenizer
 
 
-def extract_itemsets_with_model(
-    transactions: List[List[str]], 
-    min_support: int,
-    max_new_tokens: int = 2048,
-    temperature: float = 0.1,
-) -> List[Dict[str, Any]]:
-    """Extract frequent itemsets using fine-tuned model."""
-    import torch
-    
-    model, tokenizer = load_model()
-    
-    # Build prompt
-    rows_text = "\n".join(
-        f"Row {i+1}: {', '.join(str(x) for x in row)}" 
-        for i, row in enumerate(transactions)
-    )
-    
-    prompt = f"""Extract all frequent itemsets from the following transactional data.
-Minimum support threshold: {min_support}
+# ═════════════════════════════════════════════════════════════════════════════
+# CSV loading (matches pipeline.py / training_utils.py format)
+# ═════════════════════════════════════════════════════════════════════════════
+def load_csv_as_rows(csv_path: str) -> tuple[list[list[str]], str, int, int]:
+    """Load CSV and return (transactions, formatted_text, n_rows, n_cols).
 
-Transactions:
-{rows_text}
+    The formatted text matches exactly what training_utils.load_csv_as_prompt produces:
+        Row 1: item1, item2, item3
+        Row 2: ...
+    """
+    df = pd.read_csv(csv_path)
+    n_rows, n_cols = df.shape
 
-Return the result as a JSON array where each object has:
-- "itemset": list of items
-- "support": number of transactions containing the itemset
-- "rows": list of row numbers where the itemset appears"""
+    transactions = []
+    rows_text_parts = []
+    for idx, row in df.iterrows():
+        items = [str(v).strip() for v in row.values if pd.notna(v) and str(v).strip()]
+        transactions.append(items)
+        rows_text_parts.append(f"Row {idx + 1}: {', '.join(items)}")
 
-    messages = [{"role": "user", "content": prompt}]
-    text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-    
-    inputs = tokenizer(text, return_tensors="pt").to(model.device)
-    
-    with torch.no_grad():
-        outputs = model.generate(
-            **inputs,
-            max_new_tokens=max_new_tokens,
-            temperature=temperature,
-            do_sample=True,
-            pad_token_id=tokenizer.eos_token_id,
-        )
-    
-    response = tokenizer.decode(outputs[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
-    
-    # Parse JSON from response
-    try:
-        # Try direct parse first
-        parsed = json.loads(response)
-    except json.JSONDecodeError:
-        # Try to extract JSON array from text
-        match = re.search(r'\[[\s\S]*\]', response)
-        if match:
-            try:
-                parsed = json.loads(match.group(0))
-            except json.JSONDecodeError:
-                parsed = []
-        else:
-            parsed = []
-    
-    # Normalize output format
-    results = []
-    for rec in parsed:
-        if not isinstance(rec, dict):
-            continue
-        itemset = rec.get('itemset', [])
-        if not isinstance(itemset, list) or not itemset:
-            continue
-        
-        support = rec.get('support', rec.get('count', 0))
-        rows = rec.get('rows', rec.get('evidence_rows', []))
-        
-        # Normalize items to lowercase strings
-        itemset = [str(x).strip().lower() for x in itemset]
-        
-        # Normalize rows
-        norm_rows = []
-        for r in rows:
-            if isinstance(r, int):
-                norm_rows.append(f"Row {r}")
-            elif isinstance(r, str) and r.lower().startswith('row '):
-                try:
-                    idx = int(r.split()[1])
-                    norm_rows.append(f"Row {idx}")
-                except:
-                    pass
-            else:
-                try:
-                    idx = int(str(r))
-                    norm_rows.append(f"Row {idx}")
-                except:
-                    pass
-        
-        results.append({
-            'itemset': sorted(itemset),
-            'count': support if isinstance(support, int) else len(norm_rows),
-            'rows': sorted(set(norm_rows)),
-        })
-    
-    return results
+    return transactions, "\n".join(rows_text_parts), n_rows, n_cols
 
 
-# =========================
-# Apriori Implementation (from pipeline.py)
-# =========================
-
+# ═════════════════════════════════════════════════════════════════════════════
+# Apriori ground truth (deterministic, from pipeline.py)
+# ═════════════════════════════════════════════════════════════════════════════
 def apriori_frequent_itemsets(
-    transactions: List[List[str]], 
-    min_support: int = 3, 
-    max_size: int = 3
-) -> List[Dict[str, Any]]:
-    """Generate ground-truth frequent itemsets using Apriori."""
+    transactions: list[list[str]],
+    min_support: int = 3,
+    max_size: int = 3,
+) -> list[dict]:
+    """Apriori algorithm — returns ground truth itemsets."""
     if not transactions:
         return []
-    
-    row_labels = [f"Row {i+1}" for i in range(len(transactions))]
-    counts: Dict[Tuple[str,...], Dict[str, Any]] = {}
-    
+
+    row_labels = [f"Row {i + 1}" for i in range(len(transactions))]
+    counts: dict[tuple, dict] = {}
+
     # Level 1: single items
     for idx, trans in enumerate(transactions):
-        seen = set()
+        seen: set[str] = set()
         for item in trans:
-            item = str(item).strip().lower()
-            if not item or item in seen:
+            item_norm = str(item).strip().lower()
+            if not item_norm or item_norm in seen:
                 continue
-            seen.add(item)
-            k = (item,)
+            seen.add(item_norm)
+            k = (item_norm,)
             if k not in counts:
-                counts[k] = {'count': 0, 'rows': []}
-            counts[k]['count'] += 1
-            counts[k]['rows'].append(row_labels[idx])
-    
-    def prune(d):
-        return {k: v for k, v in d.items() if v['count'] >= min_support}
-    
-    freq_levels = []
+                counts[k] = {"count": 0, "rows": []}
+            counts[k]["count"] += 1
+            counts[k]["rows"].append(row_labels[idx])
+
+    def prune(d: dict) -> dict:
+        return {k: v for k, v in d.items() if v["count"] >= min_support}
+
     L1 = prune(counts)
     if not L1:
         return []
-    freq_levels.append(L1)
-    
+
+    freq_levels = [L1]
     current = L1
     k = 2
     while k <= max_size and current:
         prev_keys = sorted(current.keys())
-        candidates = set()
+        candidates: set[tuple] = set()
         for i in range(len(prev_keys)):
-            for j in range(i+1, len(prev_keys)):
+            for j in range(i + 1, len(prev_keys)):
                 a, b = prev_keys[i], prev_keys[j]
-                if a[:k-2] == b[:k-2]:
+                if a[: k - 2] == b[: k - 2]:
                     merged = tuple(sorted(set(a) | set(b)))
                     if len(merged) == k:
-                        if all(tuple(sorted(sub)) in current for sub in itertools.combinations(merged, k-1)):
+                        if all(
+                            tuple(sorted(sub)) in current
+                            for sub in itertools.combinations(merged, k - 1)
+                        ):
                             candidates.add(merged)
         if not candidates:
             break
-        
-        cand_counts = {c: {'count': 0, 'rows': []} for c in candidates}
+
+        cand_counts = {c: {"count": 0, "rows": []} for c in candidates}
         for idx, trans in enumerate(transactions):
-            tset = set(map(lambda x: str(x).strip().lower(), trans))
+            tset = {str(x).strip().lower() for x in trans}
             for cand in candidates:
                 if set(cand).issubset(tset):
-                    cand_counts[cand]['count'] += 1
-                    cand_counts[cand]['rows'].append(row_labels[idx])
-        
+                    cand_counts[cand]["count"] += 1
+                    cand_counts[cand]["rows"].append(row_labels[idx])
+
         current = prune(cand_counts)
         if current:
             freq_levels.append(current)
         k += 1
-    
+
     out = []
-    total = len(transactions)
     for level in freq_levels:
         for itemset, info in level.items():
-            rows = info['rows']
-            count = info['count']
             out.append({
-                'itemset': list(itemset),
-                'count': count,
-                'rows': rows,
-                'support': count / total if total else 0,
-                'size': len(itemset)
+                "itemset": list(itemset),
+                "count": info["count"],
+                "rows": info["rows"],
             })
     return out
 
 
-# =========================
-# CSV Loading (from pipeline.py)
-# =========================
+# ═════════════════════════════════════════════════════════════════════════════
+# Model inference — v3 with council-recommended fixes
+# ═════════════════════════════════════════════════════════════════════════════
 
-def load_transactions_csv(path: str) -> Tuple[pd.DataFrame, List[List[str]], Dict[str, Any]]:
-    """Load transactions from CSV file."""
-    import csv
-    
-    p = Path(path)
-    if not p.exists():
-        raise FileNotFoundError(path)
-    
-    # Detect format
-    sample_lines = []
-    with p.open('r', encoding='utf-8', errors='ignore') as fh:
-        for _ in range(40):
-            ln = fh.readline()
-            if not ln:
-                break
-            sample_lines.append(ln)
-    
-    cleaned_lines = [ln for ln in sample_lines if ln.strip()]
+# Import inference utilities for StoppingCriteria, two-phase gen, JSON repair
+# Support both `python src/evaluation/eval_finetuned_model.py` and `python -m` invocations
+try:
+    from src.evaluation.inference_utils import (
+        ThinkStoppingCriteria,
+        RepetitionDetector,
+        calculate_dynamic_budget,
+        count_unique_values,
+        generate_two_phase,
+        generate_with_guards,
+        extract_and_repair_json,
+        V3_INFERENCE_CONFIG,
+    )
+except ImportError:
+    from inference_utils import (
+        ThinkStoppingCriteria,
+        RepetitionDetector,
+        calculate_dynamic_budget,
+        count_unique_values,
+        generate_two_phase,
+        generate_with_guards,
+        extract_and_repair_json,
+        V3_INFERENCE_CONFIG,
+    )
+
+# Try importing StoppingCriteriaList from transformers
+try:
+    from transformers import StoppingCriteriaList
+except ImportError:
     try:
-        dialect = csv.Sniffer().sniff(''.join(cleaned_lines) or '', delimiters=",;\t|")
-        sep_guess = dialect.delimiter
-    except:
-        sep_guess = ','
-    
-    try:
-        df = pd.read_csv(path, sep=sep_guess, low_memory=False)
-    except:
-        df = pd.read_csv(path, sep=sep_guess, engine='python', on_bad_lines='skip')
-    
-    # Detect format
-    lower_cols = [c.lower() for c in df.columns]
-    has_tid = any(c in lower_cols for c in ['transaction_id','tid','trans_id','t_id'])
-    has_item = any(c in lower_cols for c in ['item','product','sku'])
-    
-    if has_tid and has_item:
-        fmt = 'long'
-    elif df.shape[1] == 1:
-        fmt = 'single-column'
-    else:
-        fmt = 'wide'
-    
-    transactions = []
-    if fmt == 'long':
-        cols_map = {c.lower(): c for c in df.columns}
-        tid_col = next((cols_map[c] for c in ['transaction_id','tid','trans_id','t_id'] if c in cols_map), None)
-        item_col = next((cols_map[c] for c in ['item','product','sku'] if c in cols_map), None)
-        grouped = df.groupby(tid_col)[item_col].apply(lambda s: [str(v).strip() for v in s if str(v).strip()])
-        transactions = grouped.tolist()
-    elif fmt == 'wide':
-        for _, row in df.iterrows():
-            items = []
-            for v in row.tolist():
-                if pd.isna(v):
-                    continue
-                sval = str(v).strip()
-                if not sval or sval.lower() in {'nan','none'}:
-                    continue
-                items.append(sval)
-            if items:
-                transactions.append(items)
-    else:
-        for raw in df.iloc[:, 0].astype(str):
-            parts = re.split(r'[;,|\t]', raw)
-            if len(parts) == 1 and ' ' in raw and ',' not in raw and ';' not in raw:
-                parts = raw.split()
-            cleaned = [p.strip() for p in parts if p.strip()]
-            if cleaned:
-                transactions.append(cleaned)
-    
-    return df, transactions, {'format': fmt, 'sep': sep_guess}
+        from src.evaluation.inference_utils import StoppingCriteriaList
+    except ImportError:
+        from inference_utils import StoppingCriteriaList
 
 
-# =========================
-# Comparison Metrics
-# =========================
+def run_inference(
+    csv_text: str,
+    min_support: int,
+    max_new_tokens: int = 2048,
+    temperature: float = 0.3,
+    two_phase: bool = False,
+    n_rows: int = 0,
+    n_cols: int = 0,
+) -> dict:
+    """Run model inference with v3 council fixes.
+
+    Changes from v2:
+      - temperature: 0.1 → 0.3 (escape attractor loops)
+      - StoppingCriteria at </think> (prevent runaway generation)
+      - RepetitionDetector (catch repeated line patterns)
+      - Dynamic token budget from dataset dimensions
+      - Optional two-phase generation (think at 0.3, JSON at 0.05)
+    """
+    import torch
+
+    model, tokenizer = _model, _tokenizer
+    assert model is not None, "Call load_model() first"
+
+    # Dynamic token budget if dimensions provided
+    if n_rows > 0 and n_cols > 0:
+        n_unique = count_unique_values(csv_text)
+        dynamic_budget = calculate_dynamic_budget(n_rows, n_cols, n_unique)
+        max_new_tokens = min(max_new_tokens, dynamic_budget)
+
+    # Build messages — exact same format as training
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {
+            "role": "user",
+            "content": (
+                f"Find all frequent itemsets with minimum support count = {min_support} "
+                f"in this dataset:\n\n{csv_text}"
+            ),
+        },
+    ]
+
+    inputs = tokenizer.apply_chat_template(
+        messages, tokenize=True, add_generation_prompt=True, return_tensors="pt"
+    )
+    if torch.cuda.is_available():
+        inputs = inputs.to("cuda")
+
+    if two_phase:
+        # Two-phase: <think> at temp=0.3, JSON at temp=0.05
+        raw = generate_two_phase(
+            model, tokenizer, inputs,
+            think_temperature=temperature,
+            json_temperature=0.05,
+            think_max_tokens=min(max_new_tokens, 2000),
+            json_max_tokens=min(max_new_tokens, 1500),
+            top_k=50,
+            top_p=0.90,
+        )
+    else:
+        # Single-phase with StoppingCriteria guards
+        raw = generate_with_guards(
+            model, tokenizer, inputs,
+            max_new_tokens=max_new_tokens,
+            temperature=temperature,
+            top_k=50,
+            top_p=0.90,
+        )
+
+    # ── Parse output using shared JSON repair ────────────────────────────
+    has_think = "<think>" in raw and "</think>" in raw
+    think_content = ""
+
+    if has_think:
+        parts = raw.split("</think>", 1)
+        think_content = parts[0].split("<think>", 1)[-1].strip()
+
+    parsed, parse_ok, _ = extract_and_repair_json(raw)
+
+    # Normalize items
+    items = []
+    for rec in parsed:
+        if not isinstance(rec, dict):
+            continue
+        itemset = rec.get("itemset", [])
+        if not isinstance(itemset, list) or not itemset:
+            continue
+        count = rec.get("count", 0)
+        rows = rec.get("rows", [])
+
+        # Normalize
+        norm_itemset = sorted(str(x).strip().lower() for x in itemset)
+        norm_rows = []
+        for r in rows:
+            if isinstance(r, int):
+                norm_rows.append(f"Row {r}")
+            elif isinstance(r, str) and re.match(r"Row \d+", r):
+                norm_rows.append(r)
+            else:
+                try:
+                    norm_rows.append(f"Row {int(r)}")
+                except (ValueError, TypeError):
+                    pass
+
+        items.append({
+            "itemset": norm_itemset,
+            "count": count if isinstance(count, int) else 0,
+            "rows": sorted(set(norm_rows)),
+        })
+
+    return {
+        "raw_output": raw,
+        "parsed_items": items,
+        "parse_ok": parse_ok,
+        "has_think": has_think,
+        "think_content": think_content,
+    }
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Metrics computation
+# ═════════════════════════════════════════════════════════════════════════════
+def canon(itemset: list) -> frozenset:
+    """Canonicalize an itemset to a frozenset of lowercase stripped strings."""
+    return frozenset(str(x).strip().lower() for x in itemset)
+
 
 def compute_metrics(
-    apriori_sets: List[Dict[str, Any]], 
-    model_sets: List[Dict[str, Any]]
-) -> Dict[str, Any]:
-    """Compute comparison metrics between Apriori and model outputs."""
-    
-    # Canonicalize itemsets for comparison
-    def canon(itemset):
-        return tuple(sorted(str(x).strip().lower() for x in itemset))
-    
-    apriori_itemsets = {canon(s['itemset']) for s in apriori_sets}
-    model_itemsets = {canon(s['itemset']) for s in model_sets}
-    
-    # Set-based metrics
-    true_positives = apriori_itemsets & model_itemsets
-    false_positives = model_itemsets - apriori_itemsets
-    false_negatives = apriori_itemsets - model_itemsets
-    
-    precision = len(true_positives) / len(model_itemsets) if model_itemsets else 0.0
-    recall = len(true_positives) / len(apriori_itemsets) if apriori_itemsets else 0.0
+    apriori_sets: list[dict],
+    model_sets: list[dict],
+    all_csv_items: set[str],
+    count_tolerance: int = 1,
+) -> dict:
+    """Compute all evaluation metrics for one dataset."""
+    apr_canonical = {canon(s["itemset"]) for s in apriori_sets}
+    mod_canonical = {canon(s["itemset"]) for s in model_sets}
+
+    tp = apr_canonical & mod_canonical
+    fp = mod_canonical - apr_canonical
+    fn = apr_canonical - mod_canonical
+
+    precision = len(tp) / len(mod_canonical) if mod_canonical else 0.0
+    recall = len(tp) / len(apr_canonical) if apr_canonical else 0.0
     f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
-    
-    # Jaccard similarity
-    union = apriori_itemsets | model_itemsets
-    jaccard = len(true_positives) / len(union) if union else 1.0
-    
-    # Per-size metrics
+
+    # Count accuracy — for matched itemsets, how many have correct count?
+    apr_count_map = {}
+    for s in apriori_sets:
+        apr_count_map[canon(s["itemset"])] = s["count"]
+
+    count_correct = count_total = 0
+    for s in model_sets:
+        c = canon(s["itemset"])
+        if c in apr_count_map:
+            count_total += 1
+            if abs(s["count"] - apr_count_map[c]) <= count_tolerance:
+                count_correct += 1
+
+    count_accuracy = count_correct / count_total if count_total > 0 else 0.0
+
+    # Hallucination — items not in the CSV
+    hallucinated = 0
+    for s in model_sets:
+        for item in s["itemset"]:
+            if item not in all_csv_items:
+                hallucinated += 1
+                break  # count per itemset, not per item
+
+    hallucination_rate = hallucinated / len(model_sets) if model_sets else 0.0
+
+    # Per-size breakdown
     def by_size(sets_list):
-        result = {}
+        result: dict[int, set] = {}
         for s in sets_list:
-            size = len(s['itemset'])
-            if size not in result:
-                result[size] = set()
-            result[size].add(canon(s['itemset']))
+            size = len(s["itemset"])
+            result.setdefault(size, set()).add(canon(s["itemset"]))
         return result
-    
-    apriori_by_size = by_size(apriori_sets)
-    model_by_size = by_size(model_sets)
-    
-    size_metrics = {}
-    all_sizes = set(apriori_by_size.keys()) | set(model_by_size.keys())
-    for size in sorted(all_sizes):
-        apr = apriori_by_size.get(size, set())
-        mod = model_by_size.get(size, set())
-        tp = len(apr & mod)
-        fp = len(mod - apr)
-        fn = len(apr - mod)
-        p = tp / (tp + fp) if (tp + fp) > 0 else 0.0
-        r = tp / (tp + fn) if (tp + fn) > 0 else 0.0
-        size_metrics[f"size_{size}"] = {
-            "apriori_count": len(apr),
-            "model_count": len(mod),
-            "precision": round(p, 4),
-            "recall": round(r, 4),
+
+    apr_by_size = by_size(apriori_sets)
+    mod_by_size = by_size(model_sets)
+    size_breakdown = {}
+    for size in sorted(set(apr_by_size) | set(mod_by_size)):
+        a = apr_by_size.get(size, set())
+        m = mod_by_size.get(size, set())
+        s_tp = len(a & m)
+        s_p = s_tp / len(m) if m else 0.0
+        s_r = s_tp / len(a) if a else 0.0
+        s_f1 = 2 * s_p * s_r / (s_p + s_r) if (s_p + s_r) > 0 else 0.0
+        size_breakdown[f"size_{size}"] = {
+            "apriori": len(a),
+            "model": len(m),
+            "tp": s_tp,
+            "precision": round(s_p, 4),
+            "recall": round(s_r, 4),
+            "f1": round(s_f1, 4),
         }
-    
+
     return {
-        "apriori_total": len(apriori_itemsets),
-        "model_total": len(model_itemsets),
-        "true_positives": len(true_positives),
-        "false_positives": len(false_positives),
-        "false_negatives": len(false_negatives),
+        "apriori_count": len(apr_canonical),
+        "model_count": len(mod_canonical),
+        "tp": len(tp),
+        "fp": len(fp),
+        "fn": len(fn),
         "precision": round(precision, 4),
         "recall": round(recall, 4),
-        "f1_score": round(f1, 4),
-        "jaccard_similarity": round(jaccard, 4),
-        "exact_match": apriori_itemsets == model_itemsets,
-        "size_breakdown": size_metrics,
+        "f1": round(f1, 4),
+        "exact_match": f1 == 1.0,
+        "count_accuracy": round(count_accuracy, 4),
+        "hallucination_rate": round(hallucination_rate, 4),
+        "size_breakdown": size_breakdown,
     }
 
 
-# =========================
-# Main Evaluation Pipeline
-# =========================
+# ═════════════════════════════════════════════════════════════════════════════
+# Training dataset exclusion
+# ═════════════════════════════════════════════════════════════════════════════
+def get_training_dataset_filenames(project_root: Path) -> set[str]:
+    """Extract dataset filenames used in SFT/DPO training data."""
+    filenames: set[str] = set()
 
-def evaluate_single_dataset(
-    data_path: str,
+    for json_file in ["data/sft_cot_v2.json", "data/dpo_real_v2.json"]:
+        path = project_root / json_file
+        if not path.exists():
+            continue
+        try:
+            with open(path, "r") as f:
+                data = json.load(f)
+            for entry in data:
+                ds_id = entry.get("dataset_id", "")
+                # Format: "ds_0001_7x12_85aed5f8.csv:85aed5f80c90"
+                filename = ds_id.split(":")[0] if ":" in ds_id else ds_id
+                if filename:
+                    filenames.add(filename)
+        except Exception:
+            pass
+
+    return filenames
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Single dataset evaluation
+# ═════════════════════════════════════════════════════════════════════════════
+def evaluate_dataset(
+    csv_path: str,
     min_support: int,
     max_size: int,
-    output_dir: Path,
-) -> Dict[str, Any]:
-    """Evaluate model on a single dataset."""
-    
-    # Load data
-    df, transactions, meta = load_transactions_csv(data_path)
-    print(f"   Loaded: {len(transactions)} transactions, format={meta['format']}")
-    
-    # Compute hash for filenames
-    sha = hashlib.sha256()
-    with open(data_path, 'rb') as f:
-        for chunk in iter(lambda: f.read(8192), b''):
-            sha.update(chunk)
-    file_hash = sha.hexdigest()[:12]
-    stem = Path(data_path).stem
-    
-    # Run Apriori (ground truth)
-    apriori_start = time.perf_counter()
+    max_new_tokens: int,
+    two_phase: bool = False,
+    temperature: float = 0.3,
+) -> dict:
+    """Evaluate model on one dataset. Returns full result dict."""
+    # Load CSV
+    transactions, csv_text, n_rows, n_cols = load_csv_as_rows(csv_path)
+    print(f"   Loaded: {n_rows} rows × {n_cols} cols")
+
+    # All items in the CSV (for hallucination check)
+    all_items: set[str] = set()
+    for trans in transactions:
+        for item in trans:
+            all_items.add(str(item).strip().lower())
+
+    # Ground truth
+    t0 = time.perf_counter()
     apriori_sets = apriori_frequent_itemsets(transactions, min_support, max_size)
-    apriori_time = time.perf_counter() - apriori_start
-    print(f"   Apriori: {len(apriori_sets)} itemsets in {apriori_time*1000:.1f}ms")
-    
-    # Run fine-tuned model
-    model_start = time.perf_counter()
-    model_sets = extract_itemsets_with_model(transactions, min_support)
-    model_time = time.perf_counter() - model_start
-    print(f"   Model: {len(model_sets)} itemsets in {model_time*1000:.1f}ms")
-    
-    # Compute metrics
-    metrics = compute_metrics(apriori_sets, model_sets)
-    
-    # Save outputs
-    result = {
-        "dataset": Path(data_path).name,
-        "dataset_hash": file_hash,
-        "num_transactions": len(transactions),
+    apriori_time = time.perf_counter() - t0
+    print(f"   Apriori: {len(apriori_sets)} itemsets ({apriori_time * 1000:.0f}ms)")
+
+    # Model inference (v3: temp=0.3, StoppingCriteria, dynamic budget)
+    t0 = time.perf_counter()
+    inference = run_inference(
+        csv_text, min_support,
+        max_new_tokens=max_new_tokens,
+        temperature=temperature,
+        two_phase=two_phase,
+        n_rows=n_rows,
+        n_cols=n_cols,
+    )
+    model_time = time.perf_counter() - t0
+    model_sets = inference["parsed_items"]
+    print(
+        f"   Model:   {len(model_sets)} itemsets ({model_time:.1f}s) "
+        f"| JSON={'✅' if inference['parse_ok'] else '❌'} "
+        f"| <think>={'✅' if inference['has_think'] else '❌'}"
+    )
+
+    # Metrics
+    metrics = compute_metrics(apriori_sets, model_sets, all_items)
+
+    return {
+        "dataset": Path(csv_path).name,
+        "n_rows": n_rows,
+        "n_cols": n_cols,
         "min_support": min_support,
         "max_size": max_size,
-        "apriori_time_ms": round(apriori_time * 1000, 2),
-        "model_time_ms": round(model_time * 1000, 2),
+        "apriori_count": len(apriori_sets),
+        "model_count": len(model_sets),
+        "apriori_time_s": round(apriori_time, 3),
+        "model_time_s": round(model_time, 2),
+        "parse_ok": inference["parse_ok"],
+        "has_think": inference["has_think"],
         "metrics": metrics,
-        "timestamp": datetime.now(UTC).isoformat(),
+        "raw_output": inference["raw_output"],
+        "think_content": inference["think_content"],
+        "apriori_output": apriori_sets,
+        "model_output": model_sets,
     }
-    
-    # Save detailed outputs
-    output_file = output_dir / f"eval_{stem}_{file_hash}.json"
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump({
-            **result,
-            "apriori_output": apriori_sets,
-            "model_output": model_sets,
-        }, f, ensure_ascii=False, indent=2)
-    
-    return result
 
 
+# ═════════════════════════════════════════════════════════════════════════════
+# Report generation
+# ═════════════════════════════════════════════════════════════════════════════
+def generate_report(results: list[dict], summary: dict, output_dir: Path) -> None:
+    """Generate markdown evaluation report."""
+    lines = [
+        "# Model Evaluation Report",
+        "",
+        f"**Date:** {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}",
+        f"**Model:** {summary['model']}",
+        f"**Datasets evaluated:** {summary['successful']}/{summary['total']}",
+        f"**Total time:** {summary['total_time_s']:.0f}s",
+        "",
+        "## Aggregate Metrics",
+        "",
+        "| Metric | Value | Target |",
+        "|--------|-------|--------|",
+        f"| **F1 Score** | **{summary['avg_f1']:.1%}** | ≥ 80% |",
+        f"| Precision | {summary['avg_precision']:.1%} | — |",
+        f"| Recall | {summary['avg_recall']:.1%} | — |",
+        f"| Exact Match | {summary['exact_match_rate']:.1%} | ≥ 50% |",
+        f"| JSON Parse Rate | {summary['parse_rate']:.1%} | ≥ 90% |",
+        f"| Hallucination Rate | {summary['avg_hallucination']:.1%} | ≤ 5% |",
+        f"| Think Rate | {summary['think_rate']:.1%} | — |",
+        f"| Count Accuracy | {summary['avg_count_accuracy']:.1%} | — |",
+        f"| Avg Inference Time | {summary['avg_time_s']:.1f}s | ≤ 60s |",
+        "",
+        "## Per-Dataset Results",
+        "",
+        "| Dataset | Rows×Cols | Apriori | Model | TP | FP | FN | P | R | F1 | JSON | Think | Time |",
+        "|---------|-----------|---------|-------|----|----|----|---|---|----|----- |-------|------|",
+    ]
+
+    successful = [r for r in results if "metrics" in r]
+    for r in successful:
+        m = r["metrics"]
+        lines.append(
+            f"| {r['dataset']} | {r['n_rows']}×{r['n_cols']} | "
+            f"{r['apriori_count']} | {r['model_count']} | "
+            f"{m['tp']} | {m['fp']} | {m['fn']} | "
+            f"{m['precision']:.0%} | {m['recall']:.0%} | {m['f1']:.0%} | "
+            f"{'✅' if r['parse_ok'] else '❌'} | "
+            f"{'✅' if r['has_think'] else '❌'} | "
+            f"{r['model_time_s']:.0f}s |"
+        )
+
+    # Failure analysis
+    failures = [r for r in successful if r["metrics"]["f1"] < 0.5]
+    parse_failures = [r for r in results if not r.get("parse_ok", True)]
+    hallucinating = [r for r in successful if r["metrics"]["hallucination_rate"] > 0.1]
+
+    lines.extend(["", "## Failure Analysis", ""])
+
+    if not failures and not parse_failures:
+        lines.append("No significant failures detected. 🎉")
+    else:
+        if parse_failures:
+            lines.append(f"### JSON Parse Failures ({len(parse_failures)})")
+            for r in parse_failures:
+                raw = r.get("raw_output", "")[:200]
+                lines.append(f"- **{r['dataset']}**: `{raw}...`")
+            lines.append("")
+
+        if failures:
+            lines.append(f"### Low F1 Datasets ({len(failures)})")
+            for r in failures:
+                m = r["metrics"]
+                lines.append(
+                    f"- **{r['dataset']}**: F1={m['f1']:.0%} "
+                    f"(P={m['precision']:.0%} R={m['recall']:.0%}, "
+                    f"TP={m['tp']} FP={m['fp']} FN={m['fn']})"
+                )
+            lines.append("")
+
+        if hallucinating:
+            lines.append(f"### Hallucinating Datasets ({len(hallucinating)})")
+            for r in hallucinating:
+                lines.append(
+                    f"- **{r['dataset']}**: "
+                    f"{r['metrics']['hallucination_rate']:.0%} hallucination rate"
+                )
+            lines.append("")
+
+    # Size breakdown (aggregate across all datasets)
+    all_size_metrics: dict[str, list] = {}
+    for r in successful:
+        for size_key, size_data in r["metrics"]["size_breakdown"].items():
+            all_size_metrics.setdefault(size_key, []).append(size_data)
+
+    if all_size_metrics:
+        lines.extend(["## Performance by Itemset Size", ""])
+        lines.append("| Size | Avg Apriori | Avg Model | Avg P | Avg R | Avg F1 |")
+        lines.append("|------|------------|-----------|-------|-------|--------|")
+        for size_key in sorted(all_size_metrics):
+            entries = all_size_metrics[size_key]
+            n = len(entries)
+            avg_apr = sum(e["apriori"] for e in entries) / n
+            avg_mod = sum(e["model"] for e in entries) / n
+            avg_p = sum(e["precision"] for e in entries) / n
+            avg_r = sum(e["recall"] for e in entries) / n
+            avg_f1 = sum(e["f1"] for e in entries) / n
+            lines.append(
+                f"| {size_key.replace('size_', '')} | {avg_apr:.1f} | {avg_mod:.1f} | "
+                f"{avg_p:.0%} | {avg_r:.0%} | {avg_f1:.0%} |"
+            )
+        lines.append("")
+
+    report_path = output_dir / "evaluation_report.md"
+    report_path.write_text("\n".join(lines), encoding="utf-8")
+    print(f"\n📄 Report saved → {report_path}")
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Main
+# ═════════════════════════════════════════════════════════════════════════════
 def main():
-    parser = argparse.ArgumentParser(description="Evaluate fine-tuned itemset extraction model")
-    parser.add_argument('--data', help='Single dataset CSV path')
-    parser.add_argument('--data-dir', help='Directory containing CSV datasets')
-    parser.add_argument('--min-support', type=int, default=3, help='Minimum support threshold')
-    parser.add_argument('--max-size', type=int, default=3, help='Maximum itemset size for Apriori')
-    parser.add_argument('--output-dir', default='eval_results', help='Output directory for results')
-    parser.add_argument('--limit', type=int, help='Limit number of datasets to evaluate')
+    parser = argparse.ArgumentParser(
+        description="Evaluate fine-tuned itemset extraction model vs Apriori ground truth"
+    )
+    parser.add_argument(
+        "--model",
+        default="OliverSlivka/qwen2.5-7b-itemset-extractor",
+        help="HuggingFace model repo or local path (default: OliverSlivka/qwen2.5-7b-itemset-extractor)",
+    )
+    parser.add_argument("--data", help="Single CSV dataset path")
+    parser.add_argument("--data-dir", help="Directory of CSV datasets")
+    parser.add_argument(
+        "--count",
+        type=int,
+        default=10,
+        help="Number of random datasets to evaluate from --data-dir (default: 10)",
+    )
+    parser.add_argument(
+        "--min-support", type=int, default=3, help="Min support threshold (default: 3)"
+    )
+    parser.add_argument(
+        "--max-size", type=int, default=3, help="Max itemset size for Apriori (default: 3)"
+    )
+    parser.add_argument(
+        "--max-new-tokens",
+        type=int,
+        default=2048,
+        help="Max generation tokens (default: 2048)",
+    )
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=0.3,
+        help="Sampling temperature (default: 0.3, council recommendation)",
+    )
+    parser.add_argument(
+        "--two-phase",
+        action="store_true",
+        help="Use two-phase generation: <think> at temp=0.3, JSON at temp=0.05",
+    )
+    parser.add_argument(
+        "--output-dir", default="eval_results", help="Output directory (default: eval_results)"
+    )
+    parser.add_argument(
+        "--seed", type=int, default=42, help="Random seed for dataset selection"
+    )
+    parser.add_argument(
+        "--exclude-training",
+        action="store_true",
+        help="Exclude datasets used in SFT/DPO training (fair evaluation)",
+    )
     args = parser.parse_args()
-    
-    # Determine datasets to evaluate
-    if args.data_dir:
+
+    # ── Collect datasets ─────────────────────────────────────────────────
+    if args.data:
+        data_files = [args.data]
+    elif args.data_dir:
         if not os.path.isdir(args.data_dir):
             print(f"❌ Directory not found: {args.data_dir}", file=sys.stderr)
             sys.exit(1)
-        data_files = sorted([
-            os.path.join(args.data_dir, f) 
-            for f in os.listdir(args.data_dir) 
-            if f.lower().endswith('.csv')
+        all_csvs = sorted([
+            os.path.join(args.data_dir, f)
+            for f in os.listdir(args.data_dir)
+            if f.lower().endswith(".csv")
         ])
-        if args.limit:
-            data_files = data_files[:args.limit]
-    elif args.data:
-        data_files = [args.data]
+
+        # Exclude training datasets
+        if args.exclude_training:
+            project_root = Path(__file__).resolve().parents[2]
+            training_names = get_training_dataset_filenames(project_root)
+            before = len(all_csvs)
+            all_csvs = [f for f in all_csvs if Path(f).name not in training_names]
+            excluded = before - len(all_csvs)
+            print(f"🔒 Excluded {excluded} training datasets ({len(all_csvs)} remaining)")
+
+        # Random sample
+        random.seed(args.seed)
+        if len(all_csvs) > args.count:
+            data_files = random.sample(all_csvs, args.count)
+        else:
+            data_files = all_csvs
     else:
-        print("❌ Please specify --data or --data-dir", file=sys.stderr)
+        print("❌ Specify --data or --data-dir", file=sys.stderr)
         sys.exit(1)
-    
+
     if not data_files:
         print("❌ No CSV files found", file=sys.stderr)
         sys.exit(1)
-    
-    # Create output directory
+
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    
-    print("=" * 60)
-    print("FINE-TUNED MODEL EVALUATION")
-    print("=" * 60)
-    print(f"Datasets: {len(data_files)}")
-    print(f"Min support: {args.min_support}")
-    print(f"Max itemset size: {args.max_size}")
-    print(f"Output: {output_dir}")
-    print("=" * 60)
-    
-    # Load model once
-    load_model()
-    
-    # Run evaluation
+
+    # ── Banner ───────────────────────────────────────────────────────────
+    print("═" * 60)
+    print("  ITEMSET EXTRACTION MODEL EVALUATION (v3)")
+    print("═" * 60)
+    print(f"  Model:       {args.model}")
+    print(f"  Datasets:    {len(data_files)}")
+    print(f"  Min support: {args.min_support}")
+    print(f"  Max size:    {args.max_size}")
+    print(f"  Temperature: {args.temperature}")
+    print(f"  Two-phase:   {'Yes' if args.two_phase else 'No'}")
+    print(f"  Output:      {output_dir}")
+    print("═" * 60)
+
+    # ── Load model once ──────────────────────────────────────────────────
+    load_model(args.model)
+
+    # ── Run evaluation ───────────────────────────────────────────────────
     all_results = []
     total_start = time.perf_counter()
-    
-    for i, data_path in enumerate(data_files, 1):
-        print(f"\n[{i}/{len(data_files)}] {Path(data_path).name}")
+
+    for i, csv_path in enumerate(data_files, 1):
+        print(f"\n[{i}/{len(data_files)}] {Path(csv_path).name}")
         try:
-            result = evaluate_single_dataset(
-                data_path, 
-                args.min_support, 
-                args.max_size,
-                output_dir,
+            result = evaluate_dataset(
+                csv_path, args.min_support, args.max_size, args.max_new_tokens,
+                two_phase=args.two_phase, temperature=args.temperature,
             )
             all_results.append(result)
-            
-            m = result['metrics']
-            print(f"   → P={m['precision']:.2%} R={m['recall']:.2%} F1={m['f1_score']:.2%} | "
-                  f"TP={m['true_positives']} FP={m['false_positives']} FN={m['false_negatives']}")
-            
+
+            m = result["metrics"]
+            print(
+                f"   → P={m['precision']:.0%} R={m['recall']:.0%} F1={m['f1']:.0%} "
+                f"| halluc={m['hallucination_rate']:.0%}"
+            )
         except Exception as e:
             print(f"   ❌ Error: {e}")
-            all_results.append({
-                "dataset": Path(data_path).name,
-                "error": str(e),
-                "timestamp": datetime.now(UTC).isoformat(),
-            })
-    
+            all_results.append({"dataset": Path(csv_path).name, "error": str(e)})
+
     total_time = time.perf_counter() - total_start
-    
-    # Compute aggregate metrics
-    successful = [r for r in all_results if 'metrics' in r]
-    
-    if successful:
-        avg_precision = sum(r['metrics']['precision'] for r in successful) / len(successful)
-        avg_recall = sum(r['metrics']['recall'] for r in successful) / len(successful)
-        avg_f1 = sum(r['metrics']['f1_score'] for r in successful) / len(successful)
-        avg_jaccard = sum(r['metrics']['jaccard_similarity'] for r in successful) / len(successful)
-        exact_matches = sum(1 for r in successful if r['metrics']['exact_match'])
-        
-        summary = {
-            "total_datasets": len(data_files),
-            "successful_evaluations": len(successful),
-            "failed_evaluations": len(all_results) - len(successful),
-            "avg_precision": round(avg_precision, 4),
-            "avg_recall": round(avg_recall, 4),
-            "avg_f1_score": round(avg_f1, 4),
-            "avg_jaccard": round(avg_jaccard, 4),
-            "exact_match_count": exact_matches,
-            "exact_match_rate": round(exact_matches / len(successful), 4) if successful else 0,
-            "total_time_seconds": round(total_time, 2),
-            "timestamp": datetime.now(UTC).isoformat(),
-            "config": {
-                "min_support": args.min_support,
-                "max_size": args.max_size,
-                "model": ADAPTER_NAME,
-            },
-        }
-        
-        # Save summary
-        summary_file = output_dir / "evaluation_summary.json"
-        with open(summary_file, 'w', encoding='utf-8') as f:
-            json.dump(summary, f, ensure_ascii=False, indent=2)
-        
-        # Save all results
-        all_results_file = output_dir / "all_results.json"
-        with open(all_results_file, 'w', encoding='utf-8') as f:
-            json.dump(all_results, f, ensure_ascii=False, indent=2)
-        
-        print("\n" + "=" * 60)
-        print("EVALUATION SUMMARY")
-        print("=" * 60)
-        print(f"Datasets evaluated: {len(successful)}/{len(data_files)}")
-        print(f"Average Precision: {avg_precision:.2%}")
-        print(f"Average Recall: {avg_recall:.2%}")
-        print(f"Average F1 Score: {avg_f1:.2%}")
-        print(f"Average Jaccard: {avg_jaccard:.2%}")
-        print(f"Exact Matches: {exact_matches}/{len(successful)} ({exact_matches/len(successful)*100:.1f}%)")
-        print(f"Total Time: {total_time:.1f}s")
-        print(f"\n📁 Results saved to: {output_dir}")
-    else:
+
+    # ── Aggregate ────────────────────────────────────────────────────────
+    successful = [r for r in all_results if "metrics" in r]
+    if not successful:
         print("\n❌ No successful evaluations")
+        sys.exit(1)
+
+    n = len(successful)
+    summary = {
+        "model": args.model,
+        "total": len(data_files),
+        "successful": n,
+        "failed": len(all_results) - n,
+        "avg_precision": sum(r["metrics"]["precision"] for r in successful) / n,
+        "avg_recall": sum(r["metrics"]["recall"] for r in successful) / n,
+        "avg_f1": sum(r["metrics"]["f1"] for r in successful) / n,
+        "exact_match_count": sum(1 for r in successful if r["metrics"]["exact_match"]),
+        "exact_match_rate": sum(1 for r in successful if r["metrics"]["exact_match"]) / n,
+        "parse_rate": sum(1 for r in successful if r["parse_ok"]) / n,
+        "think_rate": sum(1 for r in successful if r["has_think"]) / n,
+        "avg_hallucination": sum(r["metrics"]["hallucination_rate"] for r in successful) / n,
+        "avg_count_accuracy": sum(r["metrics"]["count_accuracy"] for r in successful) / n,
+        "avg_time_s": sum(r["model_time_s"] for r in successful) / n,
+        "total_time_s": round(total_time, 1),
+        "min_support": args.min_support,
+        "max_size": args.max_size,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "output_diversity": compute_diversity_report([r["raw_output"] for r in successful]),
+    }
+
+    # Round summary floats
+    for k in summary:
+        if isinstance(summary[k], float):
+            summary[k] = round(summary[k], 4)
+
+    # ── Save outputs ─────────────────────────────────────────────────────
+    # Summary (lightweight — no raw outputs)
+    (output_dir / "evaluation_summary.json").write_text(
+        json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+
+    # Full results (includes raw outputs for debugging)
+    detail_results = []
+    for r in all_results:
+        detail = {k: v for k, v in r.items() if k != "raw_output"}
+        # Keep raw output in a separate per-dataset file for debugging
+        if "raw_output" in r:
+            raw_file = output_dir / f"raw_{r['dataset'].replace('.csv', '')}.txt"
+            raw_file.write_text(r["raw_output"], encoding="utf-8")
+        detail_results.append(detail)
+
+    (output_dir / "all_results.json").write_text(
+        json.dumps(detail_results, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+
+    # Markdown report
+    generate_report(all_results, summary, output_dir)
+
+    # ── Print summary ────────────────────────────────────────────────────
+    print("\n" + "═" * 60)
+    print("  EVALUATION SUMMARY")
+    print("═" * 60)
+    print(f"  Datasets:          {n}/{len(data_files)} successful")
+    print(f"  Avg Precision:     {summary['avg_precision']:.1%}")
+    print(f"  Avg Recall:        {summary['avg_recall']:.1%}")
+    print(f"  Avg F1 Score:      {summary['avg_f1']:.1%}")
+    print(
+        f"  Exact Match:       "
+        f"{summary['exact_match_count']}/{n} ({summary['exact_match_rate']:.1%})"
+    )
+    print(f"  JSON Parse Rate:   {summary['parse_rate']:.1%}")
+    print(f"  Think Rate:        {summary['think_rate']:.1%}")
+    print(f"  Hallucination:     {summary['avg_hallucination']:.1%}")
+    print(f"  Count Accuracy:    {summary['avg_count_accuracy']:.1%}")
+    print(f"  Avg Inference:     {summary['avg_time_s']:.1f}s per dataset")
+    print(f"  Total Time:        {total_time:.0f}s")
+    print(f"\n  📁 Results → {output_dir}/")
+
+    # ── Pass/fail verdict ────────────────────────────────────────────────
+    print("\n" + "─" * 60)
+    passed = (
+        summary["avg_f1"] >= 0.80
+        and summary["parse_rate"] >= 0.90
+        and summary["avg_hallucination"] <= 0.05
+    )
+    if passed:
+        print("  🎉 PASSED — Model meets production targets!")
+    else:
+        reasons = []
+        if summary["avg_f1"] < 0.80:
+            reasons.append(f"F1 {summary['avg_f1']:.1%} < 80%")
+        if summary["parse_rate"] < 0.90:
+            reasons.append(f"Parse rate {summary['parse_rate']:.1%} < 90%")
+        if summary["avg_hallucination"] > 0.05:
+            reasons.append(f"Hallucination {summary['avg_hallucination']:.1%} > 5%")
+        print(f"  ⚠️  NOT YET — {', '.join(reasons)}")
+    print("─" * 60)
 
 
 if __name__ == "__main__":

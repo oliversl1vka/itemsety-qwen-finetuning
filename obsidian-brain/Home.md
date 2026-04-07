@@ -22,12 +22,20 @@
 - [[References/API Limits|API Token Limits]]
 - [[References/Model Comparison|Model Comparison]]
 - [[References/Pipeline Bug 2026-02-08|Pipeline Bug (2026-02-08)]]
+- [[References/Unsloth Notebook Patterns|Unsloth Notebook Patterns]] — Diamond knowledge from 11 reviewed notebooks
+- [[References/HF Dataset Repos|HF Dataset Repos]] — Versioned HuggingFace repos (v2, v3, ...)
+- [[References/Training Methods Guide|Training Methods Guide]] — SFT/DPO/GRPO comparison with project-specific overrides
+- [[References/Hardware and Memory Guide|Hardware & Memory Guide]] — VRAM estimation, GPU selection, Unsloth optimization
+- [[References/Training Troubleshooting|Training Troubleshooting]] — OOM, NaN loss, repetition loops, JSON parse failures
+- [[References/HuggingFace Hub Operations|HuggingFace Hub Operations]] — Auth, upload patterns, versioning, GGUF conversion
+- [[References/Dataset Formats and Templates|Dataset Formats & Templates]] — SFT/DPO/GRPO formats, ChatML templates, quality criteria
 
 ### Run Logs
 - Browse `Logs/` for per-run activity logs
 
 ### Decisions
 - Browse `Decisions/` for architecture & strategy decisions
+- [[Decisions/Diamond Knowledge Integration 2026-03-17|Diamond Knowledge Integration]] — v3.2 notebook changes from Unsloth review
 
 ---
 
@@ -64,7 +72,7 @@ This is the **persistent knowledge base** for the multi-agent workflow system.
 ### Tags
 - `#agent/orchestrator`, `#agent/pipeline`, etc.
 - `#experiment`, `#decision`, `#bug`, `#insight`
-- `#model/gpt-4o`, `#model/gpt-4.1-mini`, `#model/qwen-3b`
+- `#model/gpt-4o`, `#model/gpt-4.1-mini`, `#model/qwen-7b`, `#model/o4-mini`
 
 ### Memory Entry Format
 ```markdown

@@ -1,0 +1,74 @@
+[
+  {
+    "version": "v2",
+    "date": "2026-03-07",
+    "filename": "training_3phase_2026-03-07_v2.ipynb",
+    "phases": "SFT-CoT → GRPO (no DPO)",
+    "changes": [
+      "LoRA alpha/r = 64/32 = 2.0 (was 16/64 = 0.25)",
+      "DPO removed entirely (council 4/4 unanimous)",
+      "SFT 5 epochs (was 2), lr=1e-4 (was 2e-4)",
+      "packing=False, weight_decay=0.01, max_grad_norm=1.0",
+      "Save adapters only between phases (no merged_4bit_forced)",
+      "5 GRPO reward functions with partial credit",
+      "Format verification gate between SFT and GRPO",
+      "max_seq_length=6144 (was 4096)",
+      "GRPO: 500 steps, lr=2e-6, num_gen=6, completion=3000, beta=0.001"
+    ],
+    "based_on_council": "docs/reports/council_training_advice.json",
+    "result": "SFT converged (loss 0.0291) but merged_4bit_forced destroyed LoRA → 0.4% F1"
+  },
+  {
+    "version": "v3",
+    "date": "2026-03-09",
+    "filename": "training_3phase_2026-03-09_v3.ipynb",
+    "phases": "SFT-CoT (3ep) → DPO-Real (1ep), GRPO skipped",
+    "data": {
+      "sft_source": "data/sft_cot_v3.json (258 examples, concise CoT format)",
+      "dpo_source": "data/dpo_real_v2.json (606 pairs, 4 model sources)",
+      "hf_dataset": {
+        "sft": "233 train / 25 val",
+        "dpo": "546 train / 60 val",
+        "grpo": "233 train / 25 val (available but unused)"
+      }
+    },
+    "changes": [
+      "Concise CoT format: column-grouped, RESULT SUMMARY termination signal (~700 avg tokens vs ~1547)",
+      "max_seq_length: 4096 → 2048 (concise CoT fits easily)",
+      "LoRA r=32, alpha=64 (ratio 2.0, same as v2)",
+      "lora_dropout: 0 → 0.05 (regularization against repetition loops)",
+      "SFT: 3 epochs (was 5), lr=1e-4, warmup=0.10, weight_decay=0.01",
+      "SFT: eval_steps=50, load_best_model_at_end=True (early stopping)",
+      "DPO RE-ENABLED: 1 epoch, lr=5e-5, beta=0.1 (real LLM failures as rejected)",
+      "GRPO: SKIPPED (Unsloth bugs: tensor mismatch + KL explosion)",
+      "Save: adapter-only via save_pretrained() — NEVER merged_4bit_forced",
+      "Inference: temp=0.3, top_k=50, top_p=0.90, StoppingCriteria at </think>"
+    ],
+    "based_on_council": "docs/reports/council_v3_plan_2026-03-09.json",
+    "root_causes_fixed": [
+      "merged_4bit_forced → adapter-only save (council unanimous)",
+      "verbose CoT repetition loops → concise column-grouped format",
+      "over-training (5 epochs on 348 examples) → 3 epochs on 258 examples",
+      "no DPO (v2 removed it) → DPO re-enabled with real LLM failures for termination learning"
+    ],
+    "expected_f1": "conservative 50-65%, optimistic 75-85%"
+  },
+  {
+    "version": "v3.2",
+    "date": "2026-03-17",
+    "filename": "training_3phase_2026-03-09_v3.ipynb",
+    "phases": "SFT-CoT (3ep) → DPO-Real (1ep), GRPO skipped (unchanged from v3)",
+    "changes": [
+      "Optimizer: adamw_8bit → paged_adamw_8bit (SFT Cell 8 + DPO Cell 12) — pages optimizer states to CPU when GPU RAM tight",
+      "New Cell 8b: Label masking verification — decodes labels to confirm train_on_responses_only() masking is correct",
+      "Enhanced Cell 9: SFT format verification gate — generates on 2 val samples, checks <think> + JSON + col:value before DPO"
+    ],
+    "based_on": "Diamond knowledge extraction from 11 Unsloth × Qwen notebooks (knowledge_extraction/unsloth_notebooks/notes/DIAMOND_KNOWLEDGE.md)",
+    "changes_not_applied": [
+      "packing=True — v3 Council explicitly disabled; can corrupt train_on_responses_only masking",
+      "lr=2e-4 — Council overrode to 1e-4 for our repetition loop situation",
+      "random_state=3407 — seed 42 is fine, no meaningful difference"
+    ],
+    "decision_log": "obsidian-brain/Decisions/Diamond Knowledge Integration 2026-03-17.md"
+  }
+]

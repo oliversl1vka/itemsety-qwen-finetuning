@@ -1,0 +1,1 @@
+[{"itemset": ["famrel", "health", "medu"], "count": 3, "rows": ["Row 1", "Row 3", "Row 7"]}, {"itemset": ["famrel", "walc", "medu"], "count": 3, "row": ["Row 1", "Row 20", "Row 13"]}]

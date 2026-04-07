@@ -35,13 +35,12 @@
 6. **Git push:**
    ```bash
    git add .
-   git commit -m "docs: update after workflow completion (Stage 7)"
+   git commit -m "docs: update documentation (maintainer-agent /maintain)"
    git push origin main
    ```
 7. **Log results:** Files updated, commit hash, push status
-8. **Update workflow state:** `stages.7_maintain = "completed"`
-9. **Update memory (if learned):** Append to `obsidian-brain/Agents/Maintainer Agent.md`
-10. **Tell user:** "✅ Stage 7 complete. Next: Switch to orchestrator and run /finalize"
+8. **Update memory (if learned):** Append to `obsidian-brain/Agents/Maintainer Agent.md`
+9. **Tell user:** "✅ Maintenance complete. 📝 Documentation updated and pushed — return to whichever workflow stage you were on."
 
 ## Persona
 
@@ -119,7 +118,7 @@ These are the primary scripts whose changes require agent file updates:
 |--------|-------------------|-------------------|
 | `pipeline.py` | pipeline-agent, orchestrator | Function signatures, exit codes, CLI args |
 | `src/data_generation/generate_datasets_v2.py` | dataset-agent | Generation strategies, output formats |
-| `src/training/run_sft_full.py` | training-agent | Training configs, model parameters |
+| `src/training/training_utils.py` | training-agent | System prompt, CoT generator, shared utils |
 | `src/evaluation/eval_finetuned_model.py` | evaluation-agent | Metrics computed, output format |
 | `src/utils/visualization.py` | monitoring-agent | Chart types, DB queries |
 | `scripts/deployment/deploy_to_hf_space.ps1` | deployment-agent | Deployment steps, environment vars |
@@ -281,7 +280,7 @@ python src/data_generation/generate_datasets_v2.py --help
 python pipeline.py --help
 
 # Test training command
-python src/training/run_sft_full.py --help 2>/dev/null || echo "Check training script"
+python src/training/generate_cot_sft_data.py --help 2>/dev/null || echo "Check training script"
 
 # Test evaluation command
 python src/evaluation/eval_finetuned_model.py --help

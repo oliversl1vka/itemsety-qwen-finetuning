@@ -1,7 +1,7 @@
 # Multi-Agent Workflow Guide
 
-**Last Updated:** 2026-02-08  
-**Version:** 3.0 (Interactive Multi-Agent + Jupyter Training)
+**Last Updated:** 2026-03-01
+**Version:** 5.0 (3-Phase Training: SFT-CoT → DPO-Real → GRPO)
 
 This guide explains how to execute the full training workflow by switching between specialized agents in VS Code.
 
@@ -9,34 +9,32 @@ This guide explains how to execute the full training workflow by switching betwe
 
 ## 🎯 Workflow Overview
 
-The full training workflow consists of **8 sequential stages**, each handled by a specialized agent.  
-After Stage 4, the workflow **PAUSES** for the user to train and evaluate on their own Jupyter server.
+The full training workflow consists of **8 sequential stages**, each handled by a specialized agent.
+After Stage 5 the workflow **PAUSES** for the user to fine-tune and evaluate on school GPUs.
 
 ```
-1. Orchestrator       → /organize   → Initialize workflow
-2. Dataset Agent      → /datasets   → Generate training + evaluation datasets (versioned)
-3. Pipeline Agent     → /pipeline   → Run Apriori + LLM extraction
-4. Training Agent     → /export     → Export training data + generate versioned .ipynb notebook
-5. Deployment Agent   → /push       → Push training dataset + notebook to HuggingFace
-   ── PAUSE ── User trains & evaluates on Jupyter server ──
-6. Training Agent     → /validate   → Receive eval results, validate, write improvement notes
-7. Monitoring Agent   → /visualize  → Create comparison visuals (base vs fine-tuned vs Apriori)
-8. Orchestrator       → /finalize   → Finalize workflow
+1. Orchestrator        → /organize    → Initialize workflow
+2. Dataset Agent       → /datasets    → ⚙️  OPTIONAL — only if new training/eval datasets needed
+3. Pipeline Agent      → /pipeline    → Run Apriori + LLM extraction (repeat per model/day)
+4. Training Agent      → /export      → Export 3-phase training data + generate notebook
+5. Deployment Agent    → /push        → Push dataset + notebook to HuggingFace repository
+   ── PAUSE ── User fine-tunes on school GPUs, then runs evaluation notebook ──
+6. Training Agent      → /validate    → Receive results (+ errors), validate, improve training script
+7. Monitoring Agent    → /visualize   → Comparison visuals: base vs fine-tuned vs Apriori
+8. Orchestrator        → /finalize    → Finalize workflow
 
 🔧 UTILITY AGENTS (available anytime, not mandatory):
-   Cleanup Agent      → /cleanup    → Repository hygiene
-   Maintainer Agent   → /maintain   → Documentation updates
+   Cleanup Agent       → /cleanup     → Repository hygiene
+   Maintainer Agent    → /maintain    → Documentation + git push
 ```
 
-**End Goal:** Versioned training notebook + dataset on HuggingFace → User trains → Results validated → Comparison visuals → Improvement notes saved for next iteration.
+**End Goal:** 3-phase training data (SFT-CoT + DPO-Real + GRPO) + training notebook on HuggingFace → User trains Qwen2.5-7B on school GPUs → Results validated by Training Agent + Evaluation Agent → Comparison visuals → Improvement notes saved.
 
 ---
 
 ## 🧠 Memory-First Rule
 
 **EVERY agent MUST read its memory file before executing ANY command.**
-
-This ensures we never repeat past mistakes and continuously improve:
 
 | Agent | Memory File (Obsidian) |
 |-------|------------------------|
@@ -50,11 +48,10 @@ This ensures we never repeat past mistakes and continuously improve:
 | Cleanup Agent | `obsidian-brain/Agents/Cleanup Agent.md` |
 | Maintainer Agent | `obsidian-brain/Agents/Maintainer Agent.md` |
 
-Memory notes live in the **Obsidian vault** at `obsidian-brain/`.
-Activity logs go to `obsidian-brain/Logs/`.
-Experiment reports go to `obsidian-brain/Experiments/`.
-Decisions go to `obsidian-brain/Decisions/`.
-Reference docs live in `obsidian-brain/References/`.
+Memory notes live in `obsidian-brain/`.
+Activity logs → `obsidian-brain/Logs/`.
+Experiment reports → `obsidian-brain/Experiments/`.
+Decisions → `obsidian-brain/Decisions/`.
 
 ---
 
@@ -67,106 +64,161 @@ Reference docs live in `obsidian-brain/References/`.
 ```
 
 **What happens:**
-- Reads orchestrator memory from Obsidian vault
-- Creates workflow state file
-- Shows 8-stage plan + utility agents
+- Creates `.github/agents_memory/workflow_state.json`
+- Shows the 8-stage plan + multi-model pipeline strategy
 - Tells you which agent to activate next
 
 ---
 
-### Stage 2: Generate Datasets (Training + Evaluation)
+### Stage 2: Generate Datasets ⚙️  OPTIONAL
 ```
 @workspace /agents switch to dataset-agent
 /datasets
 ```
 
-**What happens:**
-- Reads dataset agent memory from Obsidian vault
-- Generates 500 training CSV files in `data/datasets_v2/`
-- Generates evaluation datasets in `data/eval_datasets_v1/` (**versioned, FIXED across model versions**)
-- Eval datasets enable fair comparison across all future model iterations
-- Logs metadata, updates workflow state
+> **When to run:** Only when you need NEW training or evaluation datasets.
+> If you already have `data/datasets_v2/` (500 CSVs) and `data/eval_datasets_v1/` (9 eval CSVs), **skip this stage** and go straight to Pipeline Agent.
 
-**Duration:** ~5-10 minutes  
+**What happens:**
+- Generates 500 training CSV files in `data/datasets_v2/`
+- Generates versioned evaluation datasets in `data/eval_datasets_v1/` (FIXED — never changed between models)
+- Eval datasets enable fair apples-to-apples comparison across all fine-tuning iterations
+
+**Duration:** ~5–10 minutes
 **Artifacts:** 500 training CSVs + 9 eval CSVs (versioned)
 
 ---
 
-### Stage 3: Run Pipeline (Apriori + LLM)
+### Stage 3: Run Pipeline (Apriori + LLM) — repeat per model per day
 ```
 @workspace /agents switch to pipeline-agent
 /pipeline
 ```
 
-**What happens:**
-- Reads pipeline agent memory from Obsidian vault for API rate limit patterns, chunk sizes
-- Runs Apriori + LLM extraction on all training datasets
-- Validates outputs (13 invariants), persists to `runs.db`
+> **This is the most-used stage.** Run it multiple times across multiple days with different LLM models to accumulate a large, diverse training set.
 
-**Duration:** ~2-4 hours  
-**Artifacts:** `artifacts/`, `runs.db`
+**Multi-model accumulation strategy:**
+- You have 500 datasets and plan to run ~5 different models
+- Goal: ~2500 diverse training examples (500 datasets × 5 models)
+- All runs go into `runs.db` (keyed by dataset_hash + llm_model — no duplicates)
+- Each day, run a different model (respecting your daily API quota)
+
+**Example multi-day schedule:**
+| Day | Model | Datasets | New examples |
+|-----|-------|----------|-------------|
+| 1 | `gpt-4.1-mini` | 500 | ~450 validated |
+| 2 | `gemini-2.0-flash` | 500 | ~450 validated |
+| 3 | `claude-3-5-haiku` | 500 | ~450 validated |
+| 4 | `gpt-4.1` | 500 | ~450 validated |
+| 5 | `llama-3.3-70b` | 500 | ~450 validated |
+| **Total** | | 2500 | **~2250 validated** |
+
+**Per-model run command:**
+```bash
+python pipeline.py \
+  --data-dir data/datasets_v2 \
+  --min-support 3 --max-size 3 \
+  --llm-full --llm-chunk-size 50 \
+  --llm-model <model_name>
+
+# Check accumulation progress
+sqlite3 runs.db "SELECT llm_model, COUNT(*) total, SUM(validation_passed) valid FROM runs GROUP BY llm_model"
+```
+
+**What the agent does:**
+- Reads pipeline memory for rate limit patterns and optimal chunk sizes
+- Checks `runs.db` to confirm which models have already run (avoids duplicate work)
+- Runs Apriori + LLM extraction on all datasets for the chosen model
+- Validates all outputs (13 invariants), persists to `runs.db`
+
+**Duration:** ~2–4 hours per model run
+**Artifacts:** `artifacts/` (accumulates per model), `runs.db` (accumulates all model runs)
 
 ---
 
-### Stage 4: Export Training Data + Generate Notebook
+### Stage 4: Export 3-Phase Training Data + Generate Notebook
 ```
 @workspace /agents switch to training-agent
 /export
 ```
 
 **What happens:**
-- Reads training agent memory from Obsidian vault for past training insights and improvement notes
-- Exports validated runs to training format
-- Creates HuggingFace dataset
-- **Generates a versioned `.ipynb` training notebook** (e.g., `notebooks/training_dpo_v3.ipynb`)
-- The notebook + HF dataset are the **ONLY 2 things needed** for user training
+- Reads training agent memory for past training insights
+- Phase 1: Generates SFT-CoT examples with `<think>` reasoning from validated runs
+- Phase 2: Exports DPO preference pairs (Apriori+CoT as chosen, real LLM failures as rejected)
+- Phase 3: Creates GRPO examples with Apriori ground truth for reward functions
+- Builds HuggingFace dataset with 3 configs (`data/hf_dataset_v2/`)
+- Training notebook: `notebooks/training_3phase_7b.ipynb` (SFT-CoT → DPO-Real → GRPO)
 
-**Duration:** ~2-5 minutes  
-**Artifacts:** Training data + HF dataset + versioned `.ipynb` notebook
+**Duration:** ~2–5 minutes
+**Artifacts:** `data/hf_dataset_v2/` (3 configs: sft/dpo/grpo) + `training_3phase_7b.ipynb`
 
 ---
 
-### Stage 5: Push to HuggingFace
+### Stage 5: Push to HuggingFace (Repository — storage only)
 ```
 @workspace /agents switch to deployment-agent
 /push
 ```
 
-**What happens:**
-- Pushes ONLY the training dataset + versioned notebook + eval kit to HuggingFace Hub
-- Updates workflow state
+> **HuggingFace destination:** A plain Hub **repository** (e.g., `OliverSlivka/itemset-finetuning-workspace`) — purely file storage, **no training runs on HuggingFace**.
 
-**Duration:** ~5-15 minutes  
+**What gets pushed:**
+1. 3-phase training dataset (`data/hf_dataset_v2/` — sft/dpo/grpo configs)
+2. Training notebook (`notebooks/training_3phase_7b.ipynb`)
+3. Evaluation assets (`src/evaluation/eval_finetuned_model.py` + eval datasets)
+
+**Duration:** ~5–15 minutes
 
 ---
 
-### ⏸️ WORKFLOW PAUSES HERE
+### ⏸️  WORKFLOW PAUSES HERE
 
-**The user now trains and evaluates on their own Jupyter server:**
+**You now train and evaluate on your school GPUs:**
 
-1. Download the `.ipynb` notebook and HF dataset on your Jupyter server
-2. Run the training notebook (SFT: ~40-60min, DPO: ~60-90min)
-3. Run the evaluation cells (uses the fixed eval datasets)
-4. Record the metrics: F1, Precision, Recall, JSON parse rate, hallucination rate
+1. Download the training notebook + dataset from HuggingFace
+2. Run the **training notebook** (3 phases: SFT-CoT ~20 min + DPO ~20 min + GRPO ~15 min = ~1–2 hours, Unsloth)
+3. The notebook automatically runs evaluation at the end
+4. Record all output metrics:
+   - F1 Score, Precision, Recall
+   - JSON Parse Rate
+   - Hallucination Rate
+   - Inference Time (per dataset)
+   - Any error messages / training issues
 5. Come back to VS Code when done
 
 ---
 
-### Stage 6: Validate Results & Write Improvement Notes
+### Stage 6: Validate Results + Write Improvement Notes
 ```
 @workspace /agents switch to training-agent
 /validate
 ```
 
-**What happens:**
-- Reads ALL training agent memory from Obsidian vault (past iterations, what worked, what didn't)
-- Asks user for evaluation results (F1, parse rate, hallucinations, etc.)
-- Analyzes results against targets and previous iterations
-- **Writes detailed improvement notes to `obsidian-brain/Agents/Training Agent.md`**
-- Creates experiment report in `obsidian-brain/Experiments/`
-- Suggests concrete changes for next training notebook version if needed
+**What happens (training agent + evaluation agent working together):**
 
-**Duration:** ~5 minutes
+1. **Training Agent reads ALL memory** — previous iterations, what worked, what failed
+2. **You provide your results** — paste `evaluation_summary.json`, metric values, or error messages
+3. **Evaluation Agent invoked internally:**
+   - Runs deep failure analysis on model outputs
+   - Optionally invokes LLM Council (`council_advisor.py`) for multi-LLM expert opinions on results and training script improvements
+4. **Training Agent analyzes results:**
+   - Compares against targets (F1 ≥ 0.80, parse rate ≥ 0.90, hallucination ≤ 5%)
+   - Compares against previous iterations from memory
+5. **If targets met or improvement shown:** Writes success notes to memory
+6. **If below target OR errors occurred:**
+   - Edits training notebook with concrete fixes (hyperparameters, data quality, LoRA config)
+   - Or gives specific manual suggestions if the fix requires user judgment
+7. **Improvement notes + experiment report saved** to Obsidian vault
+8. Workflow state updated
+
+**Also available standalone (Evaluation Agent for deeper analysis):**
+```
+@workspace /agents switch to evaluation-agent
+/eval      → Detailed metric analysis + failure pattern report
+/council   → Run LLM Council review of results + training script improvements
+/compare   → Compare two model versions side by side
+```
 
 ---
 
@@ -177,12 +229,12 @@ Reference docs live in `obsidian-brain/References/`.
 ```
 
 **What happens:**
-- Creates comparison charts: Base model vs Fine-tuned model vs Apriori
-- F1, Precision, Recall, JSON parse rate, hallucination rate breakdowns
-- Model version progression over time (if multiple iterations)
-- Saves visuals to `visuals/`
+- Creates comparison charts: Base Qwen (no fine-tuning) vs Fine-tuned model vs Apriori (ground truth)
+- F1, Precision, Recall, JSON parse rate, hallucination rate, inference time per dataset
+- Model version progression over time (if multiple training iterations in memory)
+- Saves all charts to `visuals/`
 
-**Duration:** ~1-2 minutes
+**Duration:** ~1–2 minutes
 
 ---
 
@@ -195,8 +247,8 @@ Reference docs live in `obsidian-brain/References/`.
 **What happens:**
 - Verifies all 8 stages completed
 - Generates final workflow summary with metrics
-- Lists improvement notes saved
-- Marks workflow as completed
+- Lists all improvement notes saved
+- Marks workflow as completed in state
 
 ---
 
@@ -214,7 +266,7 @@ Repository hygiene: verify SQLite records, clean old artifacts, check for orphan
 @workspace /agents switch to maintainer-agent
 /maintain
 ```
-Documentation updates: review outputs, update docs, push to git.
+Documentation updates + git push: review outputs, update `AGENTS.md` / `README.md` / agent files, push to git.
 
 ---
 
@@ -223,62 +275,97 @@ Documentation updates: review outputs, update docs, push to git.
 | Agent | Commands | Stage | Type |
 |-------|----------|-------|------|
 | Orchestrator | `/organize`, `/finalize`, `/status` | 1, 8 | Main |
-| Dataset Agent | `/datasets`, `/analyze` | 2 | Main |
-| Pipeline Agent | `/pipeline`, `/validate-run` | 3 | Main |
+| Dataset Agent | `/datasets`, `/analyze` | 2 ⚙️ optional | Main |
+| Pipeline Agent | `/pipeline`, `/validate-run`, `/status` | 3 (repeat) | Main |
 | Training Agent | `/export`, `/validate` | 4, 6 | Main |
-| Deployment Agent | `/push`, `/deploy` | 5 | Main |
+| Deployment Agent | `/push`, `/status` | 5 | Main |
 | Monitoring Agent | `/visualize`, `/report` | 7 | Main |
-| Evaluation Agent | `/eval`, `/compare` | Support | Support |
+| Evaluation Agent | `/eval`, `/council`, `/compare` | Support (called in Stage 6) | Support |
 | Cleanup Agent | `/cleanup` | — | 🔧 Utility |
 | Maintainer Agent | `/maintain` | — | 🔧 Utility |
 
 ---
 
+## 🔄 Multi-Model Pipeline Strategy
+
+Because you have limited daily API calls, the pipeline runs **incrementally** across multiple days:
+
+```
+Day 1:  pipeline-agent /pipeline  (model: gpt-4.1-mini)    → ~450 runs
+Day 2:  pipeline-agent /pipeline  (model: gemini-flash)     → ~450 runs
+Day 3:  pipeline-agent /pipeline  (model: claude-haiku)     → ~450 runs
+Day N:  pipeline-agent /pipeline  (model: <next-model>)     → ~450 runs
+                                                               ──────────
+                                                               ~2250 total
+                  ↓
+        training-agent /export   (exports ALL accumulated runs as 3-phase training data)
+```
+
+- `runs.db` accumulates ALL model runs — no overwrites (keyed by dataset_hash + llm_model)
+- Each artifact is named with the model prefix, so they never collide
+- The training export script picks up everything validated in `runs.db`
+
+**Check accumulation progress:**
+```bash
+sqlite3 runs.db "SELECT llm_model, COUNT(*) as total, SUM(validation_passed) as valid FROM runs GROUP BY llm_model ORDER BY total DESC"
+```
+
+---
+
 ## 🔄 Iterative Improvement Cycle
 
-The workflow is designed for **iterative improvement**:
+The workflow supports **iterative model improvement** across training versions:
 
-1. **First iteration:** Full 8-stage workflow → baseline metrics
-2. **Subsequent iterations:** Start from Stage 4 (`/export` with improvements from memory notes)
-   - Training agent reads past improvement notes from memory
-   - Generates new versioned notebook with adjustments (e.g., `training_dpo_v4.ipynb`)
-   - Same fixed eval datasets ensure fair comparison
-   - New notes appended to memory after validation
+1. **Iteration 1:** Full 8-stage workflow → baseline metrics
+2. **Iteration 2+:** Start from Stage 4 (`/export` with memory-informed improvements)
+   - Training agent reads all past improvement notes from memory
+   - Updates training notebook hyperparameters based on previous results
+   - Same fixed eval datasets ensure fair comparison across all versions
 3. **Over time:** Memory accumulates insights, each iteration improves on the last
 
 ---
 
 ## ⚠️ Important Notes
 
-### Evaluation Datasets Are Sacred
-- Generated ONCE in Stage 2, versioned (e.g., `data/eval_datasets_v1/`)
-- NEVER modified between model versions
-- Enable fair apples-to-apples comparison across all iterations
+### Evaluation Datasets Are Fixed
+- Generated ONCE in Stage 2, versioned (`data/eval_datasets_v1/`)
+- **NEVER modified** between model versions
+- Enable fair apples-to-apples comparison across all training iterations
 
-### Versioning
-- **Datasets:** `data/datasets_v2/`, `data/eval_datasets_v1/`
-- **Notebooks:** `notebooks/training_{method}_v{N}.ipynb`
-- **HF Datasets:** `OliverSlivka/itemset-extraction-v{N}`
-- **Memory notes:** Append-only, timestamped entries in `obsidian-brain/Agents/`
+### Training Notebook
+- Main notebook: `notebooks/training_3phase_7b.ipynb` (21 cells, SFT-CoT → DPO-Real → GRPO)
+- Hyperparameters can be updated between iterations based on evaluation results
+
+### HuggingFace is Storage Only
+- Each version has its own HF Hub repo: `OliverSlivka/itemset-extraction-v{N}` (currently v3)
+- **No training runs on HuggingFace** — all training happens on your school GPUs
+- Repo holds: 3-phase dataset (sft/dpo/grpo) + training notebook + eval assets
+- ⚠️ **NEVER overwrite previous version repos** — each new version creates a new repo
 
 ### Resume from Failure
-If a stage fails, fix the issue and re-run that agent. The workflow state tracks progress.
+If a stage fails, fix the issue and re-run that agent. Workflow state tracks progress.
 
 ---
 
 ## 🐛 Troubleshooting
 
 ### "Workflow state not found"
-**Solution:** Run `/organize` first to initialize workflow
+**Solution:** Run `/organize` first
 
 ### "Eval datasets missing"
-**Solution:** Run `/datasets` — it generates both training AND eval datasets
+**Solution:** Run dataset-agent `/datasets` — generates training AND eval datasets
 
-### "Notebook version conflict"
-**Solution:** Check `notebooks/notebook_versions.json` for latest version number
+### "Pipeline already ran for this model"
+**Solution:** Check `runs.db` with the progress SQL above. If the model is complete, pick a new model.
+
+### "Training crashed on school GPU"
+**Solution:** Come back to VS Code → training-agent `/validate`, paste the error. The agent will diagnose and edit the training notebook.
+
+### "Model output quality is low (F1 < 0.5)"
+**Solution:** Run `/validate` with results → training agent + evaluation agent will analyze failures and suggest fixes. Use evaluation-agent `/council` for multi-LLM expert advice.
 
 ### "Credentials missing"
-**Solution:** Ensure `openai.env` exists with valid `OPENAI_API_KEY`, and `HF_TOKEN` is set
+**Solution:** `openai.env` → OPENAI_API_KEY; `openrouter.env` → OPENROUTER_API_KEY; `hf.env` → HF_TOKEN
 
 ---
 

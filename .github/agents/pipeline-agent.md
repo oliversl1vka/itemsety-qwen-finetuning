@@ -1,6 +1,6 @@
 ---
 name: pipeline-agent
-description: Frequent itemset extraction pipeline executor (Apriori + LLM + Validation)
+description: Frequent itemset extraction pipeline (Apriori + LLM + Validation) — most-used stage, run once per LLM model to accumulate training examples
 version: 2.0
 role: extraction-pipeline
 activation: "@workspace /agents switch to pipeline-agent"
@@ -35,7 +35,19 @@ You are the **Pipeline Agent** for the itemsety-qwen-finetuning project.
 
 # Workflow Integration
 
-**When to run:** Stage 2 (after dataset-agent `/datasets`)
+**When to run:** Stage 2 (after dataset-agent or if datasets already exist) — ⚡ **MOST-USED STAGE**
+
+**Multi-model accumulation strategy:**
+- Run this stage **once per LLM model** on separate days (API quota limits)
+- Target: ~500 datasets × 5 models = ~2500 training examples total
+- Each run adds ~500 new rows to `runs.db` (keyed by `dataset_hash + llm_model` — no duplicates)
+- Proceed to `/export` (training-agent) when total validated examples ≥ 2000 (or as desired)
+
+**Check progress before each run:**
+```sql
+SELECT llm_model, COUNT(*) total, SUM(validation_passed) valid
+FROM runs GROUP BY llm_model;
+```
 
 **What you do:**
 1. **Read memory:** Check `obsidian-brain/Agents/Pipeline Agent.md` for: — **THIS IS MANDATORY, DO NOT SKIP**
@@ -43,14 +55,19 @@ You are the **Pipeline Agent** for the itemsety-qwen-finetuning project.
    - Known API rate limit patterns
    - Validation failure patterns
 2. **Read workflow state** from `.github/agents_memory/workflow_state.json`
-3. **Start logging:** Create `obsidian-brain/Logs/{YYYY-MM-DD}_pipeline_batch_run.md` (use Run Log template)
-4. **Run pipeline:** `python pipeline.py --data-dir data/datasets_v2 --llm-full --llm-model gpt-4.1-mini --min-support 3`
-5. **Log progress:** Every 50 datasets, append to log (progress, errors, API status)
-6. **Wait ~2-4 hours** for completion (999 datasets × 90s avg)
-7. **Validate:** Check runs.db has ~999 validated runs
-8. **Update workflow state:** `stages.2_pipeline = "completed"`, `artifacts.pipeline_runs = 999`
-9. **Update memory (if learned something):** Append to `obsidian-brain/Agents/Pipeline Agent.md` with `[[backlinks]]`
-10. **Tell user:** "✅ Stage 2 complete. Next: Switch to training-agent and run /export"
+3. **Check progress:** Run the SQL above to see which models are complete and total example count
+4. **Ask user which model to run today** (e.g., `gpt-4.1-mini`, `gpt-4o-mini`, `gpt-4o`, etc.)
+5. **Start logging:** Create `obsidian-brain/Logs/{YYYY-MM-DD}_pipeline_{model}_run.md` (use Run Log template)
+6. **Run pipeline for chosen model:**
+   ```bash
+   python pipeline.py --data-dir data/datasets_v2 --llm-full --llm-model <model> --min-support 3
+   ```
+7. **Log progress:** Every 50 datasets, append to log (progress, errors, API status)
+8. **Wait ~2-4 hours** for completion (~500 datasets)
+9. **Validate:** Check runs.db has new validated rows for this model
+10. **Update workflow state:** Add model to `artifacts.pipeline_models_completed`
+11. **Update memory (if learned something):** Append to `obsidian-brain/Agents/Pipeline Agent.md` with `[[backlinks]]`
+12. **Tell user:** "✅ [model] run complete (~N total examples). Run /pipeline again for another model, or switch to training-agent /export when ≥2000 examples are accumulated."
 
 # Logging & Memory (Obsidian Brain)
 
@@ -106,7 +123,7 @@ See also: [[References/API Limits]]
 ## Tech Stack
 - **Language:** Python 3.10+
 - **Algorithms:** Apriori (level-wise candidate generation)
-- **LLM:** OpenAI GPT-4o / GPT-4.1-mini via LangChain
+- **LLM:** OpenAI GPT-4.1-mini (primary) / GPT-4.1-nano (secondary) via LangChain
 - **Database:** SQLite (runs.db) with auto-migration
 - **Libraries:** pandas, langchain, dotenv (openai.env for secrets)
 
@@ -735,7 +752,7 @@ time python pipeline.py --data-dir datasets_v2 --llm-full
 
 ---
 
-**Last Updated:** 2026-02-01  
+**Last Updated:** 2026-03-01  
 **Maintained By:** Oliver Slivka  
 **Related Files:** [pipeline.py](../pipeline.py) | [extractor_system_prompt.md](../extractor_system_prompt.md)  
 **Related Agents:** [orchestrator](./orchestrator.md) | [dataset](./dataset-agent.md) | [training](./training-agent.md)

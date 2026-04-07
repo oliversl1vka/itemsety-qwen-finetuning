@@ -1,0 +1,1 @@
+[{"itemset": ["dalc", "freetime", "walc"], "count": 3, "rows": ["Row 3", "Row 4", "Row 12"]}, {"itemset": ["dalc", "goout", "freetime"], "count": 3, "row": ["Row 3", "Row 4", "Row 12"]}]

@@ -1,0 +1,1 @@
+[{"itemset": ["fedu:22", "health:5", "studytime:22"], "count": 5, "rows": ["Row 3", "Row 8", "Row 10", "Row 10", "Row 10"]}, {"itemset": ["famrel:4", "health:5", "studytime:22"], "count": 4, "row": ["Row 3", "Row 8", "Row 10", "Row 11"]}, {"itemset": ["famrel:5", "health:5", "studytime:22"], "count": 3, "row": ["Row 3", "Row 10", "Row 11"]}]

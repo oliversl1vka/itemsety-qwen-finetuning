@@ -1,76 +1,87 @@
 ---
 name: huggingface-deployment
-description: Deploy models and datasets to HuggingFace Hub. Manage Gradio Spaces for interactive demos.
+description: Deploy adapters, datasets, and notebooks to HuggingFace Hub. Manage versioned repos, GGUF conversion, and model cards. No Spaces/Gradio (not used in this project).
 ---
 
 # HuggingFace Hub Deployment
 
-Deploy models, datasets, and Spaces to HuggingFace Hub.
+Push adapters, datasets, and training notebooks to HuggingFace Hub.
 
 ## Overview
 
-Deployment targets:
-- **Models:** Fine-tuned Qwen models
-- **Datasets:** Training and evaluation datasets
-- **Spaces:** Interactive Gradio demos
+Deployment targets for this project:
+- **Adapters:** LoRA adapters (NEVER merged 4-bit models)
+- **Datasets:** Versioned HF datasets (sft/dpo/grpo configs)
+- **Notebooks:** Versioned training notebooks
+- **GGUF:** Optional quantized exports for local inference
+
+⚠️ **No Spaces/Gradio** — This project uses direct model inference, not web demos.
 
 ## Prerequisites
 
 ### HuggingFace Token
 ```bash
-# Set environment variable
+# Environment variable (preferred)
 export HF_TOKEN=hf_your_write_token
 
 # Or login via CLI
 huggingface-cli login
+
+# Or from hf.env file (gitignored)
+source hf.env
 ```
 
 ### Required Permissions
-- Write access to target repositories
-- For Spaces: GPU quota (if using Zero GPU)
+- Write access to `OliverSlivka/` namespace
+- For large models: Git LFS quota
 
-## Model Deployment
-
-### Push Merged Model
-```python
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
-model = AutoModelForCausalLM.from_pretrained("./outputs/final")
-tokenizer = AutoTokenizer.from_pretrained("./outputs/final")
-
-model.push_to_hub("OliverSlivka/qwen2.5-3b-itemset-extractor")
-tokenizer.push_to_hub("OliverSlivka/qwen2.5-3b-itemset-extractor")
-```
-
-### Push with Model Card
-```python
-# Create README.md in model directory first
-model.push_to_hub(
-    "OliverSlivka/qwen2.5-3b-itemset-extractor",
-    commit_message="Add fine-tuned model v2.0"
-)
-```
+## Adapter Deployment (Primary)
 
 ### Push Adapter Only
 ```python
-# For LoRA adapter without merging
-model.save_pretrained("./adapter")
-model.push_to_hub("OliverSlivka/qwen2.5-3b-itemset-adapter")
+# ✅ CORRECT: Save and push adapter (from training notebook)
+model.save_pretrained("./final-adapter")
+tokenizer.save_pretrained("./final-adapter")
+
+model.push_to_hub("OliverSlivka/qwen2.5-7b-itemset-v3")
+tokenizer.push_to_hub("OliverSlivka/qwen2.5-7b-itemset-v3")
+```
+
+### ❌ NEVER Do This
+```python
+# NEVER merge 4-bit models — corrupts weights (v1 catastrophic bug)
+model.merge_and_unload()  # → BROKEN ON 4-BIT
+merged_model.push_to_hub(...)  # → GARBAGE WEIGHTS
+```
+
+### Adapter Loading (for inference)
+```python
+from unsloth import FastLanguageModel
+
+# Load base + adapter
+model, tokenizer = FastLanguageModel.from_pretrained(
+    model_name="OliverSlivka/qwen2.5-7b-itemset-v3",
+    max_seq_length=2048,
+    load_in_4bit=True,
+)
+FastLanguageModel.for_inference(model)
 ```
 
 ## Dataset Deployment
 
-### Push Dataset
+### Upload Script
 ```bash
-python src/training/upload_dataset_to_hf.py --dataset-path data/hf_dataset_v2
+python src/training/upload_dataset_to_hf.py \
+  --dataset-path data/hf_dataset_v3 \
+  --repo OliverSlivka/itemset-extraction-v3
 ```
 
 ### Programmatic Upload
 ```python
 from datasets import load_from_disk
 
-dataset = load_from_disk("data/hf_dataset_v2")
-dataset.push_to_hub("OliverSlivka/itemset-extraction-dataset")
+dataset = load_from_disk("data/hf_dataset_v3")
+dataset.push_to_hub("OliverSlivka/itemset-extraction-v3")
 ```
 
 ### Dataset Card
@@ -82,137 +93,127 @@ task_categories:
 tags:
   - frequent-itemset-mining
   - csv-analysis
+  - sft
+  - dpo
 size_categories:
   - 100<n<1K
----
-
-# Itemset Extraction Dataset
-
-Training data for frequent itemset extraction from CSV files.
-```
-
-## Gradio Space Deployment
-
-### Deploy Script
-```powershell
-./deploy_to_hf_space.ps1
-```
-
-### Manual Deployment
-```bash
-# Clone Space repo
-git clone https://huggingface.co/spaces/OliverSlivka/itemset-extractor
-cd itemset-extractor
-
-# Copy files
-cp ../app_v2.py app.py
-cp ../requirements.txt .
-
-# Push
-git add .
-git commit -m "Update app"
-git push
-```
-
-### Space Configuration (README.md)
-```yaml
----
-title: Itemset Extractor
-emoji: 🔍
-colorFrom: blue
-colorTo: purple
-sdk: gradio
-sdk_version: 4.0.0
-app_file: app.py
-pinned: false
-license: apache-2.0
-hardware: zero-gpu  # or cpu-basic, t4-small, a10g-small
+configs:
+  - sft    # SFT-CoT training examples
+  - dpo    # DPO preference pairs
+  - grpo   # GRPO prompts (format ready)
 ---
 ```
 
-### GPU Options
+## Versioning Rules (CRITICAL)
 
-| Hardware | VRAM | Cost | Use Case |
-|----------|------|------|----------|
-| cpu-basic | - | Free | Testing |
-| zero-gpu | 16GB (shared) | Free | Demo |
-| t4-small | 16GB | $0.60/hr | Production |
-| a10g-small | 24GB | $1.50/hr | Large models |
+### ⚠️ NEVER Overwrite Old Repos
+Each training version gets its own repo:
 
-## Health Checks
+| Version | Model Repo | Dataset Repo |
+|---------|-----------|--------------|
+| v2 | `OliverSlivka/qwen2.5-7b-itemset-v2` | `OliverSlivka/itemset-extraction-v2` |
+| **v3** | **`OliverSlivka/qwen2.5-7b-itemset-v3`** | **`OliverSlivka/itemset-extraction-v3`** |
+| v4 | `OliverSlivka/qwen2.5-7b-itemset-v4` | `OliverSlivka/itemset-extraction-v4` |
 
-### Check Model
+### Naming Convention
+- Models: `OliverSlivka/qwen2.5-{size}-itemset-{version}`
+- Datasets: `OliverSlivka/itemset-extraction-{version}`
+- Each version is immutable after push
+
+### Version Tracking
+Keep track of all versions in Obsidian:
+- `obsidian-brain/References/HF Dataset Repos.md`
+- `obsidian-brain/Experiments/` (per-training reports)
+
+## GGUF Conversion (Optional)
+
+For local inference with llama.cpp or Ollama:
+
+### Using Unsloth (Recommended)
 ```python
-from huggingface_hub import model_info
+# Must reload base in float16 first!
+model, tokenizer = FastLanguageModel.from_pretrained(
+    "unsloth/Qwen2.5-7B-Instruct",
+    load_in_4bit=False,       # Full precision for merge
+    dtype=torch.float16,
+)
 
-info = model_info("OliverSlivka/qwen2.5-3b-itemset-extractor")
-print(f"Downloads: {info.downloads}")
-print(f"Last modified: {info.lastModified}")
-```
+# Load adapter
+model = PeftModel.from_pretrained(model, "./final-adapter")
+model = model.merge_and_unload()  # Safe on float16!
 
-### Check Space
-```python
-from huggingface_hub import space_info
+# Save GGUF
+model.save_pretrained_gguf(
+    "model-gguf",
+    tokenizer,
+    quantization_method="q4_k_m",  # Good balance
+)
 
-info = space_info("OliverSlivka/itemset-extractor")
-print(f"Status: {info.runtime.stage}")
-print(f"Hardware: {info.runtime.hardware}")
-```
-
-### Test Inference
-```python
-from huggingface_hub import InferenceClient
-
-client = InferenceClient("OliverSlivka/qwen2.5-3b-itemset-extractor")
-response = client.text_generation("Extract itemsets from...")
-```
-
-## Version Management
-
-### Tag Release
-```bash
-# Using git
-cd model_repo
-git tag v2.0.0
-git push --tags
-
-# Using API
-from huggingface_hub import HfApi
-api = HfApi()
-api.create_tag("OliverSlivka/qwen2.5-3b-itemset-extractor", tag="v2.0.0")
-```
-
-### Rollback
-```python
-# Download specific revision
-model = AutoModelForCausalLM.from_pretrained(
-    "OliverSlivka/qwen2.5-3b-itemset-extractor",
-    revision="v1.0.0"
+# Push GGUF to Hub
+model.push_to_hub_gguf(
+    "OliverSlivka/qwen2.5-7b-itemset-v3-GGUF",
+    tokenizer,
+    quantization_method="q4_k_m",
 )
 ```
 
-## Troubleshooting
+### GGUF Quantization Options
+| Method | Size (7B) | Quality | Use Case |
+|--------|-----------|---------|----------|
+| q4_k_m | ~4.5GB | Good | Default choice |
+| q5_k_m | ~5.5GB | Better | Quality-focused |
+| q8_0 | ~8GB | Best | Max quality |
+| q2_k | ~3GB | Fair | Size-constrained |
 
-### Push Failed (403)
-- Check token has write permission
-- Verify repository exists
-- Check you own the repo
+## Hub Operations
 
-### Space Build Failed
-- Check requirements.txt syntax
-- Verify Python version compatibility
-- Check app.py has valid Gradio interface
+### Check Repository
+```python
+from huggingface_hub import model_info, HfApi
 
-### Zero GPU Timeout
-- Optimize model loading
-- Use smaller model
-- Reduce max_new_tokens
+info = model_info("OliverSlivka/qwen2.5-7b-itemset-v3")
+print(f"Downloads: {info.downloads}")
+print(f"Last modified: {info.lastModified}")
+print(f"Files: {[s.rfilename for s in info.siblings]}")
+```
 
-### Large Files
+### List All Versions
+```python
+api = HfApi()
+models = api.list_models(author="OliverSlivka", search="itemset")
+for m in models:
+    print(f"{m.modelId} — {m.lastModified}")
+```
+
+### Upload Additional Files
+```python
+api = HfApi()
+
+# Upload eval results
+api.upload_file(
+    path_or_fileobj="eval_results.json",
+    path_in_repo="eval_results.json",
+    repo_id="OliverSlivka/qwen2.5-7b-itemset-v3",
+)
+
+# Upload training notebook
+api.upload_file(
+    path_or_fileobj="notebooks/training_3phase_7b.ipynb",
+    path_in_repo="training_notebook.ipynb",
+    repo_id="OliverSlivka/qwen2.5-7b-itemset-v3",
+)
+```
+
+### CLI Operations
 ```bash
-# Enable Git LFS
-git lfs install
-git lfs track "*.bin" "*.safetensors"
+# Download model
+huggingface-cli download OliverSlivka/qwen2.5-7b-itemset-v3
+
+# Check repo info
+huggingface-cli repo info OliverSlivka/qwen2.5-7b-itemset-v3
+
+# Upload folder
+huggingface-cli upload OliverSlivka/qwen2.5-7b-itemset-v3 ./final-adapter
 ```
 
 ## Model Card Template
@@ -225,29 +226,75 @@ tags:
   - qwen2.5
   - frequent-itemset-mining
   - lora
+  - unsloth
 pipeline_tag: text-generation
+base_model: Qwen/Qwen2.5-7B-Instruct
 ---
 
-# Qwen2.5-3B Itemset Extractor
+# Qwen2.5-7B Itemset Extractor (v3)
 
-## Model Description
-Fine-tuned Qwen2.5-3B-Instruct for extracting frequent itemsets from CSV data.
+LoRA adapter fine-tuned on Qwen2.5-7B-Instruct for extracting frequent itemsets from CSV data.
 
-## Training Data
-- 439 validated examples from Apriori + GPT-4 pipeline
-- ChatML format with Chain-of-Thought reasoning
+## Training
+- **Method:** SFT-CoT → DPO-Real (3-phase, GRPO skipped)
+- **Framework:** Unsloth + LoRA (r=32, alpha=64)
+- **Data:** 348 SFT examples + 606 DPO preference pairs
+- **Hardware:** NVIDIA H200 NVL
 
 ## Usage
-\`\`\`python
-from transformers import pipeline
+```python
+from unsloth import FastLanguageModel
 
-pipe = pipeline("text-generation", model="OliverSlivka/qwen2.5-3b-itemset-extractor")
-result = pipe("Extract frequent itemsets from: ...")
-\`\`\`
+model, tokenizer = FastLanguageModel.from_pretrained(
+    "OliverSlivka/qwen2.5-7b-itemset-v3",
+    load_in_4bit=True,
+)
+FastLanguageModel.for_inference(model)
+```
 
 ## Metrics
 | Metric | Score |
 |--------|-------|
+| F1 | TBD |
+| Parse Rate | TBD |
+```
+
+## Deployment Checklist
+
+Before pushing any version:
+
+- [ ] Training completed successfully (no NaN loss)
+- [ ] Adapter saved (NOT merged 4-bit)
+- [ ] Eval results recorded in Obsidian
+- [ ] Version number incremented (check existing repos)
+- [ ] Model card written with training details
+- [ ] Dataset repo matches model version
+- [ ] Training notebook included
+- [ ] Pushed with descriptive commit message
+
+## Troubleshooting
+
+### Push Failed (403)
+- Check token has write permission: `huggingface-cli whoami`
+- Verify HF_TOKEN is set: `echo $HF_TOKEN`
+- Check repo ownership
+
+### Large File Errors
+```bash
+# Enable Git LFS
+git lfs install
+git lfs track "*.safetensors" "*.bin" "*.gguf"
+```
+
+### Adapter vs Full Model Confusion
+- **Adapter repo:** Contains `adapter_config.json` + `adapter_model.safetensors` (~100MB)
+- **Full model repo:** Contains `model.safetensors` (~15GB for 7B)
+- This project ONLY pushes adapters (except GGUF conversions)
+
+### Wrong Version Pushed
+- HuggingFace repos are immutable by convention in this project
+- If wrong content pushed: Create new version repo instead of overwriting
+- Contact HF support to delete repo only if absolutely necessary
 | F1 | 0.XX |
 | Parse Rate | XX% |
 

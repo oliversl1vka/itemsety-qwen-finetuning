@@ -31,9 +31,8 @@
    - Archive old logs from `logs/` if >90 days old
    - Check for orphaned CSV files in `data/datasets_v2/`
 6. **Log results:** Files removed, disk space saved, warnings
-7. **Update workflow state:** `stages.6_cleanup = "completed"`
-8. **Update memory (if learned):** Append to `obsidian-brain/Agents/Cleanup Agent.md`
-9. **Tell user:** "✅ Stage 6 complete. Next: Switch to maintainer-agent and run /maintain"
+7. **Update memory (if learned):** Append to `obsidian-brain/Agents/Cleanup Agent.md`
+8. **Tell user:** "✅ Cleanup complete. 🧹 Repository hygiene task done — return to whichever workflow stage you were on."
 
 ## Persona
 
@@ -121,7 +120,7 @@ itemsety-qwen-finetuning/
 **Current Workflow Dependencies (DO NOT REMOVE):**
 - `pipeline.py` - Core extraction (Stage 3)
 - `src/data_generation/generate_datasets_v2.py` - Dataset creation (Stage 2)
-- `src/training/run_sft_full.py` - Model training (Stage 4)
+- `src/training/training_utils.py` - Shared training utilities
 - `src/training/export_training_data.py` - Training data export (Stage 4)
 - `src/training/create_hf_dataset.py` - HF dataset creation (Stage 4)
 - `src/training/upload_dataset_to_hf.py` - HF upload (Stage 4)
@@ -295,9 +294,10 @@ Merge overlapping documentation.
 itemsety-qwen-finetuning/
 ├── src/                      # Source code
 │   ├── training/             # Training scripts
-│   │   ├── run_sft_full.py
-│   │   ├── export_training_data.py
-│   │   └── create_hf_dataset.py
+│   │   ├── training_utils.py
+│   │   ├── generate_cot_sft_data.py
+│   │   ├── export_real_dpo_data.py
+│   │   └── build_hf_dataset_v2.py
 │   ├── evaluation/           # Evaluation scripts
 │   │   └── eval_finetuned_model.py
 │   ├── data_generation/      # Dataset generation
@@ -401,7 +401,7 @@ Phase 6: Update documentation
 archive/
 ├── legacy_scripts/           # Old Python scripts
 │   ├── dataset_generation.py # Replaced by v2
-│   └── train_qwen_sft.py     # Replaced by run_sft_full.py
+│   └── train_qwen_sft.py     # Replaced by 3-phase training scripts
 │
 ├── old_docs/                 # Historical documentation
 │   ├── FIRST_FINETUNING_REPORT.md

@@ -1,14 +1,14 @@
 {
   "workflow_id": "wf_20260222_production_v2",
-  "status": "v2_sft_only_pushed_evaluating",
-  "current_stage": 6,
+  "status": "v3_pushed_waiting_for_user_training",
+  "current_stage": 5,
   "stages": {
     "1_datasets": "completed",
     "2_pipeline": "completed",
-    "3_export": "completed_v2",
-    "4_push": "completed_v2",
-    "5_wait_for_user": "completed_v2_sft_only",
-    "6_validate": "in_progress",
+    "3_export": "completed_v3",
+    "4_push": "completed_v3",
+    "5_wait_for_user": "in_progress",
+    "6_validate": "pending_v3",
     "7_visualize": "pending",
     "8_finalize": "pending"
   },
@@ -44,10 +44,12 @@
       }
     },
     "total_validated_runs": 450,
-    "training_method": "SFT-CoT only (5 epochs) — GRPO abandoned (Unsloth bugs)",
-    "sft_examples": 348,
+    "training_method": "v3: SFT-CoT (3ep) → DPO-Real (1ep), GRPO skipped",
+    "sft_examples_v3": 258,
+    "sft_format": "concise_cot_column_grouped",
+    "sft_avg_tokens": 1117,
     "dpo_pairs": 606,
-    "grpo_status": "abandoned_unsloth_bugs",
+    "grpo_status": "skipped_v3",
     "v2_training_result": {
       "sft_final_loss": 0.0291,
       "sft_val_loss": 0.0291,
@@ -61,14 +63,14 @@
       "inference_colval_format": false
     },
     "hf_dataset": {
-      "sft":  {"train": 314, "val": 34},
+      "sft":  {"train": 245, "val": 27},
       "dpo":  {"train": 546, "val": 60},
-      "grpo": {"train": 314, "val": 34}
+      "grpo": {"train": 245, "val": 27}
     },
-    "hf_dataset_url": "https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v2",
-    "notebook_url": "https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v2/blob/main/notebooks/training_3phase_2026-03-07_v2.ipynb",
-    "notebook_version": "2phase_7b_v2_council_corrected",
-    "eval_script_url": "https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v2/blob/main/eval/eval_finetuned_model.py",
+    "hf_dataset_url": "https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v3",
+    "notebook_url": "https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v3/blob/main/notebooks/training_3phase_7b.ipynb",
+    "notebook_version": "v3.11_versioned_hf_repos",
+    "eval_script_url": "https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v3/blob/main/eval/eval_finetuned_model.py",
     "target_model_repo": "OliverSlivka/qwen2.5-7b-itemset-extractor",
     "eval_f1": 0.004,
     "v2_eval_results": {
@@ -119,14 +121,15 @@
     "min_support": 3,
     "max_size": 3,
     "llm_models_completed": ["gpt-4.1-mini", "gpt-4.1-nano", "gpt-4o", "o4-mini"],
-    "training_method": "SFT-CoT only (5 epochs) — GRPO abandoned",
+    "training_method": "v3: SFT-CoT 3ep → DPO-Real 1ep, GRPO skipped",
     "base_model": "Qwen2.5-7B-Instruct",
     "lora_r": 32,
     "lora_alpha": 64,
-    "max_seq_length": 6144,
-    "notebook": "notebooks/training_3phase_2026-03-07_v2.ipynb",
-    "v2_changes": "LoRA ratio 2.0, DPO removed, SFT 5ep lr=1e-4, 5 GRPO rewards, format gate"
+    "lora_dropout": 0.05,
+    "max_seq_length": 2048,
+    "notebook": "notebooks/training_3phase_2026-03-09_v3.ipynb",
+    "v3_changes": "Concise CoT, seq_len 2048, DPO re-enabled, GRPO skipped, adapter-only save, temp=0.3"
   },
   "started_at": "2026-02-17T22:21:01Z",
-  "updated_at": "2026-03-08T01:30:00Z"
+  "updated_at": "2026-03-09T22:10:00Z"
 }

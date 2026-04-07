@@ -1,0 +1,1 @@
+[{"itemset": ["has_accelerated_healinging", "has_super_strength"], "count": 3, "rows": ["Row 6", "Row 8", "Row 11"]}, {"itemset": ["has_self_sustenance", "has_super_strength"], "count": 3, "rows": ["Row 1", "Row 6", "Row 11"]}]

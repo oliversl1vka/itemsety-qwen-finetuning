@@ -1,112 +1,97 @@
 #!/usr/bin/env python3
 """
-Upload training dataset to HuggingFace Hub for fine-tuning.
+Upload pre-built HuggingFace dataset (3 configs: sft/dpo/grpo) to HuggingFace Hub.
+
+Usage:
+    python src/training/upload_dataset_to_hf.py
+    python src/training/upload_dataset_to_hf.py --dataset-path data/hf_dataset_v2 --repo OliverSlivka/itemset-extraction-v2
 """
 
 import argparse
-import json
+import os
 from pathlib import Path
-from datasets import Dataset, DatasetDict
-from huggingface_hub import HfApi
+from datasets import load_from_disk
+from huggingface_hub import HfApi, login, create_repo
 
-# Configuration
-REPO_NAME = "OliverSlivka/itemset-extraction-v2"
-DEFAULT_TRAINING_DATA_DIR = Path("data/training_v2")
+# ── Defaults ─────────────────────────────────────────────────────────────────
+DEFAULT_DATASET_PATH = Path("data/hf_dataset_v2")
+DEFAULT_REPO = "OliverSlivka/itemset-extraction-v2"
 
-def load_jsonl(path: Path) -> list[dict]:
-    """Load JSONL file."""
-    examples = []
-    with open(path, "r", encoding="utf-8") as f:
-        for line in f:
-            examples.append(json.loads(line))
-    return examples
 
 def main():
-    parser = argparse.ArgumentParser(description="Upload training dataset to HuggingFace Hub")
-    parser.add_argument("--training-dir", type=Path, default=DEFAULT_TRAINING_DATA_DIR,
-                       help="Path to training data directory (default: data/training_v2)")
-    parser.add_argument("--dataset-path", type=Path, help="Alias for --training-dir (for backward compat)")
+    parser = argparse.ArgumentParser(
+        description="Upload HF dataset (sft/dpo/grpo) to HuggingFace Hub"
+    )
+    parser.add_argument(
+        "--dataset-path", type=Path, default=DEFAULT_DATASET_PATH,
+        help=f"Path to local HF dataset directory (default: {DEFAULT_DATASET_PATH})",
+    )
+    parser.add_argument(
+        "--repo", type=str, default=DEFAULT_REPO,
+        help=f"HuggingFace repo ID (default: {DEFAULT_REPO})",
+    )
+    parser.add_argument(
+        "--private", action="store_true", default=False,
+        help="Make the dataset private",
+    )
     args = parser.parse_args()
-    
-    # Use dataset-path if provided, otherwise training-dir
-    training_dir = args.dataset_path if args.dataset_path else args.training_dir
-    
-    print("📂 Loading training data...")
-    print(f"   Directory: {training_dir}")
-    
-    # Load simple format (clean JSON output - better for fine-tuning)
-    simple_examples = load_jsonl(training_dir / "train_simple.jsonl")
-    print(f"   Loaded {len(simple_examples)} simple examples")
-    
-    # Load CoT format (with reasoning - for comparison)
-    cot_examples = load_jsonl(training_dir / "train_cot.jsonl")
-    print(f"   Loaded {len(cot_examples)} CoT examples")
-    
-    # Split into train/validation (90/10)
-    split_idx = int(len(simple_examples) * 0.9)
-    
-    train_simple = simple_examples[:split_idx]
-    val_simple = simple_examples[split_idx:]
-    
-    train_cot = cot_examples[:split_idx]
-    val_cot = cot_examples[split_idx:]
-    
-    print(f"\n📊 Split statistics:")
-    print(f"   Train: {len(train_simple)} examples")
-    print(f"   Validation: {len(val_simple)} examples")
-    
-    # Convert to HuggingFace format - extract messages for SFT training
-    def convert_to_hf_format(examples: list[dict]) -> dict:
-        """Convert to format expected by HF training."""
-        return {
-            "messages": [ex["messages"] for ex in examples],
-            "dataset_id": [ex["metadata"]["dataset_id"] for ex in examples],
-            "num_itemsets": [ex["metadata"]["num_itemsets"] for ex in examples],
-        }
-    
-    # Create datasets
-    print("\n🔨 Creating HuggingFace datasets...")
-    
-    # Simple format dataset (recommended for fine-tuning)
-    ds_simple = DatasetDict({
-        "train": Dataset.from_dict(convert_to_hf_format(train_simple)),
-        "validation": Dataset.from_dict(convert_to_hf_format(val_simple)),
-    })
-    
-    # CoT format dataset (alternative with reasoning)
-    ds_cot = DatasetDict({
-        "train": Dataset.from_dict(convert_to_hf_format(train_cot)),
-        "validation": Dataset.from_dict(convert_to_hf_format(val_cot)),
-    })
-    
-    print(f"   Simple dataset: {ds_simple}")
-    print(f"   CoT dataset: {ds_cot}")
-    
-    # Upload to Hub
-    print(f"\n📤 Uploading to HuggingFace Hub: {REPO_NAME}")
-    
-    # Upload simple format (main dataset)
-    ds_simple.push_to_hub(
-        REPO_NAME,
-        private=False,
-        commit_message="Upload itemset extraction training data v2 (simple format)"
-    )
-    print(f"   ✅ Uploaded simple format to {REPO_NAME}")
-    
-    # Upload CoT format as separate config
-    ds_cot.push_to_hub(
-        f"{REPO_NAME}",
-        config_name="chain_of_thought",
-        private=False,
-        commit_message="Add chain-of-thought format"
-    )
-    print(f"   ✅ Uploaded CoT format to {REPO_NAME} (config: chain_of_thought)")
-    
-    # Create dataset card
-    print("\n📝 Creating dataset card...")
-    
+
+    dataset_path = args.dataset_path
+    repo = args.repo
+
+    # ── Resolve HF token ────────────────────────────────────────────────────
+    token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_TOKEN")
+    if not token:
+        raise EnvironmentError(
+            "HF_TOKEN not set. Run `source hf.env` or set the env variable."
+        )
+    login(token=token, add_to_git_credential=False)
+    print(f"✅ Logged in to HuggingFace (token: {token[:10]}...)")
+
+    # ── Ensure repo exists ───────────────────────────────────────────────────
+    create_repo(repo, repo_type="dataset", exist_ok=True, token=token)
+    print(f"✅ Repo ready: https://huggingface.co/datasets/{repo}")
+    print()
+
+    # ── Validate local dataset ───────────────────────────────────────────────
+    configs = ["sft", "dpo", "grpo"]
+    for cfg in configs:
+        cfg_path = dataset_path / cfg
+        if not cfg_path.exists():
+            raise FileNotFoundError(
+                f"Missing config directory: {cfg_path}\n"
+                f"Run build_hf_dataset_v2.py first to create the dataset."
+            )
+
+    print(f"📂 Dataset path: {dataset_path}")
+    print(f"📤 Target repo:  {repo}")
+    print()
+
+    # ── Push each config ─────────────────────────────────────────────────────
+    for cfg in configs:
+        cfg_path = dataset_path / cfg
+        ds = load_from_disk(str(cfg_path))
+
+        print(f"  [{cfg}] Train: {len(ds['train']):,} | Val: {len(ds['validation']):,}")
+
+        ds.push_to_hub(
+            repo,
+            config_name=cfg,
+            private=args.private,
+            token=token,
+            commit_message=f"Upload {cfg} config ({len(ds['train'])} train, {len(ds['validation'])} val)",
+        )
+        print(f"  ✅ Pushed '{cfg}' config")
+
+    # ── Upload dataset card ──────────────────────────────────────────────────
+    print("\n📝 Uploading dataset card...")
+
+    sft_ds = load_from_disk(str(dataset_path / "sft"))
+    dpo_ds = load_from_disk(str(dataset_path / "dpo"))
+    grpo_ds = load_from_disk(str(dataset_path / "grpo"))
+
     dataset_card = f"""---
-license: mit
+license: apache-2.0
 task_categories:
   - text-generation
 language:
@@ -116,105 +101,111 @@ tags:
   - data-extraction
   - json-generation
   - fine-tuning
+  - chain-of-thought
+  - dpo
+  - grpo
+  - rlhf
 size_categories:
   - n<1K
 configs:
-  - config_name: default
+  - config_name: sft
     data_files:
       - split: train
-        path: data/train-*
-      - split: validation  
-        path: data/validation-*
-  - config_name: chain_of_thought
-    data_files:
-      - split: train
-        path: chain_of_thought/train-*
+        path: sft/train-*
       - split: validation
-        path: chain_of_thought/validation-*
+        path: sft/validation-*
+  - config_name: dpo
+    data_files:
+      - split: train
+        path: dpo/train-*
+      - split: validation
+        path: dpo/validation-*
+  - config_name: grpo
+    data_files:
+      - split: train
+        path: grpo/train-*
+      - split: validation
+        path: grpo/validation-*
 ---
 
 # Itemset Extraction Training Data v2
 
-Training dataset for fine-tuning LLMs to extract frequent itemsets from transaction data.
+3-phase training dataset for fine-tuning LLMs to extract frequent itemsets from CSV transaction data.
 
-## Dataset Description
+## Overview
 
-This dataset contains {len(simple_examples)} examples of:
-- **Input**: Transaction data in CSV format + minimum support threshold
-- **Output**: JSON array of frequent itemsets with support counts and evidence rows
+| Config | Purpose | Train | Val | Format |
+|--------|---------|-------|-----|--------|
+| **sft** | SFT with Chain-of-Thought | {len(sft_ds['train'])} | {len(sft_ds['validation'])} | `messages` (ChatML) |
+| **dpo** | DPO with real LLM failures | {len(dpo_ds['train'])} | {len(dpo_ds['validation'])} | `prompt` / `chosen` / `rejected` |
+| **grpo** | GRPO with Apriori rewards | {len(grpo_ds['train'])} | {len(grpo_ds['validation'])} | `prompt` / `ground_truth` |
 
-### Configs
+## Training Pipeline (v2 — council-corrected)
 
-1. **default** - Clean JSON output format (recommended for fine-tuning)
-2. **chain_of_thought** - Includes reasoning steps before JSON output
-
-### Statistics
-
-| Metric | Value |
-|--------|-------|
-| Total examples | {len(simple_examples)} |
-| Train split | {len(train_simple)} |
-| Validation split | {len(val_simple)} |
-| Avg itemsets per example | 17.2 |
-| Source datasets | 500 semi-human CSVs |
-
-### Data Format
-
-Each example has a `messages` field with ChatML format:
-
-```json
-{{
-  "messages": [
-    {{"role": "system", "content": "You are an expert data mining assistant..."}},
-    {{"role": "user", "content": "Analyze the following transaction data..."}},
-    {{"role": "assistant", "content": "[{{\\"itemset\\": [...], \\"count\\": N, ...}}]"}}
-  ]
-}}
+```
+Phase 1: SFT-CoT (5 epochs)  → Teach <think> reasoning + JSON with col:val format
+Phase 2: GRPO (500 steps)    → Optimize with 5 programmatic reward functions
 ```
 
-### Key Features
+> **Note:** DPO data is included for reference but the v2 notebook does NOT use it.
+> DPO was removed after LLM Council analysis found it destroyed `<think>` reasoning.
 
-- **Real column names** from 25 diverse domains (retail, healthcare, education, etc.)
-- **Anti-hallucination rules** in system prompt
-- **Validated outputs** - all examples passed strict validation against Apriori ground truth
-- **Support evidence** - each itemset includes row IDs where it appears
+## Data Sources
 
-### Usage
+- **SFT**: Validated pipeline runs with Chain-of-Thought reasoning generated from Apriori ground truth
+- **DPO chosen**: Apriori ground truth + CoT reasoning
+- **DPO rejected**: Real extraction failures from GPT-4.1-mini (25%), GPT-4.1-nano (44.5%), o4-mini (26.6%), GPT-4o (3.8%)
+- **GRPO**: Same prompts as SFT, with serialized Apriori ground truth for reward computation
+
+## Usage
 
 ```python
 from datasets import load_dataset
 
-# Load default (simple) format
-ds = load_dataset("OliverSlivka/itemset-extraction-v2")
-
-# Load chain-of-thought format
-ds_cot = load_dataset("OliverSlivka/itemset-extraction-v2", "chain_of_thought")
+# Load each config
+sft  = load_dataset("{repo}", "sft")
+dpo  = load_dataset("{repo}", "dpo")
+grpo = load_dataset("{repo}", "grpo")
 ```
 
-### Fine-tuning
+## Key Features
 
-Recommended for SFT with:
-- Qwen2.5-3B or Qwen2.5-7B
-- LoRA/QLoRA for efficiency
-- 2-3 epochs
+- **`<think>` reasoning**: SFT examples include step-by-step reasoning inside `<think>` tags
+- **Real failures**: DPO rejected samples are actual LLM extraction errors (not synthetic)
+- **Compact system prompt**: ~150 tokens, optimized for small models
+- **Validated**: All ground truth verified against Apriori algorithm (13 invariants)
+- **500 diverse datasets**: 5-25 rows, 4-20 columns, 25 domains
+
+## Recommended Model
+
+- **Qwen2.5-7B-Instruct** with LoRA (r=32, alpha=64 — ratio 2.0)
+- 4-bit quantization via Unsloth
+- 6144 max sequence length
+- SFT: 5 epochs, lr=1e-4, packing=False
+- GRPO: 500 steps, 5 reward functions, lr=2e-6
+- Target: F1 >= 0.80 vs Apriori
+
+## Training Notebook
+
+See `notebooks/training_3phase_7b.ipynb` (v2) in this repo for the full training script.
 
 ## License
 
-MIT
+Apache 2.0
 """
-    
-    # Upload README
-    api = HfApi()
+
+    api = HfApi(token=token)
     api.upload_file(
         path_or_fileobj=dataset_card.encode(),
         path_in_repo="README.md",
-        repo_id=REPO_NAME,
+        repo_id=repo,
         repo_type="dataset",
-        commit_message="Add dataset card"
+        commit_message="Update dataset card for v2 (3-phase: sft/dpo/grpo)",
     )
-    print("   ✅ Dataset card uploaded")
-    
-    print(f"\n🎉 Done! Dataset available at: https://huggingface.co/datasets/{REPO_NAME}")
+    print("  ✅ Dataset card uploaded")
+
+    print(f"\n🎉 Done! Dataset at: https://huggingface.co/datasets/{repo}")
+
 
 if __name__ == "__main__":
     main()

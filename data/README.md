@@ -43,7 +43,7 @@ from datasets import load_from_disk
 # Load local dataset
 dataset = load_from_disk("data/hf_dataset_v2")
 
-# Or from Hub
+# Or from Hub (current version = v3)
 from datasets import load_dataset
-dataset = load_dataset("OliverSlivka/itemset-extraction-v2")
+dataset = load_dataset("OliverSlivka/itemset-extraction-v3")
 ```

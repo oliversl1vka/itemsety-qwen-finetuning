@@ -1,7 +1,7 @@
 # AI Coding Agent Instructions
 
-**Version:** 4.0 (Interactive Multi-Agent with Obsidian Knowledge Base)  
-**Last Updated:** 2026-02-08
+**Version:** 6.0 (v3 Training: SFT-CoT → DPO-Real, GRPO skipped)  
+**Last Updated:** 2026-03-09
 
 Concise guidance for working productively in this frequent itemset mining + LLM fine-tuning project.
 
@@ -97,18 +97,25 @@ Orchestrator → Dataset Agent → Pipeline Agent → Training Agent → Deploym
 
 **See:** [AGENTS.md](../AGENTS.md) for detailed agent documentation
 
-## Repository Structure (Updated 2026-02-08)
+## Repository Structure (Updated 2026-03-09)
 
 ```
 itemsety-qwen-finetuning/
 ├── pipeline.py                    # Core extraction pipeline (Apriori + LLM)
 ├── src/
 │   ├── training/                  # Fine-tuning scripts
-│   ├── evaluation/                # Model evaluation
+│   ├── evaluation/                # Model evaluation + inference utilities
 │   ├── data_generation/           # Dataset generation
 │   └── utils/                     # Utilities
 ├── data/
-│   └── datasets_v2/               # CSV datasets (500+)
+│   ├── datasets_v2/               # CSV datasets (500)
+│   ├── sft_cot_v2.json            # SFT-CoT training examples v2 (348, verbose format)
+│   ├── sft_cot_v3.json            # SFT-CoT training examples v3 (concise format)
+│   ├── dpo_real_v2.json           # DPO preference pairs with real LLM failures (606)
+│   └── hf_dataset_v2/             # HuggingFace dataset (3 configs: sft/dpo/grpo)
+├── notebooks/                     # Training + evaluation notebooks
+│   ├── training_3phase_7b.ipynb   # v3 training notebook (SFT→DPO, GRPO skipped)
+│   └── training_sft_dpo_template.ipynb  # Legacy 2-phase template
 ├── obsidian-brain/                # 🧠 Obsidian knowledge vault
 │   ├── Home.md                    # Vault navigation hub
 │   ├── Agents/                    # Agent memory notes (9 files)
@@ -133,11 +140,18 @@ itemsety-qwen-finetuning/
 
 ## Key Files
 - `pipeline.py` – Orchestrates load → Apriori → LLM → validation → persistence.
-- `src/data_generation/generate_datasets_v2.py` – Semi-human dataset factory (500 datasets); logs to `data/datasets_v2/generation_log.json`.
+- `src/data_generation/generate_datasets_v2.py` – Semi-human dataset factory (500 datasets).
 - `src/utils/visualization.py` – Comparative plots Apriori vs LLM (uses `runs.db`).
-- `src/training/run_sft_full.py` – Production fine-tuning script.
-- `src/evaluation/eval_finetuned_model.py` – Model evaluation script.
-- `requirements.txt` – Core runtime deps (pandas, langchain, matplotlib, sqlite via stdlib).
+- `src/training/training_utils.py` – Shared utilities: compact system prompt (~150 tokens), CoT generator (v3 concise format), CSV loader, ground truth formatter, token budget calculator.
+- `src/training/generate_cot_sft_data.py` – Phase 1: Generate SFT-CoT examples with `<think>` reasoning (v3 concise format).
+- `src/training/export_real_dpo_data.py` – Phase 2: Export DPO pairs using real LLM failures as rejected (606 pairs).
+- `src/training/build_hf_dataset_v2.py` – Build HuggingFace dataset with 3 configs (sft/dpo/grpo).
+- `src/training/upload_dataset_to_hf.py` – Push dataset to HuggingFace Hub.
+- `notebooks/training_3phase_7b.ipynb` – v3 training notebook: SFT-CoT → DPO-Real (GRPO skipped) for Qwen2.5-7B.
+- `src/evaluation/eval_finetuned_model.py` – Model evaluation script (F1/P/R vs Apriori, v3 inference fixes).
+- `src/evaluation/inference_utils.py` – v3 inference utilities: StoppingCriteria, two-phase generation, dynamic token budget.
+- `src/evaluation/council_advisor.py` – LLM Council multi-model analysis via OpenRouter.
+- `requirements.txt` – Core runtime deps (pandas, langchain, unsloth, matplotlib, sqlite via stdlib).
 
 ## Naming & IDs
 - Dataset file pattern: `ds_<NNNN>_<rows>x<cols>.csv` → hash (SHA256 first 12 chars) used in artifact filenames.
@@ -166,12 +180,28 @@ itemsety-qwen-finetuning/
 - For performance: consider replacing Apriori with FP-Growth for high column counts.
 - When modifying validation logic ensure invariants list stays in sync and update summary JSON + DB fields.
 
-## Typical Commands (PowerShell)
-```powershell
-python pipeline.py --data data/datasets_v2/ds_0001_5x53.csv --min-support 3 --max-size 3 --llm-full --llm-model gpt_4_1
-python pipeline.py --data-dir data/datasets_v2 --min-support 3 --max-size 3 --llm-full --llm-chunk-size 50 --llm-model gpt_4_1
-python src/training/run_sft_full.py
-python src/evaluation/eval_finetuned_model.py --model-path OliverSlivka/qwen2.5-3b-itemset-extractor
+## Typical Commands (macOS/Linux)
+```bash
+# Run pipeline (single dataset or full batch)
+python pipeline.py --data data/datasets_v2/ds_0001_7x12.csv --min-support 3 --max-size 3 --llm-full --llm-model gpt-4.1-mini
+python pipeline.py --data-dir data/datasets_v2 --min-support 3 --max-size 3 --llm-full --llm-chunk-size 50 --llm-model gpt-4.1-mini
+
+# Generate SFT-CoT training data (Phase 1)
+python src/training/generate_cot_sft_data.py --db runs.db --output data/sft_cot_v2.json
+
+# Export DPO pairs with real LLM failures (Phase 2)
+python src/training/export_real_dpo_data.py --db runs.db --output data/dpo_real_v2.json
+
+# Build HuggingFace dataset (3 configs: sft/dpo/grpo)
+python src/training/build_hf_dataset_v2.py --sft data/sft_cot_v2.json --dpo data/dpo_real_v2.json --output data/hf_dataset_v2
+
+# Push to HuggingFace (each version gets its own repo — NEVER overwrite old versions)
+python src/training/upload_dataset_to_hf.py --dataset-path data/hf_dataset_v3 --repo OliverSlivka/itemset-extraction-v3
+
+# Evaluate fine-tuned model
+python src/evaluation/eval_finetuned_model.py --model-path OliverSlivka/qwen2.5-7b-itemset-extractor
+
+# Visualize pipeline results
 python src/utils/visualization.py --db runs.db --outdir visuals --bins 5
 ```
 

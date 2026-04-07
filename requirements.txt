@@ -1,4 +1,5 @@
 # Core pipeline dependencies
+httpx>=0.27.0          # async HTTP client (used by council_advisor / openrouter_client)
 langchain>=0.2.0
 langchain-openai>=0.1.0
 pandas>=2.0.0
@@ -13,6 +14,7 @@ trl>=0.7.0
 peft>=0.7.0
 accelerate>=0.24.0
 bitsandbytes>=0.41.0
+unsloth                # 2x faster training + 70% less VRAM (Qwen/Llama/etc); install: pip install unsloth
 gradio>=4.0.0
 torch
 torchvision

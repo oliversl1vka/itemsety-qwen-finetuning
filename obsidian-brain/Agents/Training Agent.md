@@ -135,7 +135,7 @@ See also: [[References/Model Comparison]], [[References/API Limits]]
 - `src/training/build_hf_dataset_v2.py` — HF dataset with 3 configs (sft/dpo/grpo)
 
 **Notebook:** `notebooks/training_3phase_7b.ipynb` (21 cells)
-**Dataset repo:** `OliverSlivka/itemset-extraction-v2` (3 configs)
+**Dataset repo:** `OliverSlivka/itemset-extraction-v2` (3 configs) — ⚠️ NOW FROZEN, current = `itemset-extraction-v3`
 **Model repo:** `OliverSlivka/qwen2.5-7b-itemset-extractor`
 
 **Tags:** #training-method #3-phase #sft-cot #dpo-real #grpo #qwen-7b
@@ -279,7 +279,7 @@ See also: [[Experiments/2026-03-01 Qwen2.5-7B v1]]
 
 **For future training runs on the school server:**
 
-1. Download notebook from HF: `wget https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v2/resolve/main/notebooks/training_3phase_7b.ipynb`
+1. Download notebook from HF: `wget https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v3/resolve/main/notebooks/training_3phase_7b.ipynb`
 2. Run Cell 1 (install) → installs packages, removes user-level torch
 3. **RESTART KERNEL** (Kernel → Restart)
 4. Run Cell 2+ (system torch is now the active one)
@@ -717,3 +717,542 @@ Council unanimously says:
 **Tags:** #council #v2-postmortem #merged-4bit-forced #critical #v3-planning
 
 See also: [[Experiments/2026-03-07 Qwen2.5-7B v2]]
+
+---
+
+## [2026-03-09] 🏛️ LLM Council v3 Plan — Adapter Eval + Repetition Loop Fix
+
+**Context:** After v2 adapter evaluation (2026-03-08) showed 78.6% F1 on small datasets but repetition loops on 87% of datasets, ran full LLM Council session with 3 frontier models (Gemini-3-Flash, DeepSeek-v3.2, Grok-4.1-Fast) to decide v3 strategy.
+
+**Council Report:** `docs/reports/council_v3_plan_2026-03-09.json`
+**Raw responses:** `docs/reports/council_v3_partial.json`
+
+### Root Cause (UNANIMOUS)
+
+The repetition loop is caused by 3 factors:
+1. **(c) CoT format too repetitive** (60%): Rigid `- col:val: N rows → [Row ...] ✓` pattern creates a local attractor
+2. **(b) Over-training** (25%): 5 epochs on 348 examples = pattern memorization
+3. **(a) Insufficient data diversity** (15%): No termination examples
+
+### v3 Training Config (UPDATED Council Consensus)
+
+```python
+v3_config = {
+    "lora_r": 32, "lora_alpha": 64,   # r DOWN from 64, alpha ratio 2.0
+    "lora_dropout": 0.1,               # NEW regularization
+    "sft_lr": 1e-4, "sft_epochs": 3,   # LR down from 2e-4, epochs down from 5
+    "max_seq_length": 2048,             # DOWN from 4096
+    "dataset_size": 1000,               # UP from 348
+    "dpo_lr": 5e-5, "dpo_beta": 0.1, "dpo_epochs": 1,  # NEW DPO phase
+    "grpo": "SKIP",
+    "save_method": "adapter_only",      # NEVER merge_4bit_forced
+}
+```
+
+### Critical CoT Format Change
+
+Remove evidence_rows from `<think>` — only counts. Move evidence to JSON. Cuts tokens 1547→700.
+
+### Data Plan: 1000 examples
+
+400 concise CoT + 200 termination + 200 short/direct + 100 edge cases + 100 negative (for DPO)
+
+### Immediate Actions
+
+1. Test v2 adapter with inference fixes (StoppingCriteria at `</think>` + temp=0.3 + top_k=50)
+2. Generate concise CoT training data (1000 examples)
+3. SFT 3 epochs → DPO 1 epoch → eval
+
+### 🔴 Claude's Late Response — Critical Additions (incorporated 2026-03-09)
+
+Claude-sonnet-4.6 responded after 245s with 47,667 chars — the most detailed response. Key NEW insights:
+
+1. **Loop probability proof**: If P(continue)=0.95 per item, P(terminate over 50 items)=0.95^50≈7.7%. Small datasets work because fewer items = higher termination probability. This is a MATH problem.
+
+2. **alpha/r ratio was fundamentally broken in v2**: alpha/r = 16/64 = 0.25 (very weak LoRA signal). Must fix to 64/32 = 2.0. This is the **#2 most impactful fix** after CoT format.
+
+3. **Temperature 0.1 makes loops WORSE** (counterintuitive): At low temp, model is near-deterministic → locks into highest-probability loop → cannot escape. Recommend temp=0.3 (enough randomness to escape attractors, <3% F1 degradation).
+
+4. **Two-phase generation**: Generate `<think>` with temp=0.3, then switch to temp=0.05 for JSON. StoppingCriteria at `</think>`.
+
+5. **Evaluation gate between SFT and DPO**: Do NOT run DPO if SFT is broken. Gates: parse≥0.70, F1≥0.55, loop_rate≤0.30.
+
+6. **DPO cannot fix broken SFT**: DPO learns preferences, but needs the base to sometimes produce correct outputs. Fix SFT FIRST.
+
+7. **Priority actions by impact**: (1) Compact CoT +25-35% F1, (2) Fix alpha/r ratio +10-15%, (3) Reduce epochs +10-15%, (4) Temp=0.3 +15-20% (FREE), (5) Dynamic token budget +10-20% (FREE)
+
+8. **Key quote**: "The gap between 78.6% and 7.5% mean F1 is almost entirely explained by the repetition loop. Fix the loop → fix the model."
+
+**Updated immediate action #1**: Use temp=0.3 (not 0.05) based on Claude's analysis.
+**Updated lora_dropout**: 0.05 (Claude) vs 0.1 (others). Go with 0.05.
+**Updated DPO beta consideration**: Claude says 0.05, others say 0.1. Start with 0.1, reduce if instability.
+
+**Tags:** #council #v3-plan #repetition-loop #concise-cot #claude-insights
+
+---
+
+## [2026-03-09] ✅ v3 Implementation — All Council Recommendations Applied
+
+**Context:** Implemented ALL changes from the 2026-03-09 LLM Council session into the codebase. This is a comprehensive update touching training data generation, inference, evaluation, and the notebook.
+
+### Files Modified
+
+| File | Changes |
+|------|---------|
+| `src/training/training_utils.py` | New concise `generate_cot()` v3 format, `generate_cot_legacy()` preserved, `calculate_token_budget()` added |
+| `src/training/generate_cot_sft_data.py` | Default output → `sft_cot_v3.json`, max_tokens → 1800 |
+| `src/evaluation/inference_utils.py` | **NEW** — ThinkStoppingCriteria, RepetitionDetector, two-phase generation, dynamic budget |
+| `src/evaluation/eval_finetuned_model.py` | temp 0.1→0.3, StoppingCriteria, dynamic budget, --two-phase flag, --temperature flag |
+| `notebooks/training_3phase_7b.ipynb` | ALL config changes (see below) |
+
+### Notebook v3 Config Changes
+
+| Parameter | v2 | v3 | Rationale |
+|-----------|----|----|-----------|
+| `max_seq_length` | 4096 | **2048** | Concise CoT fits in 700-1200 tokens |
+| `lora_r` | 64 | **32** | Smaller rank, less overfitting |
+| `lora_alpha` | 16 | **64** | Alpha/r = 2.0 (was 0.25 — catastrophically weak) |
+| `lora_dropout` | 0 | **0.05** | Regularization against repetition |
+| `sft_epochs` | 2 | **3** | More epochs with lower LR |
+| `sft_lr` | 2e-4 | **1e-4** | Gentler updates |
+| `sft_warmup_ratio` | 0.05 | **0.10** | More warmup for stability |
+| `sft_weight_decay` | 0 | **0.01** | L2 regularization |
+| `sft_eval_strategy` | epoch | **steps (50)** | Earlier overfitting detection |
+| `sft_load_best` | False | **True** | Keep best checkpoint |
+| `dpo_epochs` | 2 | **1** | DPO overfits quickly with real failures |
+| GRPO | 200 steps | **SKIPPED** | Unsloth GRPO broken + unnecessary |
+| Save method | `merged_4bit_forced` | **Adapter-only** | CRITICAL: merge destroys LoRA |
+| Inference temp | 0.1 | **0.3** | Escape attractor loops |
+| Inference top_k | none | **50** | Prune long tail tokens |
+| Inference top_p | none | **0.90** | Nucleus sampling |
+
+### Concise CoT Format (v3)
+
+**Old format (verbose, ~1547 tokens avg):**
+```
+## Singles (min_support=3)
+- col:val: 5 rows → [Row 1, Row 3, Row 5, Row 7, Row 8] ✓
+```
+
+**New format (concise, ~700 tokens avg):**
+```
+## SCAN 1: Singles by column
+age: 15=3(R1,R2,R7)✓ | 16=2✗ | 17=4(R3,R4,R5,R6)✓
+FREQUENT SINGLES: age:15, age:17, medu:4 (3 items)
+## SCAN 2: Pairs
+{age:15,medu:4}: R1,R7 → 2✗
+## RESULT SUMMARY: 5 singles + 3 pairs + 1 triple = 9 itemsets
+```
+
+Key changes: column-grouped (all values for a column on one line), compact notation (R1 not Row 1), RESULT SUMMARY termination signal.
+
+### Inference Utilities (NEW module)
+
+`src/evaluation/inference_utils.py` implements:
+1. `ThinkStoppingCriteria` — stops at `</think>` token sequence
+2. `RepetitionDetector` — catches repeated line patterns (3× consecutive)
+3. `generate_two_phase()` — think at temp=0.3, JSON at temp=0.05
+4. `generate_with_guards()` — single-phase with both stopping criteria
+5. `extract_and_repair_json()` — robust JSON extraction from messy output
+6. `calculate_dynamic_budget()` — dataset-specific max_new_tokens
+7. `V3_INFERENCE_CONFIG` — reference config dict
+
+### What Still Needs to Happen
+
+1. **Regenerate SFT data** with concise CoT format: `python src/training/generate_cot_sft_data.py --db runs.db --output data/sft_cot_v3.json`
+2. **Rebuild HF dataset** with v3 data
+3. **Push to HF Hub**
+4. **Train on TLJH server** with updated notebook
+5. **Evaluate** with new inference utils (temp=0.3, StoppingCriteria)
+
+### Expected v3 Impact (from council estimates)
+
+| Fix | Expected Impact | Cost |
+|-----|----------------|------|
+| Concise CoT format | +25-35% F1 | Requires retraining |
+| Fix alpha/r ratio (already done in v2) | +10-15% F1 | Already applied |
+| Reduce epochs 5→3 + lower LR | +10-15% F1 | Requires retraining |
+| temp=0.3 at inference | +15-20% F1 | FREE — no retraining |
+| Dynamic token budget | +10-20% F1 | FREE — no retraining |
+| StoppingCriteria at </think> | Prevents 87% of timeouts | FREE — no retraining |
+
+**Conservative estimate:** 50-65% F1 (up from 7.5% mean)
+**Optimistic estimate:** 75-85% F1
+
+**Tags:** #v3 #implementation #council-applied #all-files-updated
+
+---
+
+## [2026-03-17] 🔬 Unsloth Notebook Mining — Validated Training Defaults
+
+**Source:** Diamond knowledge extraction from 11 reviewed Unsloth × Qwen notebooks (`knowledge_extraction/unsloth_notebooks/notes/DIAMOND_KNOWLEDGE.md`)
+
+### Optimizer Upgrade: `paged_adamw_8bit`
+
+**What:** Replace `adamw_8bit` with `paged_adamw_8bit` in both SFT and DPO phases.
+**Why:** Pages optimizer states to CPU when GPU RAM is tight. Strictly better — same convergence, lower peak VRAM. Used in Unsloth's own Qwen2.5-Coder notebook as the recommended optimizer.
+**Evidence:** `original_template/Qwen2.5_Coder_(14B)-Conversational.ipynb` Cell 17 uses `paged_adamw_8bit` explicitly.
+**Applied to:** `notebooks/training_3phase_2026-03-09_v3.ipynb` Cell 8 (SFT) and Cell 12 (DPO).
+
+### Label Masking Verification (New Diagnostic Cell)
+
+**What:** After creating SFTTrainer with `train_on_responses_only`, decode one sample's labels to visually confirm masking works correctly.
+**Why:** Wrong `instruction_part`/`response_part` strings cause masking to fail SILENTLY — the model trains on prompts instead of just responses, wasting capacity and potentially memorizing inputs. This was observed across Qwen3-4B-Thinking and Qwen2.5-Coder notebooks.
+**Pattern:**
+```python
+space = tokenizer(" ", add_special_tokens=False).input_ids[0]
+sample = sft_trainer.train_dataset[5]
+labels = sample["labels"] if "labels" in sample else sample.get("label_ids", [])
+print(tokenizer.decode([space if x == -100 else x for x in labels]))
+```
+**Applied to:** New cell added after SFT trainer creation in notebook.
+
+### SFT Format Verification Gate (Generate Before Proceeding)
+
+**What:** After SFT training, generate on 2 validation samples and check: (a) `<think>` tags present, (b) JSON parseable, (c) col:val format used.
+**Why:** v2 had a gate but used `max_new_tokens=512` (too short) → false negatives. Diamond knowledge confirms: ALWAYS verify format learning before proceeding to next phase. The Qwen3-4B-GRPO notebook uses this exact pattern (intermediate verification after SFT, before GRPO).
+**Applied to:** Added actual generation test to notebook Cell 9 (was just a print statement).
+
+### Validated LoRA/Training Defaults (Cross-Notebook Consensus)
+
+These defaults appeared in 8+ of 11 reviewed notebooks — they are the canonical Unsloth configuration:
+
+| Parameter | SFT Value | GRPO Value | Our v3 | Status |
+|-----------|-----------|------------|--------|--------|
+| `lora_r` | 16 | 32 | 32 | ✅ Matches GRPO default |
+| `lora_alpha` | =r | =2r | 64 (=2r) | ✅ Correct |
+| `lora_dropout` | 0 | 0 | 0.05 | ✅ Council override |
+| `learning_rate` | 2e-4 | 5e-6 | 1e-4 | ✅ Council override |
+| `optim` | adamw_8bit | adamw_8bit | **paged_adamw_8bit** | 🔄 Upgraded |
+| `gradient_checkpointing` | "unsloth" | "unsloth" | "unsloth" | ✅ Matches |
+| `seed` | 3407 | 3407 | 42 | ℹ️ Different (our choice) |
+
+### Future: GRPO with GSPO (When Re-enabled)
+
+If GRPO is re-enabled in a future version (after Unsloth bugs are fixed), use GSPO over vanilla GRPO:
+```python
+GRPOConfig(
+    # ... standard params ...
+    importance_sampling_level = "sequence",   # GSPO
+    mask_truncated_completions = False,        # GSPO
+    loss_type = "dr_grpo",                     # GSPO
+    learning_rate = 5e-6,
+    max_grad_norm = 0.1,        # Aggressive clipping for stability
+    adam_beta2 = 0.99,
+    weight_decay = 0.1,         # Heavy regularization
+    lr_scheduler_type = "cosine",
+)
+```
+**Source:** Both Vision-GRPO notebooks use GSPO as the current Unsloth recommendation.
+
+### Future: Pre-Finetuning Before GRPO
+
+If starting GRPO from scratch (or from base model), SFT on ~50-60 format examples first:
+- Teaches output structure before reward optimization
+- Without it, GRPO wastes hundreds of steps learning format
+- Our existing SFT phase already serves this purpose — no extra step needed for our workflow
+
+### Packing: Potential 5× Speedup (NOT Applied — Needs Testing)
+
+`packing=True` concatenates multiple short samples to fill `max_seq_length`, reducing padding waste. Our CSV prompts are short (~500-700 tokens after concise CoT). Potential 5× throughput improvement.
+**NOT applied** because: (a) v3 Council explicitly set `packing=False`, (b) packing can corrupt `train_on_responses_only` masking boundaries. Test on a small subset before enabling.
+
+**Tags:** #diamond-knowledge #unsloth-mining #validated-defaults #paged-adamw #label-verification
+
+---
+
+## [2026-03-09] v3 Training Results + v3.1 merge_and_unload Fix
+
+### v3 Training on TLJH (H200 NVL, 150 GB)
+
+**SFT Phase:** 3 epochs, 90 steps, 3:35 duration
+- Final loss: 0.0709, val loss: 0.033624
+- ✅ SFT converged well
+
+**DPO Phase:** 1 epoch, 137 steps, 5:43 duration
+- Final loss: 0.0373, accuracy: 1.000 (100%)
+- Rewards: chosen=8.686, rejected=-21.749, margin=30.436
+- ✅ DPO converged perfectly (clear preference separation)
+
+**Inference Test:** ❌ FAILED
+- Output: `"count": 2wo` — JSON parse failure
+- No `<think>` tags in output
+- Root cause: **merge_and_unload() on 4-bit model** (same bug as v2!)
+
+### Root Cause Analysis
+
+The v3 notebook still had `merge_and_unload()` in:
+- **Cell 11 (DPO setup):** Merged SFT adapter into 4-bit base before DPO
+- **Cell 19 (inference):** Merged both SFT + DPO adapters into 4-bit base
+
+This is the **exact same bug** that destroyed v2 — double quantization
+(dequant→merge→requant) rounds LoRA deltas to zero.
+
+### v3.1 Fix Applied
+
+**Strategy: Option A — Continue training same adapter**
+
+Cell 11 (DPO setup):
+```python
+# OLD (broken): model.merge_and_unload() → get_peft_model() → DPO
+# NEW (v3.1): PeftModel.from_pretrained(sft_dir, is_trainable=True) → DPO
+```
+- SFT adapter loaded as TRAINABLE — DPO continues training same LoRA weights
+- Single adapter checkpoint after DPO (contains SFT + DPO knowledge)
+- DPOTrainer auto-uses base (adapter disabled) as ref_model
+
+Cell 19 (inference):
+```python
+# OLD (broken): merge_and_unload(SFT) → merge_and_unload(DPO) → generate
+# NEW (v3.1): PeftModel.from_pretrained(dpo_dir) → for_inference → generate
+```
+- DPO adapter loaded directly on base — NO merge
+- Adapter computes at inference time (LoRA math preserved in float16)
+
+**Why Option A over Option B (nested adapters):**
+- Option B: Frozen SFT + fresh LoRA on top → DPO adapter alone doesn't contain SFT knowledge
+- Option A: DPO continues training SFT adapter → single checkpoint has everything
+- Option A is simpler, more robust, proven with DPOTrainer
+
+### CRITICAL RULE (NEVER FORGET)
+**NEVER call `merge_and_unload()` on a 4-bit NF4 model.**
+- It dequantizes (4-bit→bf16), adds LoRA deltas, requantizes (bf16→4-bit)
+- The requantization rounds LoRA deltas to ZERO
+- Model reverts to untrained base → corrupted outputs like `"count": 2wo`
+- Always use adapter-only loading: `PeftModel.from_pretrained(base, adapter_dir)`
+
+### Next Steps
+1. User re-downloads v3.1 notebook from HF Hub
+2. Re-trains on TLJH (should take ~9 min again)
+3. Inference test should now produce valid JSON with `<think>` tags
+4. If F1 > 0.60, proceed to Stage 6 (/validate)
+
+**Tags:** #v3 #v3.1 #fix #merge-and-unload #critical #training-results
+
+---
+
+## [2026-03-17] ⚠️ TLJH stale `CUDA_VISIBLE_DEVICES` caused Cell 3 Torch crash
+
+**Context:** Cell 3 crashed on TLJH with `DeferredCudaCallError` / `device=3, num_gpus=3` while calling `torch.cuda.get_device_name(0)`. The notebook process inherited a stale GPU visibility mapping that referenced 4 GPUs even though only 3 were visible to the process.
+
+**Root cause:** `torch` was imported before sanitizing `CUDA_VISIBLE_DEVICES`, so lazy CUDA init saw an invalid visible-device mapping and failed internally.
+
+**Fix applied to v3 notebook:**
+1. In Cell 3, query `nvidia-smi` **before** `import torch`
+2. Parse the current `CUDA_VISIBLE_DEVICES`
+3. If it is invalid for the GPUs visible to the process, replace it with the GPU that has the most free VRAM
+4. Only then import `torch` and call `torch.cuda.init()`
+5. If `torch` was already imported, raise a clear message telling the user to restart the kernel and rerun from Cell 2
+
+**Lesson:** On shared TLJH/Jupyter environments, do not trust inherited GPU visibility. Always sanitize `CUDA_VISIBLE_DEVICES` before the first `import torch` in the notebook.
+
+**Tags:** #tljh #gpu #cuda-visible-devices #torch #notebook #critical
+
+---
+
+## [2026-03-17] ⚠️ SFT gate must use deterministic decoding + explicit truncation diagnostics
+
+**Context:** The Cell 9 SFT format gate kept reporting failures even after the JSON parser was fixed to ignore bracket counts inside `<think>`. Raw outputs showed two distinct cases:
+- generations ending before `</think>`
+- ambiguous warnings where it was unclear whether the model stopped early or simply hit `max_new_tokens`
+
+**Root cause:** The gate was still using sampled decoding for a binary format check, and it did not report whether generation had actually exhausted the token budget. That made parser issues, decoding noise, and genuine model corruption look the same.
+
+**Fix applied to v3 notebook:**
+1. Switch Cell 9 gate generation to `do_sample=False` (deterministic decoding)
+2. Size `max_new_tokens` from the reference validation completion length instead of using one fixed cap
+3. Save per-sample metadata JSON with target length, generated length, and whether the budget was hit
+4. Print a clear distinction between:
+    - `generation hit token budget before </think>`
+    - `model stopped early before </think>`
+
+**Lesson:** Format gates should be deterministic and diagnostic-first. If the goal is to verify learned structure, do not use stochastic decoding as the primary pass/fail signal.
+
+**Tags:** #sft #gate #diagnostics #decoding #notebook #v3.6
+
+---
+
+## [2026-03-17] 🚨 Likely root cause of malformed SFT outputs: notebook seq length too small
+
+**Context:** The improved Cell 9 gate showed a decisive split:
+- one sample hit the generation budget before closing `</think>`
+- another sample closed `</think>` without hitting the budget, but still emitted malformed JSON
+
+This ruled out the earlier "parser only" hypothesis. Separate dataset inspection then showed that many SFT examples are much longer than the notebook's `max_seq_length=2048` setting.
+
+**Evidence:**
+- local SFT dataset stats: 348 examples, avg estimated length ~1547 tokens, max 3744
+- 119 examples exceed 1800 estimated tokens
+- 96 examples exceed 2048 estimated tokens
+- gate sample 1 expected completion alone was ~1903 tokens, which leaves no room for system + user prompt within a 2048 training window
+
+**Implication:** With `max_seq_length=2048`, the notebook silently truncates many assistant completions during SFT. That teaches the model to produce cut-off reasoning blocks and malformed JSON endings.
+
+**Fix applied to notebook v3.7:**
+1. Restore `CONFIG["max_seq_length"] = 4096`
+2. Add explicit token-length auditing in the SFT prep cell
+3. Assert that zero train/validation samples exceed the configured length before training starts
+
+**Lesson:** Never reduce notebook sequence length without auditing the actual tokenized SFT examples first. For this project, CoT + final JSON can easily exceed 2048 even when the examples look "concise".
+
+**Tags:** #sft #truncation #seq-length #root-cause #notebook #v3.7
+
+---
+
+## [2026-03-17] ⚠️ Cell 9 gate can reintroduce false truncation if its completion cap ignores CONFIG
+
+**Context:** After restoring `CONFIG["max_seq_length"] = 4096`, the gate still reported both validation samples as truncated. The reason was not the model alone: Cell 9 still computed `generation_budget = min(2048, ...)`, so the gate itself was hard-capped at 2048 tokens.
+
+**Root cause:** The notebook's training window and gate window diverged. Even with a 4096-token model context, Cell 9 could only generate 2048 new tokens, which was insufficient for long `<think>` traces plus final JSON on some validation samples.
+
+**Fix applied:**
+1. Upgrade Cell 9 to v3.7
+2. Compute `prompt_token_count` first
+3. Derive `available_completion_budget` from `CONFIG["max_seq_length"] - prompt_token_count - margin`
+4. Cap generation using the available context window, not a fixed 2048 ceiling
+5. Persist prompt length, available budget, requested budget, and final budget to the per-sample metadata JSON
+
+**Lesson:** Whenever `CONFIG["max_seq_length"]` changes, verify that every diagnostic/inference gate uses the same effective context budget. Otherwise the notebook can appear broken even after the training config is fixed.
+
+**Tags:** #gate #seq-length #truncation #notebook #v3.7
+
+---
+
+## [2026-03-17] ✅ Notebook gate should reuse evaluation-time two-phase decoding
+
+**Context:** Even after fixing Cell 9's budget math, the SFT gate still showed runaway reasoning loops and malformed JSON tails. The repo already had a more robust inference path in `src/evaluation/inference_utils.py`, but the notebook gate and quick inference cell were still using custom one-shot generation.
+
+**Fix applied in notebook v3.8:**
+1. Cell 9 now imports and uses `generate_two_phase()`
+2. Cell 9 now parses output with `extract_and_repair_json()`
+3. Cell 19 now uses the same guarded two-phase decode path as evaluation
+4. The gate now measures separate think/json budgets instead of one flat completion budget
+
+**Why this matters:** The notebook must test the adapter under the same decoding strategy used in real evaluation. Otherwise the notebook can report failures that are partly artifacts of weaker generation settings rather than the adapter alone.
+
+**Lesson:** When an inference utility already exists in the repo, prefer reusing it in notebooks over re-implementing local generation logic.
+
+**Tags:** #gate #inference #two-phase #notebook #evaluation #v3.8
+
+---
+
+## [2026-03-17] 🔬 Root Cause: R-Shorthand Tokenization Ambiguity + Dataset Size Mismatch
+
+**Context:** SFT gate showed 0/2 pass with specific failure patterns: row hallucination (R22, R23, R24 in a 10-row dataset), value corruption (rating:55 instead of :5), duplicate evidence rows, and schema drift. Training data audit showed 0 contamination — training data was perfectly clean. Deep investigation revealed two compounding root causes.
+
+### Root Cause 1: R-Shorthand Tokenization Ambiguity
+
+The v3 concise CoT format used packed R-shorthand in think blocks: `R1,R10,R2,R3`. Qwen tokenizer splits this as:
+
+| Format | Tokens | Quality |
+|--------|--------|---------|
+| `R1,R10,R2,R3` | `R` `1` `,R` `1` `0` `,R` `2` `,R` `3` | ❌ AMBIGUOUS — R10 shares token boundary with R1 |
+| `R1, R10, R2, R3` | `R` `1` `,` `ĠR` `1` `0` `,` `ĠR` `2` `,` `ĠR` `3` | ✅ CLEAN — each R-ref starts with ĠR token |
+
+The packed format had NO clean boundary between R10 and the preceding comma — the model saw `R` `1` then `,R` `1` `0` and couldn't distinguish whether digits belong to the current or next R-ref. This directly caused:
+- **Row hallucination**: R2 → R22, R3 → R23, R4 → R24 (digit concatenation)
+- **Value corruption**: `rating:5` → `rating:55` (same digit-doubling mechanism)
+- **48% of training examples** (112/233) had adjacent single+double digit R-refs, teaching the model this ambiguous pattern
+
+### Root Cause 2: HF Dataset Size Mismatch (26% data loss)
+
+| Source | Examples | Format |
+|--------|----------|--------|
+| `sft_cot_v2.json` (local, verbose) | **348** | `Row N` format (clean tokenization) |
+| `sft_cot_v3.json` (local, concise) | **258** | `R-shorthand` packed (ambiguous) |
+| HF Hub (what model trained on) | **258** (233+25) | Built from v3, NOT v2 |
+
+The HF dataset was built from `sft_cot_v3.json` (258 examples, max_tokens=1800) not `sft_cot_v2.json` (348 examples, max_tokens=3500). The model trained on 26% fewer examples than available, AND those examples used the ambiguous R-shorthand.
+
+### Fix Applied (v3.10)
+
+1. **Spaced R-refs in `generate_cot()`**: Changed `",".join(row_nums)` to `", ".join(row_nums)` in `src/training/training_utils.py` (singles, pairs, triples sections). Also added space before `+Nmore` suffix.
+
+2. **Increased max_tokens**: Default filter raised from 1800 → 3500 in `generate_cot_sft_data.py` to capture more examples.
+
+3. **Added tokenizer-based filter**: New `scripts/filter_sft_by_tokens.py` uses actual Qwen tokenizer to verify every example ≤ 4096 tokens (chars/4 estimate was off by ~2×).
+
+4. **Regenerated + rebuilt + pushed**:
+   - `sft_cot_v3.json`: 334 → filtered to **272** examples (all ≤ 4096 actual tokens)
+   - HF dataset: SFT 245 train / 27 val (up from 233/25)
+   - Notebook bumped to **v3.10**
+   - All pushed to HF Hub
+
+### Key Numbers: Before vs After
+
+| Metric | Before (v3.9) | After (v3.10) |
+|--------|---------------|---------------|
+| SFT examples | 258 (233+25) | **272** (245+27) |
+| Packed R-refs (ambiguous) | 258/258 (100%) | **0/272 (0%)** |
+| Spaced R-refs (clean) | 0/258 (0%) | **272/272 (100%)** |
+| Examples > 4096 tokens | Unknown (no audit) | **0/272 (verified)** |
+| Token length range | 497–3820 | **503–4070** |
+
+### ⚠️ CRITICAL RULE: Never Use Packed R-Shorthand
+
+**ALWAYS** use spaced delimiters in structured data that will be tokenized:
+- ✅ `R1, R10, R2, R3` (comma + space = clean token boundary)
+- ❌ `R1,R10,R2,R3` (no space = ambiguous boundary for subword tokenizers)
+
+This applies to ANY delimiter in training data where adjacent values could share digit boundaries.
+
+### ⚠️ CRITICAL RULE: Always Filter SFT Data by Actual Token Count
+
+The `estimate_tokens()` function (chars/4) underestimates by ~2× for this content. **Always run `scripts/filter_sft_by_tokens.py`** after generating SFT data to ensure NO examples exceed `max_seq_length`.
+
+### Next Steps
+1. User re-downloads v3.10 notebook from HF Hub
+2. Re-trains on TLJH (SFT on 245 examples with clean tokenization)
+3. Expect SFT gate to show improved row references (no R22/R23 hallucination)
+4. If gate passes, proceed to DPO phase
+
+**Tags:** #v3.10 #tokenization #r-shorthand #root-cause #fix #dataset-size-mismatch
+
+---
+
+## [2026-03-18] ✅ Proper HF Versioning — Separate Repos for v2 and v3
+
+**Context:** Previously, every rebuild of the HF dataset overwrote the same repo (`OliverSlivka/itemset-extraction-v2`), destroying the training history. After v3 data was pushed to the v2 repo, the original v2 training data was lost from HF.
+
+### Problem
+
+| Time | Repo content | Issue |
+|------|-------------|-------|
+| 2026-03-07 | v2 data (348 SFT, verbose "Row N") | ✅ Correct |
+| 2026-03-09 | v3 data (258 SFT, packed R-refs) | ❌ Overwrote v2! |
+| 2026-03-17 | v3.10 data (272 SFT, spaced R-refs) | ❌ Still overwriting v2! |
+
+### Fix Applied (v3.11)
+
+Created separate HF repos — each version is now FROZEN:
+
+| Repo | SFT (train/val) | Format | Notebook |
+|------|-----------------|--------|----------|
+| `OliverSlivka/itemset-extraction-v2` | 314/34 | Verbose `Row N` | `training_3phase_2026-03-07_v2.ipynb` |
+| `OliverSlivka/itemset-extraction-v3` | 245/27 | Concise spaced `R1, R10` | `training_3phase_2026-03-09_v3.ipynb` (v3.11) |
+
+Both repos share DPO (546/60) and GRPO (matching SFT split).
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `notebooks/training_3phase_2026-03-09_v3.ipynb` | CONFIG `hf_dataset` → `OliverSlivka/itemset-extraction-v3`, version → v3.11 |
+| `scripts/push_versioned_datasets.py` | NEW — restores v2 + creates v3 in one script |
+| `scripts/verify_hf_repos.py` | NEW — verifies both repos by downloading from Hub |
+
+### Verified from Hub
+
+- v2: SFT train=314, val=34, format has `Row N` ✅
+- v3: SFT train=245, val=27, format has spaced R-refs ✅
+- Both repos have DPO 546/60, GRPO matching SFT
+
+### ⚠️ CRITICAL RULE: Never Overwrite Previous Version Repos
+
+For future versions (v4, v5, ...):
+1. Create NEW repo: `OliverSlivka/itemset-extraction-v{N}`
+2. Push data + notebook to new repo
+3. Update notebook CONFIG to point to new repo
+4. Previous repos remain FROZEN — never overwrite them
+
+**Tags:** #v3.11 #versioning #hf-repos #critical-rule #frozen-versions

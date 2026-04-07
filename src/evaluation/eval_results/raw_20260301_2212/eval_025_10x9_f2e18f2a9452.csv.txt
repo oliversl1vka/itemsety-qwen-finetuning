@@ -1,0 +1,1 @@
+[{"itemset": ["dalc", "fedu", "walc"], "count": 3, "rows": ["Row 1", "Row 3", "Row 8"]}]

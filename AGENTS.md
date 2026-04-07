@@ -15,7 +15,7 @@ This repository uses an **interactive multi-agent orchestration system** where y
 1. Generate synthetic CSV datasets (500 datasets, 5-25 rows each)
 2. Run Apriori + OpenAI GPT-4 to create ground truth
 3. Export validated runs as training data (ChatML format with CoT)
-4. Fine-tune Qwen2.5-3B using LoRA/QLoRA
+4. Fine-tune Qwen2.5-7B using LoRA/QLoRA (3-phase: SFT-CoT → DPO-Real → GRPO)
 5. Evaluate on unseen datasets (target: 80% F1 vs Apriori)
 6. Deploy to HuggingFace Hub
 
@@ -157,9 +157,10 @@ itemsety-qwen-finetuning/
 ├── pipeline.py                    # Core extraction pipeline
 ├── src/                           # Source code modules
 │   ├── training/                  # Fine-tuning scripts
-│   │   ├── run_sft_full.py        # Production training
-│   │   ├── run_sft_test.py        # Test training
-│   │   └── export_training_data.py
+│   │   ├── training_utils.py      # Shared utilities (system prompt, CoT)
+│   │   ├── generate_cot_sft_data.py  # Phase 1: SFT-CoT data
+│   │   ├── export_real_dpo_data.py   # Phase 2: DPO real failures
+│   │   └── build_hf_dataset_v2.py    # Build HF dataset (3 configs)
 │   ├── evaluation/                # Model evaluation
 │   │   └── eval_finetuned_model.py
 │   ├── data_generation/           # Dataset generation
@@ -198,9 +199,9 @@ itemsety-qwen-finetuning/
 ### Key Technologies
 - **Python 3.10+** (use `.venv` for environment isolation)
 - **SQLite** (runs.db) for metadata persistence
-- **OpenAI** (GPT-4o, GPT-4.1-mini) for baseline LLM extraction
+- **OpenAI** (GPT-4.1-mini, GPT-4.1-nano) for LLM extraction pipeline
 - **HuggingFace** (Transformers, PEFT, TRL) for fine-tuning
-- **PyTorch** with bitsandbytes (4-bit quantization)
+- **Unsloth** (2× faster training, 70% less VRAM) + bitsandbytes (4-bit fallback)
 
 ### Essential Files
 - **`openai.env`**: OpenAI API credentials (NEVER commit, use `openai.env.template`)
@@ -213,32 +214,32 @@ itemsety-qwen-finetuning/
 ## 🛠️ Common Commands
 
 ### Quick Start (Full Pipeline)
-```powershell
-# 1. Generate datasets
+```bash
+# 1. Generate datasets (skip if data/datasets_v2/ already has 500 CSVs)
 python src/data_generation/generate_datasets_v2.py --count 500
 
-# 2. Run pipeline (Apriori + GPT-4)
-python pipeline.py --data-dir data/datasets_v2 --llm-full --llm-model gpt_4_1 --min-support 3
+# 2. Run pipeline (Apriori + LLM extraction, once per model)
+python pipeline.py --data-dir data/datasets_v2 --llm-full --llm-model gpt-4.1-mini --min-support 3
 
-# 3. Export training data
-python src/training/export_training_data.py --validation-passed --min-itemsets 5
+# 3. Generate SFT-CoT training data (Phase 1)
+python src/training/generate_cot_sft_data.py --db runs.db --output data/sft_cot_v2.json
 
-# 4. Create HF dataset
-python src/training/create_hf_dataset.py --input data/training_v2 --output data/hf_dataset_v2
+# 4. Export DPO pairs with real LLM failures (Phase 2)
+python src/training/export_real_dpo_data.py --db runs.db --output data/dpo_real_v2.json
 
-# 5. Upload to Hub
-python src/training/upload_dataset_to_hf.py --dataset-path data/hf_dataset_v2
+# 5. Build HF dataset (3 configs: sft/dpo/grpo)
+python src/training/build_hf_dataset_v2.py --sft data/sft_cot_v2.json --dpo data/dpo_real_v2.json --output data/hf_dataset_v2
 
-# 6. Train model
-python src/training/run_sft_full.py
+# 6. Upload to Hub (each version gets its own repo — NEVER overwrite old versions)
+python src/training/upload_dataset_to_hf.py --dataset-path data/hf_dataset_v3 --repo OliverSlivka/itemset-extraction-v3
 
-# 7. Evaluate
-python src/evaluation/eval_finetuned_model.py --model-path OliverSlivka/qwen2.5-3b-itemset-extractor
+# 7. Train on school Jupyter server (use 3-phase notebook)
+# training-agent /export generates the notebook from notebooks/training_3phase_7b.ipynb
 
-# 8. Deploy
-./scripts/deployment/deploy_to_hf_space.ps1
+# 8. Evaluate
+python src/evaluation/eval_finetuned_model.py --model-path OliverSlivka/qwen2.5-7b-itemset-extractor
 
-# 9. Monitor
+# 8. Monitor
 python src/utils/visualization.py --db runs.db --outdir visuals
 ```
 
@@ -288,11 +289,11 @@ pytest --cov=. --cov-report=html
 # Test full pipeline on single dataset
 python pipeline.py --data tests/fixtures/test_dataset_5x8.csv --llm-full
 
-# Test training on small dataset
-python run_sft_test.py  # Uses 50 examples, ~10 min
+# Test HF dataset loading
+python -c "from datasets import load_from_disk; ds = load_from_disk('data/hf_dataset_v2'); print(ds)"
 
 # Test evaluation
-python eval_finetuned_model.py --model-path OliverSlivka/qwen2.5-3b-itemset-test --count 3
+python src/evaluation/eval_finetuned_model.py --model-path OliverSlivka/qwen2.5-7b-itemset-extractor --count 3
 ```
 
 ### Smoke Tests
@@ -388,13 +389,13 @@ except Exception as e:
 - Reduce batch size: `per_device_train_batch_size=1`
 - Enable gradient checkpointing (already enabled)
 - Use 8-bit optimizer (already enabled)
-- Try smaller model (0.5B instead of 3B)
+- Try smaller model (3B instead of 7B)
 
 ### Issue: Low F1 score (<50%)
 **Solution:**
 - Check training data quality: Are labels correct?
 - Increase training epochs (3 → 5)
-- Try larger model (3B → 7B)
+- Try larger model (already using 7B)
 - Add more training examples (500+)
 
 ### Issue: JSON parse failures (model outputs non-JSON)
@@ -441,7 +442,7 @@ Each agent has a dedicated markdown file with:
 ### Training
 - Test mode: 10-15 min (50 examples)
 - Production mode: 40-60 min (439 examples, 3 epochs)
-- Memory: < 10 GB (3B model, 4-bit quantization)
+- Memory: < 7 GB (7B model, 4-bit quantization, Unsloth optimized)
 
 ### Model Quality
 - **F1 Score:** ≥ 0.80 (vs Apriori ground truth)

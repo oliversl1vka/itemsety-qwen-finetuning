@@ -1,0 +1,1 @@
+[{"itemset": ["carinsurance"], "count": 6, "rows": ["Row 3", "Row 8", "Row 9", "Row 10", "Row 13", "Row 14"]}, {"itemset": ["default", "hhinsurance"], "count": 8, "row": ["Row 1", "Row 3", "Row 8", "Row 9", "Row 10", "Row 13", "Row 14", "Row 1"]}]

@@ -107,15 +107,16 @@ All knowledge and logs are stored in the **Obsidian vault** at `obsidian-brain/`
   "artifacts": {
     "datasets_count": 500,
     "datasets_dir": "data/datasets_v2",
-    "pipeline_runs": 999,
+    "pipeline_runs": 0,
+    "pipeline_models_completed": [],
     "training_examples": 0,
-    "hf_space_url": null
+    "hf_repo_url": null
   },
   "config": {
     "datasets": 500,
     "min_support": 3,
-    "max_size": 3,
-    "llm_model": "gpt-4.1-mini"
+    "llm_models_planned": ["gpt-4.1-mini"],
+    "target_examples": 2500
   },
   "started_at": "2026-02-03T14:30:22Z",
   "updated_at": "2026-02-03T16:45:10Z"
@@ -131,8 +132,9 @@ All knowledge and logs are stored in the **Obsidian vault** at `obsidian-brain/`
 ## Tech Stack
 - **Language:** Python 3.10+
 - **Database:** SQLite (runs.db) with auto-migration
-- **LLM APIs:** OpenAI (GPT-4o, GPT-4.1-mini), HuggingFace Transformers
-- **ML Framework:** PyTorch, PEFT (LoRA/QLoRA), TRL (SFT)
+- **LLM APIs:** OpenAI (GPT-4.1-mini, GPT-4.1-nano), HuggingFace Transformers
+- **ML Framework:** PyTorch, Unsloth + PEFT (LoRA/QLoRA), TRL (SFTTrainer/DPOTrainer/GRPOTrainer)
+- **Training:** 3-phase: SFT-CoT → DPO-Real → GRPO for Qwen2.5-7B
 - **Orchestration:** Custom multi-agent (file-based state, message passing)
 - **Storage:** Local artifacts/ directory with hash-based naming
 
@@ -157,8 +159,9 @@ itemsety-qwen-finetuning/
 │
 ├── data/                         # All data files
 │   ├── datasets_v2/              # Generated CSV datasets (500)
-│   ├── training_v2/              # Training examples
-│   └── hf_dataset_v2/            # HuggingFace dataset format
+│   ├── sft_cot_v2.json           # SFT-CoT training examples (348)
+│   ├── dpo_real_v2.json          # DPO preference pairs (606)
+│   └── hf_dataset_v2/            # HuggingFace dataset (3 configs: sft/dpo/grpo)
 │
 ├── artifacts/                    # Pipeline outputs (hash-named)
 │   ├── apriori_outputs/
@@ -194,11 +197,14 @@ itemsety-qwen-finetuning/
 Workflow ID: wf_20260203_143022
 
 📋 EXECUTION PLAN (8 stages):
-  ⏳ Stage 1: Generate training + evaluation datasets (dataset-agent)
+  ⚙️ Stage 1: Generate training + eval datasets (dataset-agent) — OPTIONAL
+              Skip if data/datasets_v2/ already has 500 CSVs
   ⏳ Stage 2: Run Apriori + LLM extraction (pipeline-agent)
-  ⏳ Stage 3: Export training data + generate versioned notebook (training-agent)
-  ⏳ Stage 4: Push training dataset + notebook to HuggingFace (deployment-agent)
-  ⏳ Stage 5: WAIT for user to train & evaluate on Jupyter server
+              ⚡ MOST-USED — run once per LLM model (~500 datasets × models = ~2500 examples)
+  ⏳ Stage 3: Export 3-phase training data (SFT-CoT + DPO-Real + GRPO) + generate notebook (training-agent)
+              → training_3phase_7b.ipynb (SFT-CoT → DPO-Real → GRPO)
+  ⏳ Stage 4: Push 3-phase dataset + training notebook to HuggingFace repository (deployment-agent)
+  ⏳ Stage 5: ⏸️ WORKFLOW PAUSED — user trains & evaluates on Jupyter server
   ⏳ Stage 6: Receive eval results, validate & write improvement notes (training-agent)
   ⏳ Stage 7: Create comparison visuals: base vs fine-tuned vs Apriori (monitoring-agent)
   ⏳ Stage 8: Finalize workflow (orchestrator)
@@ -210,12 +216,13 @@ Workflow ID: wf_20260203_143022
 ⚙️ CONFIGURATION:
   - Datasets: 500
   - Min support: 3
-  - LLM model: gpt-4.1-mini
+  - LLM models planned: [gpt-4.1-mini, ...]  (run /pipeline once per model)
+  - Target training examples: ~2500
 
 👉 NEXT STEP:
-Switch to dataset-agent:
-  @workspace /agents switch to dataset-agent
-  /datasets
+  ⚙️ Stage 1 is OPTIONAL — skip if 500 CSVs already exist in data/datasets_v2/:
+  • Need new datasets?  → @workspace /agents switch to dataset-agent → /datasets
+  • Datasets ready?     → @workspace /agents switch to pipeline-agent → /pipeline
 ```
 
 ## `/status` - Show Workflow Progress
@@ -274,11 +281,11 @@ No action needed - wait for pipeline to complete.
 Workflow ID: wf_20260203_143022
 
 ✅ ALL STAGES COMPLETED:
-  ✅ Stage 1: Training + evaluation datasets generated (versioned)
-  ✅ Stage 2: Pipeline runs completed (Apriori + LLM)
-  ✅ Stage 3: Training data exported + versioned .ipynb notebook created
-  ✅ Stage 4: Training dataset + notebook pushed to HuggingFace
-  ✅ Stage 5: User completed training & evaluation on Jupyter server
+  ✅ Stage 1: Training + eval datasets ready (generated or pre-existing)
+  ✅ Stage 2: Pipeline completed (~2500 examples accumulated across models)
+  ✅ Stage 3: 3-phase training data exported + training notebook created
+  ✅ Stage 4: Dataset (3 configs) + notebook pushed to HuggingFace repository
+  ✅ Stage 5: ⏸️ PAUSED — user trained & evaluated on school Jupyter server
   ✅ Stage 6: Eval results validated, improvement notes saved to memory
   ✅ Stage 7: Comparison visuals created (base vs fine-tuned vs Apriori)
   ✅ Stage 8: Workflow finalized
@@ -293,10 +300,12 @@ Workflow ID: wf_20260203_143022
 
 📁 ARTIFACTS LOCATION:
   - Datasets: data/datasets_v2/ (500 CSV files)
-  - Pipeline outputs: artifacts/ (999 runs)
-  - Training data: data/training_v2/all_training_examples.json
-  - HF dataset: data/hf_dataset_v2/
-  - Database: runs.db (999 validated runs)
+  - Pipeline outputs: artifacts/ (runs)
+  - SFT-CoT data: data/sft_cot_v2.json (348 examples)
+  - DPO-Real data: data/dpo_real_v2.json (606 pairs)
+  - HF dataset: data/hf_dataset_v2/ (3 configs: sft/dpo/grpo)
+  - Training notebook: notebooks/training_3phase_7b.ipynb
+  - Database: runs.db (validated runs)
 
 💡 TIPS:
   - Quality is low (F1=0.122) but OK for RLHF training
@@ -537,23 +546,26 @@ stages:
     agent: "training"
     params:
       validation_passed: true
-      min_itemsets: 5
-      format: "chatml"
-      split_ratio: 0.9
+      phases: ["sft_cot", "dpo_real", "grpo"]
+      sft_output: "data/sft_cot_v2.json"
+      dpo_output: "data/dpo_real_v2.json"
+      hf_output: "data/hf_dataset_v2"
     checkpoint: true
     
   - name: "model_training"
     agent: "training"
     params:
-      model: "Qwen/Qwen2.5-3B-Instruct"
-      epochs: 3
-      batch_size: 2
-      lora_r: 16
-      lora_alpha: 32
+      model: "unsloth/Qwen2.5-7B-Instruct-bnb-4bit"
+      phases:
+        sft: { epochs: 3, lr: 2e-4, seq_length: 4096 }
+        dpo: { epochs: 2, lr: 5e-5, beta: 0.1 }
+        grpo: { epochs: 1, lr: 5e-6 }
+      lora_r: 64
+      lora_alpha: 16
       use_4bit: true
       push_to_hub: true
     checkpoint: true
-    timeout: "2h"
+    timeout: "3h"
     
   - name: "evaluation"
     agent: "evaluation"
@@ -566,8 +578,8 @@ stages:
   - name: "deployment"
     agent: "deployment"
     params:
-      hub_repo: "OliverSlivka/qwen2.5-3b-itemset-extractor"
-      space_name: "testrun2"
+      hub_repo: "OliverSlivka/qwen2.5-7b-itemset-extractor"
+      dataset_repo: "OliverSlivka/itemset-extraction-v3"  # Each version gets own repo — NEVER overwrite old versions
       health_check: true
     condition: "evaluation.f1 >= 0.80"
     
@@ -646,7 +658,7 @@ stages:
     "query_id": "qry_123",
     "status": "success",
     "data": {
-      "model_path": "OliverSlivka/qwen2.5-3b-itemset-extractor",
+      "model_path": "OliverSlivka/qwen2.5-7b-itemset-extractor",
       "training_loss": 0.35,
       "eval_loss": 0.42,
       "token_accuracy": 0.936
@@ -748,6 +760,6 @@ Track these in `logs/agents/orchestrator/metrics.json`:
 
 ---
 
-**Last Updated:** 2026-02-01  
+**Last Updated:** 2026-03-01  
 **Maintained By:** Oliver Slivka  
 **Related Agents:** [dataset](./dataset-agent.md) | [pipeline](./pipeline-agent.md) | [training](./training-agent.md) | [evaluation](./evaluation-agent.md) | [deployment](./deployment-agent.md) | [monitoring](./monitoring-agent.md)

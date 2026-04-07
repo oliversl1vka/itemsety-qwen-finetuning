@@ -1,0 +1,48 @@
+{
+  "output_path": "data/sft_cot_v3.json",
+  "examples": 334,
+  "token_stats": {
+    "min": 358,
+    "max": 3433,
+    "avg": 1445.0
+  },
+  "itemset_stats": {
+    "min": 1,
+    "max": 83,
+    "avg": 23.4
+  },
+  "assistant_diversity": {
+    "total_texts": 334,
+    "avg_chars": 4251.6,
+    "min_chars": 346,
+    "max_chars": 12039,
+    "unique_full_text_rate": 0.8862,
+    "unique_prefix_rate": 0.6916,
+    "template_collapse_rate": 0.503,
+    "most_common_prefix_count": 8,
+    "most_common_prefix_rate": 0.024,
+    "most_common_prefix_examples": [
+      {
+        "prefix": "<think> dataset: 18 rows, 3 cols. min_support=3. singles scan: default:0=18(r1, r10, r11, r12, r13 +13more)✓ hhinsurance",
+        "count": 8
+      },
+      {
+        "prefix": "<think> dataset: 16 rows, 3 cols. min_support=3. singles scan: default:0=16(r1, r10, r11, r12, r13 +11more)✓ hhinsurance",
+        "count": 5
+      },
+      {
+        "prefix": "<think> dataset: 14 rows, 4 cols. min_support=3. singles scan: default:0=14(r1, r10, r11, r12, r13 +9more)✓ hhinsurance:",
+        "count": 5
+      },
+      {
+        "prefix": "<think> dataset: 8 rows, 3 cols. min_support=3. singles scan: default:0=8(r1, r2, r3, r4, r5 +3more)✓ hhinsurance:0=4(r1",
+        "count": 4
+      },
+      {
+        "prefix": "<think> dataset: 20 rows, 3 cols. min_support=3. singles scan: default:0=20(r1, r10, r11, r12, r13 +15more)✓ hhinsurance",
+        "count": 4
+      }
+    ],
+    "duplicate_full_text_count": 38
+  }
+}

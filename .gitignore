@@ -1,20 +1,21 @@
 ##############################################
-# Python project .gitignore
+# itemsety-qwen-finetuning .gitignore
+# Last updated: 2026-04-07
 ##############################################
 
-# Environment & secrets (CRITICAL!)
+# ── Secrets & environment (CRITICAL — never commit!) ──
 *.env
 .env
 *.key
 *.pem
 
-# Virtual environments
-venv/
+# ── Virtual environments ──
 .venv/
+venv/
 ENV/
 env/
 
-# Python cache & compiled artifacts
+# ── Python cache & compiled artifacts ──
 __pycache__/
 *.py[cod]
 *.pyo
@@ -25,19 +26,14 @@ __pycache__/
 .eggs/
 build/
 dist/
-*.pyc
 *$py.class
-
-# Packaging / distribution
 *.whl
 *.spec
 
-# Jupyter
+# ── Jupyter ──
 .ipynb_checkpoints/
-# Allow training notebooks
-!qwen_finetuning_server.ipynb
 
-# Editors / IDE
+# ── Editors / IDE ──
 .vscode/
 .idea/
 *.swp
@@ -45,10 +41,10 @@ dist/
 *.tmp
 *~
 
-# Obsidian vault config (track content, ignore app settings)
+# ── Obsidian vault config (track content, ignore app settings) ──
 obsidian-brain/.obsidian/
 
-# Logs & sqlite/db
+# ── Database & logs ──
 *.log
 *.sqlite
 *.db-journal
@@ -56,56 +52,39 @@ obsidian-brain/.obsidian/
 runs.db
 logs/
 
-# Generated outputs & large artifacts (keep source scripts)
-/datasets/
-/apriori_outputs/
-/extractor_outputs/
-/validation_reports/
-/visuals/
-/db_prepared/
+# ── Pipeline artifacts (regenerable from pipeline.py) ──
 artifacts/
+visuals/
 
-# Fine-tuning artifacts (optional - comment out if you want to track)
-# training_data/  # Now tracked for enhanced dataset
-# hf_dataset/     # Now tracked for enhanced dataset
-!training_data/all_training_examples_enhanced.json
-!hf_dataset_enhanced/
+# ── Training infrastructure (lives on GPU server) ──
 checkpoints/
 runs/
 wandb/
 
-# Seed file (comment out if you want versioning)
-master_seed.txt
-
-# Large CSVs (ignore all except curated ones)
+# ── Large CSVs (500 datasets tracked via data/datasets_v2/) ──
 *.csv
-!generation_log.csv  # Keep generation log for audit
 !README.md
 !requirements.txt
 
-# Test/temporary files
-ds_TEST.csv
+# ── Temporary / scratch files ──
 temp_*.csv
 scratch_*.py
+ds_TEST.csv
+master_seed.txt
 
-# Caches
+# ── Caches ──
 .cache/
 .mypy_cache/
 .pytest_cache/
-__pycache__/
 
-# Coverage
+# ── Coverage ──
 .coverage
 htmlcov/
 
-# Misc OS
+# ── OS files ──
 .DS_Store
 Thumbs.db
-ehthumbs.db
 Desktop.ini
 
-# Performance profiles
-*.profile
-
-# Archive (keep structure but ignore contents if needed)
-# archive/
+# ── Archives (zip kept for TLJH upload reproducibility) ──
+datasets_v2.zip

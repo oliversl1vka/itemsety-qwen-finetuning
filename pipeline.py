@@ -145,6 +145,15 @@ def validate_all(apriori_sets: List[Dict[str, Any]], llm_sets: List[Dict[str, An
     row_item_map = build_row_item_map(transactions)
     apriori_report = validate_source(apriori_sets, row_item_map, len(transactions), min_support, source_name='apriori')
     llm_report = validate_source(llm_sets, row_item_map, len(transactions), min_support, source_name='llm')
+    # If Apriori found itemsets but LLM produced nothing, that is a failure —
+    # zero errors on zero itemsets must NOT silently pass.
+    if len(apriori_sets) > 0 and len(llm_sets) == 0:
+        llm_report['errors'].append({
+            'type': 'llm_empty_output',
+            'source': 'llm',
+            'apriori_count': len(apriori_sets),
+            'detail': 'LLM extracted 0 itemsets while Apriori found itemsets',
+        })
     summary = {
         'apriori_valid_ratio': safe_div(apriori_report['validated_itemsets'], apriori_report['total_itemsets']),
         'llm_valid_ratio': safe_div(llm_report['validated_itemsets'], llm_report['total_itemsets']),
@@ -459,53 +468,61 @@ def apriori_frequent_itemsets(transactions: List[List[str]], min_support: int = 
 
 def llm_extract_full(transactions: List[List[str]], min_support: int, system_prompt: str, chunk_size: int,
                      api_key: str, model: str) -> List[Dict[str, Any]]:
-    """Extract frequent itemsets using OpenAI Chat Completions API directly."""
-    from langchain_openai import ChatOpenAI
-    from langchain_core.prompts import ChatPromptTemplate
-    from langchain_core.output_parsers import StrOutputParser
+    """Extract frequent itemsets using OpenAI Chat Completions API directly.
+    
+    Uses the raw OpenAI client (not LangChain) for reliable timeout handling.
+    Timeout: 180s per request, max 2 retries.
+    """
+    from openai import OpenAI
     
     if not api_key:
         raise ValueError("Missing OPENAI_API_KEY - cannot proceed with LLM extraction")
     
-    # Detect if this is a reasoning model (o-series, o1, o3, o4)
+    # Detect if this is a reasoning model (o-series, o1, o3, o4, gpt-5 family)
     # Reasoning models don't support temperature parameter
-    is_reasoning_model = any(keyword in model.lower() for keyword in ['o1-', 'o3-', 'o4-', 'o-series'])
+    is_reasoning_model = any(keyword in model.lower() for keyword in ['o1-', 'o3-', 'o4-', 'o-series', 'gpt-5'])
     
-    # Build LLM kwargs based on model type
-    llm_kwargs = {
-        'api_key': api_key,
-        'model': model,
-    }
+    # Raw OpenAI client with enforced timeout (180s) and retries
+    client = OpenAI(api_key=api_key, timeout=180.0, max_retries=2)
     
-    # Only add temperature for non-reasoning models
-    if not is_reasoning_model:
-        llm_kwargs['temperature'] = 0.0
-    
-    llm = ChatOpenAI(**llm_kwargs)
-    template = (
-        "{system}\nMin support count: {min_support}\nTransactions chunk rows {start}-{end}:\n{chunk_json}\n"
-        "Return ONLY JSON array: [{{'itemset':[...],'count':n,'evidence_rows':[...]}}] with count >= {min_support}."
-    )
-    # Prompt & output parser already imported above
-    prompt = ChatPromptTemplate.from_template(template)
-    chain = prompt | llm | StrOutputParser()
     aggregated: Dict[Tuple[str,...], Dict[str, Any]] = {}
     total_rows = len(transactions)
     for start in range(0, total_rows, chunk_size):
         end = min(start + chunk_size, total_rows)
         chunk = transactions[start:end]
-        raw = chain.invoke({
-            'system': system_prompt,
-            'min_support': min_support,
-            'start': start + 1,
-            'end': end,
-            'chunk_json': json.dumps(chunk, ensure_ascii=False)
-        })
+        # Build labeled dict so the LLM sees the absolute 1-based row numbers as keys
+        chunk_dict = {f"Row {start + i + 1}": trans for i, trans in enumerate(chunk)}
+        user_msg = (
+            f"{system_prompt}\nMin support count: {min_support}\n"
+            f"Transactions (rows {start + 1}-{end}), each key is the absolute row label — "
+            f"use these EXACT \"Row N\" labels in your evidence_rows:\n"
+            f"{json.dumps(chunk_dict, ensure_ascii=False)}\n"
+            f"Return ONLY JSON array: [{{\"itemset\":[...],\"count\":n,\"evidence_rows\":[\"Row N\",...]}}] with count >= {min_support}."
+        )
+        
+        # Build API call kwargs
+        create_kwargs: Dict[str, Any] = {
+            'model': model,
+            'messages': [{'role': 'user', 'content': user_msg}],
+        }
+        if not is_reasoning_model:
+            create_kwargs['temperature'] = 0.0
+        
+        try:
+            response = client.chat.completions.create(**create_kwargs)
+            raw = response.choices[0].message.content or ''
+        except Exception as e:
+            print(f"  LLM chunk {start+1}-{end} failed: {type(e).__name__}: {e}")
+            continue
+        
         try:
             parsed = json.loads(raw)
         except Exception:
             m = re.search(r'\[[\s\S]*\]', raw)
             parsed = json.loads(m.group(0)) if m else []
+        # Determine the expected row range for this chunk (1-based)
+        expected_min_row = start + 1
+        expected_max_row = end
         for rec in parsed:
             if not isinstance(rec, dict) or 'itemset' not in rec:
                 continue
@@ -530,6 +547,34 @@ def llm_extract_full(transactions: List[List[str]], min_support: int, system_pro
                         norm_rows.append(f'Row {idx}')
                     except Exception:
                         norm_rows.append(str(r))
+            # --- FIX: detect 0-based or chunk-relative indexing from LLM ---
+            # Despite sending labeled rows, LLMs sometimes re-index locally.
+            # We detect two patterns and shift to absolute 1-based:
+            #   A) 0-based chunk-local (Row 0 present) → add expected_min_row
+            #   B) 1-based chunk-local (no Row 0, all in 1..chunk_len,
+            #      but expected range starts well above) → add start offset
+            parsed_indices = []
+            for nr in norm_rows:
+                try:
+                    parsed_indices.append(int(nr.split()[1]))
+                except Exception:
+                    pass
+            if parsed_indices:
+                chunk_len = end - start
+                has_row_0 = 0 in parsed_indices
+                all_in_0based_range = all(0 <= pi < chunk_len for pi in parsed_indices)
+                all_in_1based_range = all(1 <= pi <= chunk_len for pi in parsed_indices)
+                any_below_expected = any(pi < expected_min_row for pi in parsed_indices)
+                # Case A: LLM used 0-based indexing (Row 0 is a dead giveaway)
+                if has_row_0 and all_in_0based_range and expected_min_row > 0:
+                    norm_rows = [f'Row {int(nr.split()[1]) + expected_min_row}'
+                                 if nr.startswith('Row ') else nr for nr in norm_rows]
+                # Case B: LLM used 1-based chunk-local (Row 1..chunk_len)
+                # when the expected absolute range starts well above chunk_len
+                elif (not has_row_0 and all_in_1based_range
+                      and any_below_expected and expected_min_row > chunk_len):
+                    norm_rows = [f'Row {int(nr.split()[1]) + start}'
+                                 if nr.startswith('Row ') else nr for nr in norm_rows]
             aggregated.setdefault(canon, {'rows': set()})['rows'].update(norm_rows)
     out: List[Dict[str, Any]] = []
     for its, info in aggregated.items():
@@ -541,6 +586,9 @@ def llm_extract_full(transactions: List[List[str]], min_support: int, system_pro
     # (Removed legacy duplicate build_run_summary & persist_run_to_sqlite definitions; using enhanced versions above.)
 
 def main():
+    # Load environment variables FIRST so they're available for argparse defaults
+    load_dotenv('openai.env')
+    
     parser = argparse.ArgumentParser(description="Frequent itemset pipeline (Apriori + LLM, simplified)")
     parser.add_argument('--data', default='dataset.csv', help='Single dataset CSV path (used if --data-dir not set)')
     parser.add_argument('--data-dir', help='Directory containing multiple CSV datasets to process sequentially')
@@ -550,7 +598,7 @@ def main():
     parser.add_argument('--output-llm', default='extractor_output.json')
     parser.add_argument('--llm-full', action='store_true', help='Use ALL rows for LLM extraction (chunked)')
     parser.add_argument('--llm-chunk-size', type=int, default=50)
-    parser.add_argument('--llm-model', default=os.getenv('LLM_MODEL','gpt-4o'), help='OpenAI model name (default env LLM_MODEL or gpt-4o)')
+    parser.add_argument('--llm-model', default=os.getenv('LLM_MODEL','gpt-4.1-nano'), help='OpenAI model name (default env LLM_MODEL or gpt-4.1-nano)')
     parser.add_argument('--system-prompt', default='extractor_system_prompt.md')
     parser.add_argument('--sqlite-db', default='runs.db', help='SQLite database file path')
     parser.add_argument('--disable-db', action='store_true', help='Disable SQLite persistence')
@@ -558,8 +606,6 @@ def main():
     parser.add_argument('--artifact-mode', choices=['overwrite','timestamp'], default='overwrite',
                         help='overwrite: reuse hash-based filenames (default). timestamp: append run timestamp for unique artifacts every run.')
     args = parser.parse_args()
-
-    load_dotenv('openai.env')  # Load OPENAI_API_KEY from openai.env if present
     start_time = time.perf_counter()
     # Support batch mode
     data_files: List[str]

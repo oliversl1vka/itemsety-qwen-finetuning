@@ -1,47 +1,50 @@
 ---
 name: training-data-export
-description: Export validated pipeline runs as training examples in ChatML format with Chain-of-Thought reasoning. Use before fine-tuning to prepare training dataset.
+description: Export validated pipeline runs as 3-phase training data (SFT-CoT, DPO-Real, GRPO). Creates ChatML format with concise Chain-of-Thought. Use before fine-tuning to prepare HuggingFace dataset.
 ---
 
-# Training Data Export
+# Training Data Export (3-Phase Pipeline)
 
-Convert validated pipeline runs into fine-tuning training examples.
+Convert validated pipeline runs into a multi-config HuggingFace dataset for 3-phase fine-tuning.
 
 ## Overview
 
-Export creates training data with:
-- ChatML conversation format (system/user/assistant)
-- Chain-of-Thought (CoT) reasoning steps
-- CSV input → JSON output pairs
-- Quality filtering (validation_passed only)
+The export pipeline produces three training data types:
+1. **SFT-CoT** — Supervised examples with `<think>` reasoning (ground truth from Apriori)
+2. **DPO-Real** — Preference pairs using real LLM failures as rejected responses
+3. **GRPO** — Reward-based prompts (format ready, training phase currently skipped)
+
+## Current Scripts
+
+| Script | Phase | Output |
+|--------|-------|--------|
+| `src/training/generate_cot_sft_data.py` | SFT-CoT | `data/sft_cot_v3.json` |
+| `src/training/export_real_dpo_data.py` | DPO-Real | `data/dpo_real_v2.json` |
+| `src/training/build_hf_dataset_v2.py` | All → HF | `data/hf_dataset_v3/` |
+| `src/training/upload_dataset_to_hf.py` | Upload | HuggingFace Hub |
 
 ## Quick Start
 
-### Export Validated Runs
 ```bash
-python src/training/export_training_data.py --validation-passed --min-itemsets 5
+# Phase 1: Generate SFT-CoT (v3 concise format with R-shorthand)
+python src/training/generate_cot_sft_data.py --db runs.db --output data/sft_cot_v3.json
+
+# Phase 2: Export DPO pairs (real LLM failures as rejected)
+python src/training/export_real_dpo_data.py --db runs.db --output data/dpo_real_v2.json
+
+# Phase 3: Build HuggingFace dataset (3 configs: sft/dpo/grpo)
+python src/training/build_hf_dataset_v2.py \
+  --sft data/sft_cot_v3.json \
+  --dpo data/dpo_real_v2.json \
+  --output data/hf_dataset_v3
+
+# Phase 4: Upload (versioned — NEVER overwrite old repos)
+python src/training/upload_dataset_to_hf.py \
+  --dataset-path data/hf_dataset_v3 \
+  --repo OliverSlivka/itemset-extraction-v3
 ```
 
-### Export to HuggingFace Format
-```bash
-python src/training/create_hf_dataset.py --input data/training_v2 --output data/hf_dataset_v2
-```
-
-### Upload to Hub
-```bash
-python src/training/upload_dataset_to_hf.py --dataset-path data/hf_dataset_v2
-```
-
-## Export Parameters
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `--validation-passed` | true | Only export validated runs |
-| `--min-itemsets` | 5 | Minimum itemsets per example |
-| `--output-dir` | data/training_v2 | Output directory |
-| `--db-path` | runs.db | Database path |
-
-## Training Example Format
+## SFT-CoT Format (v3 — Concise)
 
 ### ChatML Structure
 ```json
@@ -49,127 +52,156 @@ python src/training/upload_dataset_to_hf.py --dataset-path data/hf_dataset_v2
   "messages": [
     {
       "role": "system",
-      "content": "You are an expert at extracting frequent itemsets from CSV data..."
+      "content": "You extract frequent itemsets from CSV data. Return JSON array."
     },
     {
-      "role": "user", 
-      "content": "Extract frequent itemsets from this CSV:\n\nproduct,category,brand\nApple,Fruit,FreshCo\n..."
+      "role": "user",
+      "content": "Extract frequent itemsets (min_support=3, max_size=3):\n\nCol1,Col2,Col3\nA,B,C\nA,B,D\n..."
     },
     {
       "role": "assistant",
-      "content": "<think>\nLet me analyze this CSV data...\n1. First, I'll identify all items...\n2. Then count co-occurrences...\n</think>\n\n[{\"itemset\": [\"Apple\", \"Banana\"], \"count\": 5, ...}]"
+      "content": "<think>\n8R×3C. min_sup=3, max=3.\n\n1-sets: {A}×5 R1-R5, {B}×4 R1-R4...\n2-sets: {A,B}×4 R1-R4...\n</think>\n\n[{\"itemset\":[\"A\",\"B\"],\"count\":4,\"rows\":[\"R1\",\"R2\",\"R3\",\"R4\"],\"support\":0.500}]"
     }
   ]
 }
 ```
 
-### Chain-of-Thought Format
-```
-<think>
-Let me analyze this CSV data step by step.
+### v3 Concise CoT Features
+- **R-shorthand**: "R1-R4" instead of "Row 1, Row 2, Row 3, Row 4" (saves tokens)
+- **Compact header**: "8R×3C. min_sup=3, max=3." (dimensions + params)
+- **No verbose prose** — structured enumeration only
+- **Token budget**: ~150 tokens for system prompt (compact)
 
-1. **Item Identification**: The dataset has 15 rows and 10 columns...
-2. **Frequency Counting**: Looking for items appearing 3+ times...
-3. **Co-occurrence Analysis**: Finding pairs that appear together...
-4. **Itemset Construction**: Building itemsets with counts and row evidence...
-</think>
+### CoT Generator (in training_utils.py)
+```python
+from src.training.training_utils import generate_cot_reasoning_v3
 
-[{"itemset": [...], "count": N, "rows": [...], "support": X.XXX}]
-```
-
-## Output Structure
-
-```
-data/training_v2/
-├── ds_0001_15x10.json    # Individual example
-├── ds_0002_20x12.json
-├── ...
-└── manifest.json          # Index of all examples
+cot = generate_cot_reasoning_v3(
+    csv_text=csv_text,
+    apriori_itemsets=itemsets,
+    min_support=3,
+    max_size=3,
+)
 ```
 
-## HuggingFace Dataset Format
+## DPO Preference Pair Format
 
-After `src/training/create_hf_dataset.py`:
+### Structure
+```json
+{
+  "prompt": [
+    {"role": "system", "content": "..."},
+    {"role": "user", "content": "Extract frequent itemsets..."}
+  ],
+  "chosen": [
+    {"role": "assistant", "content": "<think>...</think>\n\n[{correct JSON}]"}
+  ],
+  "rejected": [
+    {"role": "assistant", "content": "[{actual wrong output from LLM}]"}
+  ]
+}
+```
+
+### DPO Data Sources
+- **Chosen** = Apriori ground truth with generated CoT
+- **Rejected** = Real LLM extraction failures (from `extractor_outputs/`)
+- Current: 606 preference pairs from real GPT-4.1-mini failures
+
+## GRPO Prompt Format (Ready but Skipped)
+
+```json
+{
+  "prompt": [
+    {"role": "system", "content": "..."},
+    {"role": "user", "content": "Extract frequent itemsets..."}
+  ]
+}
+```
+
+⚠️ **GRPO phase is currently skipped** — Produced F1=0 in v1 experiments (Council decision).
+
+## HuggingFace Dataset Structure
 
 ```
-data/hf_dataset_v2/
+data/hf_dataset_v3/
 ├── dataset_dict.json
-├── train/
+├── sft/              # SFT-CoT config
 │   ├── data-00000-of-00001.arrow
 │   └── state.json
-└── validation/
+├── dpo/              # DPO preference config
+│   ├── data-00000-of-00001.arrow
+│   └── state.json
+└── grpo/             # GRPO prompts config
     ├── data-00000-of-00001.arrow
     └── state.json
 ```
 
-### Dataset Statistics
+### Inspect Dataset
 ```python
 from datasets import load_from_disk
 
-ds = load_from_disk("data/hf_dataset_v2")
-print(f"Train: {len(ds['train'])} examples")
-print(f"Validation: {len(ds['validation'])} examples")
+ds = load_from_disk("data/hf_dataset_v3")
+print(ds)                           # Shows all configs
+print(f"SFT: {len(ds['sft'])} examples")
+print(f"DPO: {len(ds['dpo'])} pairs")
+print(f"GRPO: {len(ds['grpo'])} prompts")
+
+# Verify SFT example
+print(ds["sft"][0]["messages"][2]["content"][:200])
 ```
 
 ## Quality Criteria
 
-### Include Example If:
-- ✅ `validation_passed = 1`
-- ✅ `apriori_itemsets_count >= 5`
-- ✅ `llm_itemsets_count >= 1`
-- ✅ Valid JSON in both Apriori and LLM output
+### SFT Inclusion
+- ✅ `validation_passed = 1` in runs.db
+- ✅ Apriori output has valid itemsets
+- ✅ CoT is well-formed (v3 concise format)
+- ✅ JSON output matches Apriori ground truth
 
-### Exclude Example If:
-- ❌ Validation failed
-- ❌ Too few itemsets (not enough signal)
-- ❌ Empty LLM response
-- ❌ Missing artifacts
+### DPO Inclusion
+- ✅ Real LLM extraction exists (not synthetic)
+- ✅ LLM output differs from ground truth (actual failure)
+- ✅ Both chosen and rejected are valid JSON
+- ✅ Chosen (Apriori) strictly better than rejected (LLM)
 
-## Training Split
+## Shared Utilities
 
-Default: 90% train, 10% validation
+Key functions in `src/training/training_utils.py`:
+- `get_system_prompt()` — Compact system prompt (~150 tokens)
+- `generate_cot_reasoning_v3()` — Concise CoT with R-shorthand
+- `load_csv_text()` — Load CSV as raw text for prompt
+- `format_ground_truth()` — Format Apriori output as target JSON
+- `estimate_token_budget()` — Calculate token budget per example
 
-```python
-# In create_hf_dataset.py
-train_ratio = 0.9
-```
+## Versioning Rules
 
-## Verify Export
+| Version | SFT Data | DPO Data | CoT Style | Notes |
+|---------|----------|----------|-----------|-------|
+| v2 | sft_cot_v2.json (348) | dpo_real_v2.json (606) | Verbose | Original |
+| **v3** | **sft_cot_v3.json** | dpo_real_v2.json (606) | **Concise** | **Current** |
 
-```bash
-# Check example count
-ls data/training_v2/*.json | wc -l
-
-# Inspect single example
-cat data/training_v2/ds_0001_15x10.json | jq '.messages[2].content' | head -20
-
-# Validate JSON format
-python -c "import json; [json.load(open(f)) for f in glob.glob('data/training_v2/*.json')]"
-```
-
-## Integration with Training
-
-```bash
-# Full workflow
-python src/training/export_training_data.py --validation-passed
-python src/training/create_hf_dataset.py --input data/training_v2 --output data/hf_dataset_v2
-python src/training/upload_dataset_to_hf.py --dataset-path data/hf_dataset_v2
-python src/training/run_sft_full.py  # Uses dataset from Hub
-```
+**NEVER overwrite old HF repos** — each version gets its own repo:
+- `OliverSlivka/itemset-extraction-v2`
+- `OliverSlivka/itemset-extraction-v3`
 
 ## Troubleshooting
 
 ### No examples exported
 - Check validation pass rate: `sqlite3 runs.db "SELECT AVG(validation_passed) FROM runs"`
-- Lower `--min-itemsets` threshold
-- Verify artifacts exist in `artifacts/` directories
+- Verify artifacts exist: `ls artifacts/apriori_outputs/ | wc -l`
+- Ensure pipeline was run with `--llm-full`
 
-### Malformed CoT
-- Check `extractor_system_prompt.md` for prompt structure
-- Verify LLM output has `<think>` tags
-- Post-process to add CoT if missing
+### Low DPO pair count
+- Need more pipeline runs with real LLM failures
+- DPO requires both Apriori AND LLM outputs per dataset
+- Check: `sqlite3 runs.db "SELECT COUNT(*) FROM runs WHERE validation_passed=1 AND llm_itemsets_count>0"`
 
-### Dataset too small
-- Generate more datasets
-- Run more pipeline batches
-- Lower quality thresholds (carefully)
+### CoT quality issues
+- Verify `generate_cot_reasoning_v3()` produces R-shorthand
+- Check token counts (system prompt should be ~150 tokens)
+- Inspect `data/sft_cot_v3.report.json` for generation statistics
+
+### Dataset config mismatch
+- Ensure `build_hf_dataset_v2.py` gets correct input files
+- Verify all three configs appear in `dataset_dict.json`
+- Test loading each config separately

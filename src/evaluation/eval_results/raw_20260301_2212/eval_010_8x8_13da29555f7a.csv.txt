@@ -1,0 +1,1 @@
+[{"itemset": ["battery_life_rating", "performance_rating", "display_rating"], "count": 3, "rows": ["Row 6", "Row 4", "Row 8"]}, {"itemset": ["design_rating", "rating"], "count": 3, "row": ["Row 4", "Row 6", "Row 8"]}]

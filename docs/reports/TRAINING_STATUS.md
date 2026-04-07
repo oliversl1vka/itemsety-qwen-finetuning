@@ -3,7 +3,8 @@
 ## ✅ Čo je pripravené
 
 ### 1. Dataset na HuggingFace Hub
-- **URL**: https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v2
+- **v3 (current)**: https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v3
+- **v2 (frozen)**: https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v2
 - **Train**: 439 examples
 - **Validation**: 49 examples  
 - **Format**: ChatML (system/user/assistant messages)

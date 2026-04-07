@@ -3,7 +3,9 @@
 ## Stav projektu
 
 ✅ **Hotové:**
-1. Dataset nahratý na HuggingFace Hub: https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v2
+1. Dataset nahratý na HuggingFace Hub:
+   - **v3 (current):** https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v3
+   - **v2 (frozen):** https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v2
    - 439 tréningových príkladov
    - 49 validačných príkladov
    - 2 konfigurácie: `default` (čistý JSON) a `chain_of_thought` (s reasoning)
@@ -29,7 +31,7 @@ gemini
 ### Krok 4: V Gemini CLI zadaj tento prompt:
 
 ```
-Fine-tune Qwen/Qwen2.5-3B-Instruct on OliverSlivka/itemset-extraction-v2 dataset for instruction following using SFT.
+Fine-tune Qwen/Qwen2.5-3B-Instruct on OliverSlivka/itemset-extraction-v3 dataset for instruction following using SFT.
 
 Dataset format:
 - Has "messages" column with ChatML format (system/user/assistant)
