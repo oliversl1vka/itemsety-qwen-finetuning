@@ -260,10 +260,10 @@ window.MathJax = {
 
    | Model | Precision | Recall | F1 | Exact Match |
    |---|---|---|---|---|
-   | Base Qwen2.5-7B | ? | ? | ? | ? |
-   | + SFT (phase 1) | ? | ? | ? | ? |
-   | + DPO (phase 2) | ? | ? | ? | ? |
-   | GPT-4.1-mini baseline | ? | ? | ? | ? |
+   | Base Qwen2.5-7B | 6.7% | 0.5% | 1.0% | 0.0% |
+   | + SFT (phase 1) | 13.4% | 19.2% | 12.6% | 0.0% |
+   | + DPO (phase 2) | 11.4% | 15.7% | 11.8% | 0.0% |
+   | GPT-4.1-mini baseline | 89.6% | 38.2% | 49.1% | 3.3% |
 
 4. **Architecture diagram** (Mermaid):
    ```
@@ -544,10 +544,10 @@ window.MathJax = {
 
    | Model | P | R | F1 | Exact Match | Hallucination Rate | JSON Parse |
    |---|---|---|---|---|---|---|
-   | Base Qwen2.5-7B | ? | ? | ? | ? | ? | ? |
-   | + SFT v3 | ? | ? | ? | ? | ? | ? |
-   | + SFT+DPO v3 | ? | ? | ? | ? | ? | ? |
-   | GPT-4.1-mini | ? | ? | ? | ? | ? | ? |
+   | Base Qwen2.5-7B | 6.7% | 0.5% | 1.0% | 0.0% | 6.7% | 20.0% |
+   | + SFT v3 | 13.4% | 19.2% | 12.6% | 0.0% | 0.0% | ~27% |
+   | + SFT+DPO v3 | 11.4% | 15.7% | 11.8% | 0.0% | 0.0% | ~20% |
+   | GPT-4.1-mini | 89.6% | 38.2% | 49.1% | 3.3% | 3.3% | 100% |
 
 7. **Size-wise breakdown** (per itemset size 1, 2, 3) — fill from eval output
 
@@ -1066,7 +1066,7 @@ abstract: >
   An end-to-end ML pipeline fine-tuning Qwen2.5-7B for frequent itemset extraction.
   Uses Apriori as a deterministic ground-truth oracle, eliminating human annotation.
   Training strategy: SFT with chain-of-thought reasoning (348 examples) followed by
-  DPO on real LLM failure examples (606 pairs). Achieves F1=? on a fixed evaluation set.
+  DPO on real LLM failure examples (606 pairs). Achieves F1=11.8% (SFT+DPO) on a fixed 30-dataset evaluation set. GPT-4.1-mini baseline achieves F1=49.1% on the same set.
 keywords:
   - machine-learning
   - fine-tuning
