@@ -8,7 +8,7 @@ authors:
     orcid: ""
 type: software
 version: 1.0.0
-date-released: "2026-04-XX"
+date-released: "2026-04-25"
 repository-code: "https://github.com/OliverSlivka/itemsety-qwen-finetuning"
 license: MIT
 abstract: >
