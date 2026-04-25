@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this software in your research, please cite it as below."
+title: "Fine-tuning Qwen2.5-7B for Frequent Itemset Extraction: An Apriori-Oracle Approach"
+authors:
+  - family-names: Slivka
+    given-names: Oliver
+    affiliation: "Faculty of Informatics and Statistics, Prague University of Economics and Business (FIS VŠE Praha)"
+    orcid: ""
+type: software
+version: 1.0.0
+date-released: "2026-04-XX"
+repository-code: "https://github.com/OliverSlivka/itemsety-qwen-finetuning"
+license: MIT
+abstract: >
+  An end-to-end ML pipeline for fine-tuning Qwen2.5-7B to extract frequent
+  itemsets from transactional CSV data. Uses the Apriori algorithm as a
+  deterministic ground-truth oracle, eliminating the need for human annotation.
+  Training strategy: Supervised Fine-Tuning with Chain-of-Thought reasoning
+  (348 examples) followed by Direct Preference Optimization on real LLM
+  failure pairs (606 examples). Evaluated on a held-out set of 30 synthetic
+  datasets. SFT+DPO achieves F1=11.8%; GPT-4.1-mini baseline achieves
+  F1=49.1%. Developed as part of a bachelor's thesis at FIS VŠE Praha (2026).
+keywords:
+  - machine-learning
+  - fine-tuning
+  - frequent-itemset-mining
+  - lora
+  - dpo
+  - qwen
+  - nlp
+  - apriori
+  - unstructured-to-structured
