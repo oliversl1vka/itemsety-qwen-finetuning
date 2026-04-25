@@ -6,7 +6,7 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path("/Users/oliver/itemsety-qwen-finetuning")
+ROOT = Path(__file__).resolve().parents[1]
 PARTIAL = ROOT / "docs" / "reports" / "council_v3_partial.json"
 URL = "https://openrouter.ai/api/v1/chat/completions"
 

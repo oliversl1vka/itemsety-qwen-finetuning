@@ -18,7 +18,7 @@ Store and query pipeline run metadata in SQLite database.
 ## Database Location
 
 ```
-/Users/oliver/itemsety-qwen-finetuning/runs.db
+<project-root>/runs.db
 ```
 
 ## Schema

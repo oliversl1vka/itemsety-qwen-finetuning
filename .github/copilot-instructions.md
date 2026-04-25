@@ -168,6 +168,7 @@ itemsety-qwen-finetuning/
 6. Cleanup: `--cleanup-old` removes generic artifact base names without hash.
 
 ## Conventions
+- Training notebooks are **versioned artifacts**. Keep at least **one notebook per active day** using dated filenames like `notebooks/training_3phase_YYYY-MM-DD_vN.ipynb`. Prefer one notebook per day, and only create additional same-day versions when the notebook meaningfully changes and the earlier same-day state is worth preserving.
 - All artifact outputs are organized under `artifacts/` root directory with subdirectories for each stage.
 - Always create output directories before writing (artifacts/apriori_outputs, artifacts/extractor_outputs, artifacts/validation_reports, artifacts/db_prepared). Existing code does this per run using `parents=True, exist_ok=True`.
 - Time stamps: use `datetime.now(UTC)`; dataset hash prefix = first 12 chars of SHA256.

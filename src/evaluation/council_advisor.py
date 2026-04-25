@@ -323,6 +323,10 @@ def _build_eval_analysis_query(summary: Dict[str, Any]) -> str:
     """Build the evaluation-results analysis query for the council."""
     cfg = summary.get("config", {})
     model_name = cfg.get("model", "Unknown model")
+    comparison_rows = summary.get("comparison_rows", [])
+    validation = summary.get("validation", {})
+    best_run = summary.get("best_run", {})
+    worst_run = summary.get("worst_run", {})
 
     lines = [
         "You are an expert in NLP model evaluation, frequent itemset mining, and LLM fine-tuning.",
@@ -361,12 +365,80 @@ def _build_eval_analysis_query(summary: Dict[str, Any]) -> str:
         "  Fine-tuning    : LoRA (r=16, alpha=32), 3 epochs, LR=2e-4, effective batch=16.",
         "  Output format  : JSON array [{\"itemset\": [...], \"support\": N, \"rows\": [...]}].",
         "",
+    ]
+
+    if validation:
+        lines += [
+            "EVALUATION VALIDATION CONTEXT",
+            "-----------------------------",
+            f"  Eval dir validated      : {validation.get('eval_dir_validated', 'N/A')}",
+            f"  Expected eval prefix    : {validation.get('expected_eval_prefix', 'N/A')}",
+            f"  Prefix validation OK    : {validation.get('prefix_ok', 'N/A')}",
+            f"  Training overlap count  : {validation.get('training_overlap_count', 'N/A')}",
+            f"  Saved artifact files    : {validation.get('saved_files', 'N/A')}",
+            "",
+        ]
+
+    if comparison_rows:
+        lines += [
+            "MULTI-RUN COMPARISON",
+            "--------------------",
+            "These results compare multiple adapters and decoding profiles from the same unseen eval set.",
+            "Use this table to distinguish decoding effects from genuine model-quality changes.",
+            "",
+            "model_key | model_label | profile_key | avg_precision | avg_recall | avg_f1 | hit_limit_rate | duplicate_itemset_rate | avg_output_tokens | avg_time_s",
+        ]
+        for row in comparison_rows:
+            lines.append(
+                "  {model_key} | {model_label} | {profile_key} | {avg_precision:.2%} | {avg_recall:.2%} | {avg_f1:.2%} | {hit_limit_rate:.2%} | {duplicate_itemset_rate:.2%} | {avg_output_tokens:.1f} | {avg_time_s:.1f}".format(
+                    model_key=row.get("model_key", "N/A"),
+                    model_label=row.get("model_label", "N/A"),
+                    profile_key=row.get("profile_key", "N/A"),
+                    avg_precision=row.get("avg_precision", 0.0),
+                    avg_recall=row.get("avg_recall", 0.0),
+                    avg_f1=row.get("avg_f1", 0.0),
+                    hit_limit_rate=row.get("hit_limit_rate", 0.0),
+                    duplicate_itemset_rate=row.get("duplicate_itemset_rate", 0.0),
+                    avg_output_tokens=row.get("avg_output_tokens", 0.0),
+                    avg_time_s=row.get("avg_time_s", 0.0),
+                )
+            )
+        lines.append("")
+
+    if best_run:
+        lines += [
+            "BEST OBSERVED RUN",
+            "-----------------",
+            f"  Model/Profile       : {best_run.get('model_label', 'N/A')} / {best_run.get('profile_key', 'N/A')}",
+            f"  Avg F1              : {best_run.get('avg_f1', 0):.2%}",
+            f"  Avg Precision       : {best_run.get('avg_precision', 0):.2%}",
+            f"  Avg Recall          : {best_run.get('avg_recall', 0):.2%}",
+            f"  Hit limit rate      : {best_run.get('hit_limit_rate', 0):.2%}",
+            f"  Duplicate rate      : {best_run.get('duplicate_itemset_rate', 0):.2%}",
+            "",
+        ]
+
+    if worst_run:
+        lines += [
+            "WORST OBSERVED RUN",
+            "------------------",
+            f"  Model/Profile       : {worst_run.get('model_label', 'N/A')} / {worst_run.get('profile_key', 'N/A')}",
+            f"  Avg F1              : {worst_run.get('avg_f1', 0):.2%}",
+            f"  Avg Precision       : {worst_run.get('avg_precision', 0):.2%}",
+            f"  Avg Recall          : {worst_run.get('avg_recall', 0):.2%}",
+            f"  Hit limit rate      : {worst_run.get('hit_limit_rate', 0):.2%}",
+            f"  Duplicate rate      : {worst_run.get('duplicate_itemset_rate', 0):.2%}",
+            "",
+        ]
+
+    lines += [
         "Please provide a thorough analysis covering:",
         "  1. Overall performance assessment (good / acceptable / poor and why).",
         "  2. Key strengths and weaknesses visible in the metrics.",
         "  3. Likely root causes for any performance gaps.",
         "  4. Specific, prioritised recommendations to improve the model.",
         "  5. Whether the fine-tuning approach is the right strategy vs. pure prompting.",
+        "  6. What the multi-run comparison suggests about decoding settings vs. actual model quality.",
     ]
     return "\n".join(lines)
 

@@ -88,3 +88,14 @@ Desktop.ini
 
 # ── Archives (zip kept for TLJH upload reproducibility) ──
 datasets_v2.zip
+
+# ── Claude Code metadata ──
+.claude/
+
+# ── Raw evaluation artifacts (large, regenerable) ──
+eval_reppenalty.tar.gz
+eval_raw_capture/
+eval_datasets_v2_2026-04-12.zip
+
+# ── Claude Code conversation exports ──
+20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9]*.txt

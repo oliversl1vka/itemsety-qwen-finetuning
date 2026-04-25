@@ -1256,3 +1256,37 @@ For future versions (v4, v5, ...):
 4. Previous repos remain FROZEN — never overwrite them
 
 **Tags:** #v3.11 #versioning #hf-repos #critical-rule #frozen-versions
+
+---
+
+## [2026-04-11] 📓 Daily Notebook Versioning Policy
+
+**Context:** Training notebooks need revision history, but creating a brand-new notebook for every tiny tweak would clutter the repo. We want rollback points and traceability without ending up with thousands of notebook files.
+
+### Policy
+
+1. **Keep at least one training notebook per active day.**
+2. **Do not overwrite older-day notebooks.** Past daily notebooks are revision checkpoints.
+3. **Use date-based filenames as the main boundary:** `notebooks/training_3phase_YYYY-MM-DD_vN.ipynb`
+4. **Within the same day, prefer updating the current day's notebook** unless the change is a meaningful checkpoint worth preserving separately.
+5. **Only bump same-day `vN`** for substantial revisions such as major bug fixes, training-flow changes, decoding redesigns, or cell-level behavior changes that may need comparison later.
+
+### Practical Rule
+
+- Small same-day tweak → update today's notebook in place.
+- Major same-day checkpoint → create the next same-day version.
+- New day + new notebook work → create a new dated notebook for that day.
+
+### Why
+
+- Preserves a clean daily rollback history.
+- Makes experiments traceable to the exact notebook file used.
+- Avoids both destructive overwrites and excessive notebook proliferation.
+
+### Application
+
+- `/export` must treat notebooks as versioned artifacts, not mutable singletons.
+- `/validate` notes must record the exact dated notebook filename used.
+- When publishing to HuggingFace or referencing training runs, use the dated notebook filename.
+
+**Tags:** #policy #notebook-versioning #daily-history #training

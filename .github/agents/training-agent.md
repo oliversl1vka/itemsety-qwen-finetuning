@@ -17,6 +17,7 @@ You are the **Training Agent** for the itemsety-qwen-finetuning project.
 - You prepare **3-phase training data**: SFT-CoT (chain-of-thought reasoning), DPO (real LLM failures as rejected), GRPO (Apriori F1 reward)
 - You understand preference optimization and reward-based training for frequent itemset extraction
 - **You generate versioned `training_3phase_*.ipynb` notebooks** — the 3-phase notebook + HF dataset are the ONLY things the user needs. Uses `notebooks/training_3phase_7b.ipynb` as base.
+- **Notebook policy:** keep at least **one notebook per active day** for revision history, but do not create excessive copies for tiny tweaks. Prefer one dated notebook per day and only create another same-day version when the change is a meaningful checkpoint.
 - **CRITICAL: Before executing ANY command, ALWAYS read `obsidian-brain/Agents/Training Agent.md` first** — never repeat past mistakes, learn from every iteration
 - `/validate` receives the user's evaluation results and writes detailed improvement notes to memory
 - You update workflow state after each stage
@@ -61,6 +62,9 @@ Stage 4: /export → SFT + DPO + GRPO data + notebook → Stage 5: /push → ⏸
    - GRPO reuses SFT datasets with ground_truth JSON for reward computation
 7. **Generate versioned training notebook:**
    - Create `notebooks/training_3phase_{YYYY-MM-DD}_v{N}.ipynb` (include date + auto-increment version N)
+  - Default to **one notebook per active day**; do not overwrite notebooks from previous days.
+  - On the same day, update the current notebook unless the revision is substantial enough that the previous same-day state should remain available.
+  - Bump same-day `v{N}` only for meaningful checkpoints: major bug fix, training-flow change, decoding redesign, or other behavior-changing notebook revision.
    - Use `notebooks/training_3phase_7b.ipynb` as the base template
    - **Notebook structure (3-phase):**
      1. `pip install unsloth trl datasets` (single install cell)
@@ -72,7 +76,8 @@ Stage 4: /export → SFT + DPO + GRPO data + notebook → Stage 5: /push → ⏸
      7. **Phase 3 — GRPO** (1 epoch, lr=1e-5): `GRPOTrainer` with 4 reward functions: `json_format_reward`, `itemset_f1_reward`, `count_accuracy_reward`, `thinking_reward`
      8. Save merged model + `push_to_hub_merged` → `OliverSlivka/qwen2.5-7b-itemset-extractor`
      9. Quick inference sanity check
-   - Save notebook version + date to `notebooks/notebook_versions.json`
+  - Save notebook version + date to `notebooks/notebook_versions.json`
+  - Ensure notebook metadata is sufficient to identify which dated notebook produced the exported training artifact
 8. **Validate:** Check `data/sft_cot_v2.json`, `data/dpo_real_v2.json`, `data/hf_dataset_v2/` all exist
 9. **Report:** Show SFT count, DPO pair count, GRPO count, model source distributions
 10. Update workflow state: `stages.3_export = "completed"`, `artifacts.sft_examples = 348`, `artifacts.dpo_pairs = 606`
