@@ -1,0 +1,139 @@
+site_name: "Itemset Extraction via Fine-tuned LLM"
+site_description: >
+  Bachelor's thesis — fine-tuning Qwen2.5-7B to extract frequent itemsets
+  using Apriori as a deterministic ground-truth oracle
+site_url: https://oliversl1vka.github.io/itemsety-qwen-finetuning/
+repo_url: https://github.com/oliversl1vka/itemsety-qwen-finetuning
+repo_name: oliversl1vka/itemsety-qwen-finetuning
+edit_uri: ""
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - toc.follow
+
+plugins:
+  - search
+
+exclude_docs: |
+  legacy/
+  README.md
+  model_card_README.md
+
+validation:
+  links:
+    not_found: warn
+  absolute_links: warn
+  unrecognized_links: warn
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.arithmatex:
+      generic: true
+  - admonition
+  - tables
+  - attr_list
+  - md_in_html
+  - footnotes
+  - toc:
+      permalink: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/oliversl1vka/itemsety-qwen-finetuning
+    - icon: simple/huggingface
+      link: https://huggingface.co/OliverSlivka
+
+nav:
+  - Home: index.md
+  - Quick Start: quickstart.md
+  - Methodology:
+      - Overview: methodology/overview.md
+      - Data Generation: methodology/data-generation.md
+      - SFT Training: methodology/sft-training.md
+      - DPO Training: methodology/dpo-training.md
+      - Evaluation: methodology/evaluation.md
+  - Decision Records:
+      - Index: decisions/index.md
+      - "ADR-001: Apriori as Oracle": decisions/adr-001-apriori-as-oracle.md
+      - "ADR-002: Qwen2.5-7B Selection": decisions/adr-002-qwen2.5-7b-selection.md
+      - "ADR-003: LoRA vs Full Fine-tuning": decisions/adr-003-lora-vs-full-ft.md
+      - "ADR-004: LoRA Rank 32": decisions/adr-004-lora-rank-32.md
+      - "ADR-005: 4-bit NF4 Quantization": decisions/adr-005-4bit-nf4.md
+      - "ADR-006: Unsloth Framework": decisions/adr-006-unsloth.md
+      - "ADR-007: SFT Before DPO": decisions/adr-007-sft-before-dpo.md
+      - "ADR-008: DPO Algorithm Choice": decisions/adr-008-dpo-not-ppo.md
+      - "ADR-009: Real LLM Failures for DPO": decisions/adr-009-real-failures-dpo.md
+      - "ADR-010: GRPO Skipped in v3": decisions/adr-010-grpo-skipped.md
+      - "ADR-011: CoT with think Tags": decisions/adr-011-cot-think-tags.md
+      - "ADR-012: Column-Grouped CoT Format": decisions/adr-012-column-grouped-cot.md
+      - "ADR-013: SFT Hyperparameters": decisions/adr-013-sft-hyperparams.md
+      - "ADR-014: DPO Hyperparameters": decisions/adr-014-dpo-hyperparams.md
+      - "ADR-015: Sequence Length 2048": decisions/adr-015-seq-length-2048.md
+      - "ADR-016: Two-Phase Inference": decisions/adr-016-two-phase-inference.md
+      - "ADR-017: Thinking Temperature 0.3": decisions/adr-017-think-temp-0.3.md
+      - "ADR-018: Hash-Based Artifact Naming": decisions/adr-018-hash-artifact-naming.md
+      - "ADR-019: SQLite Persistence": decisions/adr-019-sqlite.md
+      - "ADR-020: Adapter-Only Model Push": decisions/adr-020-adapter-only-push.md
+      - "ADR-021: Support and Size Defaults": decisions/adr-021-support-and-size.md
+      - "ADR-022: Validation Invariants": decisions/adr-022-validation-invariants.md
+      - "ADR-023: Evaluation Metrics": decisions/adr-023-eval-metrics.md
+      - "ADR-024: Fixed Evaluation Set": decisions/adr-024-fixed-eval-set.md
+      - "ADR-025: Synthetic Datasets": decisions/adr-025-synthetic-datasets.md
+      - "ADR-026: Agent Workflow": decisions/adr-026-agent-workflow.md
+  - Reference:
+      - Hyperparameters: reference/hyperparameters.md
+      - Database Schema: reference/database-schema.md
+      - Prompt Templates: reference/prompt-templates.md
+      - Code Reference: reference/code-reference.md
+  - AI Workflow:
+      - Overview: ai-workflow/overview.md
+      - Agent System: ai-workflow/agent-system.md
+      - Experiment Journal: ai-workflow/experiment-journal.md
+  - Glossary: glossary.md
