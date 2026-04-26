@@ -16,7 +16,7 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -33,6 +33,16 @@ jobs:
         run: pip install mkdocs-material pymdown-extensions
       - name: Build site
         run: mkdocs build --strict
+      - name: Clean stale Pages artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/${{ github.repository }}/actions/artifacts?name=github-pages" \
+            --jq '.artifacts[] | "\(.id)"' \
+          | while read id; do
+              echo "Deleting stale artifact $id"
+              gh api --method DELETE "repos/${{ github.repository }}/actions/artifacts/$id"
+            done
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/
