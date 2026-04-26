@@ -13,6 +13,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: write
 
 concurrency:
   group: "pages"
@@ -34,15 +35,22 @@ jobs:
       - name: Build site
         run: mkdocs build --strict
       - name: Clean stale Pages artifacts
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh api "repos/${{ github.repository }}/actions/artifacts?name=github-pages" \
-            --jq '.artifacts[] | "\(.id)"' \
-          | while read id; do
-              echo "Deleting stale artifact $id"
-              gh api --method DELETE "repos/${{ github.repository }}/actions/artifacts/$id"
-            done
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: artifacts } = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'github-pages'
+            });
+            for (const artifact of artifacts.artifacts) {
+              console.log(`Deleting stale artifact ${artifact.id} (${artifact.name})`);
+              await github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: artifact.id
+              });
+            }
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/
