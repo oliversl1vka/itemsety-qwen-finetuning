@@ -4,10 +4,10 @@
 
 500 CSV datasets were generated programmatically using `src/data_generation/generate_datasets_v2.py`.
 
-**Dataset naming convention:** `ds_<NNNN>_<rows>x<cols>.csv`
+**Dataset naming convention:** `ds_<NNNN>_<rows>x<cols>_<hash>.csv`
 
-- Rows: 5--25 per dataset
-- Columns: 3--15 per dataset
+- Rows: 4--26 per dataset
+- Columns: 3--12 per dataset
 - Each row is a "transaction" with items as cell values
 - Column headers serve as item categories
 
@@ -92,7 +92,7 @@ The database is gitignored (contains local paths, is regenerable from the pipeli
 
 ## HuggingFace Dataset
 
-`src/training/build_hf_dataset_v2.py` packages the data into a HuggingFace Dataset with three configurations:
+The pre-built dataset at `data/hf_dataset_v3/` (uploaded via `src/training/upload_dataset_to_hf.py`) provides three configurations:
 
 | Config | Format | Train | Val |
 |--------|--------|-------|-----|

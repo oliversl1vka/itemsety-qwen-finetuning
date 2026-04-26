@@ -11,7 +11,7 @@ The project uses 9 specialized AI agents coordinated through a defined workflow.
 | Agent | Stage | Responsibilities | Memory File |
 |-------|-------|-----------------|-------------|
 | Orchestrator | All | Coordinates workflow, resolves inter-agent conflicts, manages workflow state | `obsidian-brain/Agents/Orchestrator.md` |
-| Dataset Agent | 2 | Generates 500 synthetic CSV datasets with controlled distributions (5-25 rows, 3-15 columns) | `obsidian-brain/Agents/Dataset Agent.md` |
+| Dataset Agent | 2 | Generates 500 synthetic CSV datasets with controlled distributions (4-26 rows, 3-12 columns) | `obsidian-brain/Agents/Dataset Agent.md` |
 | Pipeline Agent | 3 | Runs `pipeline.py` across datasets — Apriori extraction, LLM extraction, validation, SQLite persistence | `obsidian-brain/Agents/Pipeline Agent.md` |
 | Training Agent | 4, 6 | Exports SFT/DPO training data, generates training notebooks, validates post-training evaluation results | `obsidian-brain/Agents/Training Agent.md` |
 | Deployment Agent | 5 | Pushes datasets and notebooks to HuggingFace Hub, manages model card metadata | `obsidian-brain/Agents/Deployment Agent.md` |

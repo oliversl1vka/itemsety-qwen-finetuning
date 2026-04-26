@@ -17,8 +17,8 @@ Every numeric parameter used in this project, sourced to the exact file and line
 
 | Parameter | Value | Source | Notes |
 |-----------|-------|--------|-------|
-| val_ratio | 0.10 | `build_hf_dataset_v2.py:49,72,100` | 10% validation split |
-| seed | 42 | `build_hf_dataset_v2.py:49` | All data splits + LoRA init |
+| val_ratio | 0.10 | `generate_cot_sft_data.py` / `export_real_dpo_data.py` | 10% validation split |
+| seed | 42 | `generate_cot_sft_data.py` / `export_real_dpo_data.py` | All data splits + LoRA init |
 | max_sft_tokens | 3500 | `generate_cot_sft_data.py:69` | Per-example token budget (chars/4 estimate) |
 | max_cot_items | 40 | `generate_cot_sft_data.py:73` | Items shown in CoT before abbreviation |
 | max_dpo_rejected | 3 | `export_real_dpo_data.py:88` | Max rejected outputs per dataset |

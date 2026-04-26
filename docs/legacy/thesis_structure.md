@@ -204,7 +204,7 @@
 ## 7. Fine-tuning modelu (~8 strán)
 
 ### 7.1 Príprava trénovacích dát
-- SFT-CoT dáta (`sft_cot_v3.json`): 348 príkladov, ChatML formát s `<think>` tagmi
+- SFT-CoT dáta (`sft_cot_v3.json`): 272 príkladov, ChatML formát s `<think>` tagmi
 - Porovnanie v2 (verbose) vs. v3 (concise) CoT formátu:
   - v2: explicitné evidence_rows v `<think>` bloku → dlhé sekvencie
   - v3: column-grouped scanning s `✓`/`✗` markermi → ~40 % kratšie
@@ -333,7 +333,7 @@
 - Metodologický prínos: 3-fázový tréning pipeline (SFT-CoT → DPO-Real) ako opakovateľný postup
 - Dostupnosť artefaktov:
   - Kód: [GitHub](https://github.com/oliversl1vka/itemsety-qwen-finetuning)
-  - Dataset: [HuggingFace Hub — OliverSlivka/itemset-extraction-v2](https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v2)
+  - Dataset: [HuggingFace Hub — OliverSlivka/itemset-extraction-v3](https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v3)
   - Model: [HuggingFace Hub — OliverSlivka/qwen2.5-7b-itemset-extractor](https://huggingface.co/OliverSlivka/qwen2.5-7b-itemset-extractor)
 - Záverečné zhrnutie: fine-tuning malého LLM je realizovateľnou cestou k priblíženiu sa deterministickému algoritmu, avšak nie jeho náhradou — ide o komplementárny prístup s vlastnými silnými stránkami (prirodzený jazyk, integrácia do chatbotov) aj limitmi (presnosť na veľkých kombinatoriách)
 

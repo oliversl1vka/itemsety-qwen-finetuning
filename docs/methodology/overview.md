@@ -18,7 +18,7 @@ flowchart TD
     subgraph training["Training Data Export"]
         C --> D["generate_cot_sft_data.py<br/><small>272 SFT examples</small>"]
         C --> E["export_real_dpo_data.py<br/><small>606 DPO pairs</small>"]
-        D --> F["build_hf_dataset_v2.py"]
+        D --> F["upload_dataset_to_hf.py"]
         E --> F
     end
 

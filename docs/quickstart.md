@@ -84,11 +84,10 @@ python src/training/generate_cot_sft_data.py \
 python src/training/export_real_dpo_data.py \
   --db runs.db --output data/dpo_real_v2.json
 
-# Build HuggingFace dataset (3 configs: sft/dpo/grpo)
-python src/training/build_hf_dataset_v2.py \
-  --sft data/sft_cot_v3.json \
-  --dpo data/dpo_real_v2.json \
-  --output data/hf_dataset_v3
+# Upload pre-built dataset to HuggingFace Hub
+python src/training/upload_dataset_to_hf.py \
+  --dataset-path data/hf_dataset_v3 \
+  --repo OliverSlivka/itemset-extraction-v3
 ```
 
 ## Project Structure

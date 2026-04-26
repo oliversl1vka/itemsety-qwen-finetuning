@@ -1,3 +1,0 @@
-[{"itemset": ["age", "16"], "count": 3, "rows": ["Row 1", "Row 3", "Row 5"]}, {"itemset": ["medu", "2", "famrel", "4"], "count": 4, "row": ["Row 1", "Row 3", "Row 5", "Row 7"]}, {"itemset": ["medu", "2", "famrel", "5"], "count": 2, "row": []}, {"itemset": ["medu", "2", "famrel", "3"], "count": 1, "row": ["Row 8"]}, {"itemset": ["medu", "4", "famrel", "5"], "count": 1, "row": ["Row 9"]}, {"itemset": ["medu", "2", "famrel", "4"], "count": 5, "row": ["Row 1", "Row 3", "Row 5", "Row 7", "Row 10"]}]
-
-Note: The itemsets with count 0 (zero) for "medu, 1, famrel, 5" and "medu, 4, famrel, 5" are not included as they do not meet the minimum support count of of 3. Also, "medu, , famrel, 3" only appears once, so it is not included either.

@@ -16,10 +16,6 @@ Auto-generated API documentation from source code docstrings.
 
 ::: src.training.export_real_dpo_data
 
-### build_hf_dataset_v2
-
-::: src.training.build_hf_dataset_v2
-
 ## Evaluation
 
 ### eval_finetuned_model

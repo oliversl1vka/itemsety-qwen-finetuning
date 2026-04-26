@@ -44,7 +44,7 @@ Evaluated on 30 held-out synthetic datasets (5--15 rows, 3--15 columns), min_sup
 
 ```mermaid
 flowchart TD
-    A["500 Synthetic CSVs<br/><small>5-25 rows, 3-15 cols</small>"] --> B["Apriori Oracle<br/><small>min_support=3, max_size=3</small>"]
+    A["500 Synthetic CSVs<br/><small>4-26 rows, 3-12 cols</small>"] --> B["Apriori Oracle<br/><small>min_support=3, max_size=3</small>"]
     B --> C["LLM Pipeline<br/><small>4 models x 500 datasets</small>"]
     C --> D[("runs.db<br/><small>1600+ runs</small>")]
     D --> E["SFT Data Generator<br/><small>272 examples with CoT</small>"]

@@ -41,7 +41,7 @@ Domain-specific terms used throughout this project, in alphabetical order.
 :   An efficient fine-tuning technique that decomposes weight updates into two small matrices of rank `r`, rather than modifying the full weight matrix. This project uses r=32, alpha=64, targeting all attention (q, k, v, o) and MLP (gate, up, down) projections.
 
 **min_support**
-:   The minimum number of transactions in which an itemset must appear to be considered "frequent." Set to 3 in this project — the empirical sweet spot for datasets with 5-25 rows.
+:   The minimum number of transactions in which an itemset must appear to be considered "frequent." Set to 3 in this project — the empirical sweet spot for datasets with 4-26 rows.
 
 **NF4 (Normal Float 4)**
 :   A 4-bit quantization format designed for normally distributed weights. More accurate than uniform 4-bit quantization because it allocates more precision near the distribution center where most weights cluster.

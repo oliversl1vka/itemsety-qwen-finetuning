@@ -1,1 +1,0 @@
-[{"itemset": ["freetime", "goout"], "count": 4, "rows": ["Row 1", "Row 3", "Row 5", "Row 6"]}, {"itemset": ["walc", "freetime", "goout"], "count": 3, "row": ["Row 1", "Row 3", "Row 6"]}]

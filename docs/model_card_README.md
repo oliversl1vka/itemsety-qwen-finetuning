@@ -70,13 +70,13 @@ print(tokenizer.decode(outputs[0]))
 
 | Phase | Method | Examples | Epochs | LR | Details |
 |-------|--------|----------|--------|----|---------| 
-| 1 | SFT + CoT | 258 | 3 | 1e-4 | Column-grouped concise CoT format (~700 avg tokens) |
+| 1 | SFT + CoT | 272 | 3 | 1e-4 | Column-grouped concise CoT format (~700 avg tokens) |
 | 2 | DPO (real failures) | 606 pairs | 1 | 5e-5 | 4-model failures as rejected, Apriori as chosen |
 
 - **Base model:** Qwen/Qwen2.5-7B-Instruct
 - **Adapter:** LoRA (r=32, alpha=64, dropout=0.05)
 - **Quantization:** 4-bit NF4 (bitsandbytes), SDPA attention
-- **Sequence length:** 2048
+- **Sequence length:** 4096
 - **Optimizer:** paged_adamw_8bit
 
 ## Evaluation (v3, 30 held-out datasets)

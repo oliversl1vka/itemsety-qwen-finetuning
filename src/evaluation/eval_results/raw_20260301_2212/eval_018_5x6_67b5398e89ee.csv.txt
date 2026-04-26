@@ -1,1 +1,0 @@
-[{"itemset": ["age", "fedu", "traveltime"], "count": 3, "rows": ["Row 1", "Row 2", "Row 5"]}]
