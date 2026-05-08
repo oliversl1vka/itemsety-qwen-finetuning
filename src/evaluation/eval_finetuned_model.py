@@ -93,28 +93,8 @@ def load_model(model_path: str) -> tuple:
 
     import torch
 
-    # ── Try Unsloth (faster, handles 4-bit natively) ─────────────────────
-    try:
-        from unsloth import FastLanguageModel
-
-        print(f"📥 Loading model via Unsloth: {model_path}")
-        _model, _tokenizer = FastLanguageModel.from_pretrained(
-            model_name=model_path,
-            max_seq_length=4096,
-            load_in_4bit=True,
-            dtype=None,
-        )
-        FastLanguageModel.for_inference(_model)
-        print("✅ Model loaded (Unsloth, 4-bit)")
-        if torch.cuda.is_available():
-            print(f"   GPU: {torch.cuda.get_device_name(0)}")
-        return _model, _tokenizer
-    except ImportError:
-        print("   Unsloth not available, falling back to transformers...")
-    except Exception as e:
-        print(f"   Unsloth load failed ({e}), falling back to transformers...")
-
-    # ── Fallback: plain transformers ─────────────────────────────────────
+    # ── SKIP Unsloth for merged models (merged HF models are not 4-bit LoRA) ──
+    # ── Load via plain transformers ────────────────────────────────────────
     from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
     print(f"📥 Loading model via transformers: {model_path}")
