@@ -69,7 +69,7 @@ The database is gitignored (contains local paths, is regenerable from the pipeli
 4. Filter: skip examples exceeding 3500 tokens (buffer for 2048 seq_len training)
 5. Package as `{"messages": [system, user, assistant]}` in ChatML format
 
-**Output:** `data/sft_cot_v3.json` -- **272 examples** (reduced from 348 in v2 due to stricter token filtering in the concise v3 format)
+**Output:** `data/sft_cot_v3.json` -- **272 final exported examples**. The adjacent `data/sft_cot_v3.report.json` file is a stale sidecar from an earlier generation state: it records 334 examples and points to the same output path, but the current JSON was written later and is the source of truth for the final SFT count.
 
 **Split:** 90% train / 10% validation (seed=42)
 

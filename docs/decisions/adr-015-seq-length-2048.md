@@ -26,7 +26,7 @@ The v3 concise CoT format (column-grouped scanning) generates approximately 800-
 
 Halving the sequence length from 4096 to 2048 provides significant VRAM savings: attention memory scales quadratically with sequence length, so 2048 uses approximately 4x less attention memory than 4096.
 
-The `--max-tokens 3500` filter in SFT data generation ensures no example exceeds the token budget. This filter reduced the v3 dataset from 348 (v2 count) to 272 examples by excluding examples that were too long even for the concise format.
+The SFT data generation path includes a `--max-tokens 3500` filter for excluding examples that are too long for the training budget. The final exported v3 JSON contains 272 examples. A stale sidecar report next to the JSON records 334 examples from an earlier generation state, so the report must not be used as the final v3 dataset count.
 
 ## Trade-offs
 
@@ -35,5 +35,7 @@ The `--max-tokens 3500` filter in SFT data generation ensures no example exceeds
 
 ## Source Evidence
 
-- `src/training/generate_cot_sft_data.py:69` -- `--max-tokens 3500` filter
+- `src/training/generate_cot_sft_data.py` -- `--max-tokens 3500` filter and report writer
+- `data/sft_cot_v3.json` -- final exported SFT-CoT v3 JSON with 272 examples
+- `data/sft_cot_v3.report.json` -- stale sidecar report with 334 examples from an earlier generation state
 - `notebooks/training_3phase_2026-03-09_v3.ipynb` Cell 2 -- `max_seq_length=2048`

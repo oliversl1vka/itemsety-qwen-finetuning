@@ -103,10 +103,10 @@ Major decisions (v3 training strategy, hyperparameter selection) were reviewed b
 | Code generation | Manual or Copilot inline | Specialized agents with domain context |
 | Decision tracking | Git commit messages | 26 ADRs + obsidian-brain vault |
 | Experiment logging | Spreadsheets / W&B | Structured markdown + SQLite |
-| Quality assurance | Unit tests + manual review | 13 automated invariants + deterministic oracle |
+| Quality assurance | Formal unit test suite + manual review | Empirical validation via 13 pipeline invariants, deterministic Apriori oracle, evaluation scripts, and manual review |
 | Reproducibility | "Run this notebook" | Fixed eval set + hash-based artifacts + versioned data |
 
-Using AI agents for execution is analogous to using GitHub Copilot at scale — it accelerates routine coding tasks while the developer retains architectural and design authority. The difference is structure: each agent has a constrained scope, persistent memory, and defined skill modules rather than ad-hoc inline suggestions.
+Using AI agents for execution is analogous to using GitHub Copilot at scale — it accelerates routine coding tasks while the developer retains architectural and design authority. The difference is structure: each agent has a constrained scope, persistent memory, and defined skill modules rather than ad-hoc inline suggestions. The repository does not currently include a formal pytest-style unit/integration test suite; reproducibility is supported through deterministic validators, Apriori-based evaluation, archived artifacts, and manual review.
 
 ---
 
