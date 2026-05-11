@@ -87,10 +87,14 @@ print(tokenizer.decode(outputs[0]))
 | + SFT (Phase 1) | 13.4% | 19.2% | 12.6% | 0.0% |
 | + SFT+DPO (Final) | 11.4% | 15.7% | 11.8% | 0.0% |
 
-The model achieves zero hallucination (never invents items not in the input CSV)
-and strong JSON parse rates. Performance is strongest on small datasets (≤8 rows,
-≤4 cols) where F1 reaches 70–90%. The primary failure mode is JSON formatting
-errors on larger datasets rather than incorrect itemsets.
+The SFT model achieves zero hallucination (never invents items not in the input CSV).
+Its archived local primary_v3 average F1 is 12.6%, while the uploaded Hugging Face
+adapter was separately verified at 13.07% on the same 30-dataset profile. Performance
+is strongest on small datasets (≤8 rows, ≤4 cols), where SFT primary_v3 reaches 70–81%
+F1. A separate DPO raw_capture ablation reaches 0.18 average F1 and up to 0.94 on one
+13×4 dataset, but that result uses a larger token budget and is not the SFT headline.
+The primary failure mode is JSON formatting errors on larger datasets rather than
+incorrect itemsets.
 
 Complete evaluation results and per-dataset breakdowns are in the
 [GitHub repository](https://github.com/OliverSlivka/itemsety-qwen-finetuning).

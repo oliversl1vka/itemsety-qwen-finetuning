@@ -21,7 +21,7 @@ Create `openai.env` from template:
 ```bash
 cp openai.env.template openai.env
 # Edit with your API key:
-# OPENAI_API_KEY=sk-your-api-key-here
+# OPENAI_API_KEY=<your-openai-api-key>
 ```
 
 ## Quick Start

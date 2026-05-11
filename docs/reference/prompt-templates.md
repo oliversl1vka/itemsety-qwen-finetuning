@@ -4,7 +4,7 @@ All prompts used throughout the project, shown verbatim.
 
 ## Training System Prompt
 
-Used in SFT and DPO training data. Source: `src/training/training_utils.py:22-34`
+Used in SFT and DPO training data and in fine-tuned model evaluation. This is the compact CoT prompt for the trained Qwen model, not the commercial GPT baseline prompt. Source: `src/training/training_utils.py:22-34`
 
 ```
 You are a frequent itemset extractor. Given CSV transaction data and a
@@ -42,6 +42,8 @@ CSV data is formatted as `Row N: item1, item2, ...` with 1-based indexing, dedup
 
 ## Pipeline LLM Extraction Prompt
 
+Used for the earlier commercial GPT baseline runs through `pipeline.py --llm-full`. This baseline protocol is single-pass and uses the legacy API prompt from `extractor_system_prompt.md`; it is intentionally separate from the compact CoT training/evaluation prompt above.
+
 Used when running `pipeline.py --llm-full`. Source: `pipeline.py:494-500`
 
 ```
@@ -54,7 +56,7 @@ Return ONLY JSON array: [{"itemset":[...], "count":n, "evidence_rows":["Row N",.
 with count >= {min_support}.
 ```
 
-This prompt uses `extractor_system_prompt.md` (the longer, 317-line system prompt) rather than the compact training prompt.
+This prompt uses `extractor_system_prompt.md` (the longer legacy API baseline prompt) rather than the compact training/evaluation prompt. The distinction is chronological: the baseline pipeline existed before the final CoT training protocol, so comparisons should be read as comparisons between different inference protocols.
 
 ## Evaluation User Message
 

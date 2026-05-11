@@ -46,19 +46,19 @@ The model uses Chain-of-Thought reasoning inside `<think>` tags before producing
 - **Training time:** ~4 minutes (SFT phase)
 - **Dataset:** [OliverSlivka/itemset-extraction-v3](https://huggingface.co/datasets/OliverSlivka/itemset-extraction-v3)
 
-This is the **SFT checkpoint** — Iteration 4's primary result. A separate DPO ablation study (trained on top of this checkpoint) confirmed that DPO is contraproductive for rigid-format extraction tasks (SFT F1=0.13 vs DPO F1=0.12 on identical evaluation).
+This is the **SFT checkpoint** — Iteration 4's primary result. A separate DPO ablation study (trained on top of this checkpoint) confirmed that DPO is contraproductive for rigid-format extraction tasks (SFT F1=0.13 vs DPO F1=0.12 on the identical primary_v3 evaluation profile).
 
 ## Performance
 
 | Metric | Value | Context |
 |--------|-------|---------|
-| Average F1 | 0.13 | 30 holdout evaluation datasets, primary_v3 profile |
-| Best individual F1 | 0.94 | On a 13×4 dataset (complexity=52) |
+| Average F1 | 0.13 | 30 holdout evaluation datasets, primary_v3 profile; uploaded HF adapter verified at 13.07% |
+| Best individual F1 | 0.81 | SFT primary_v3, eval_002 8×4 dataset |
 | Think rate | 100% | All 120 evaluation runs (4 profiles × 30 datasets) |
 | Hallucination rate | 0% | Model produces zero hallucinated evidence rows |
 | JSON parse rate | 27% | Primary limitation — see token budget analysis below |
 
-**Limitations:** The model struggles with larger datasets due to the autoregressive token budget constraint — each item in the JSON output consumes tokens, and the 8192-token limit is frequently exhausted on datasets with many frequent itemsets. JSON format compliance (27%) is the primary bottleneck; decoding improvements (grammar-constrained decoding) are recommended for future work.
+**Limitations:** The model struggles with larger datasets due to the autoregressive token budget constraint — each item in the JSON output consumes tokens. In a separate DPO raw_capture ablation with a larger 8192-token budget, average F1 reached 0.18 and the best individual F1 reached 0.94, but 70% of runs hit the token limit, so that result is not the SFT primary headline. JSON format compliance (27%) is the primary bottleneck; decoding improvements (grammar-constrained decoding) are recommended for future work.
 
 ## Usage
 

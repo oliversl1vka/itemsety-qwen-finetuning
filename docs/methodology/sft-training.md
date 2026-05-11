@@ -20,7 +20,7 @@ The `train_on_responses_only` helper from Unsloth ensures that only the assistan
 
 ## System Prompt
 
-The training system prompt is deliberately compact (~150 tokens), optimized for a 7B model:
+The training system prompt is deliberately compact (~150 tokens), optimized for a 7B model. It is also the prompt used when evaluating the fine-tuned model. It is not the baseline prompt used by the earlier commercial GPT pipeline runs; those use the legacy API baseline prompt in `extractor_system_prompt.md`.
 
 ```
 You are a frequent itemset extractor. Given CSV transaction data and a

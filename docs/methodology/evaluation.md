@@ -36,39 +36,44 @@ Source: `src/evaluation/eval_finetuned_model.py:417-500`
 ## Inference Protocol
 
 !!! warning "Protocol difference between models"
-    The fine-tuned models (SFT, DPO) and the baselines (Base Qwen, GPT-4.1-mini) use **different inference protocols**. This is an important methodological caveat.
+    The fine-tuned models (SFT, DPO) and the commercial GPT baselines use **different prompts and inference protocols**. This is an important methodological caveat caused by the chronological development of the project: the commercial baseline pipeline used the older API extraction prompt, while the fine-tuned model was later trained and evaluated with the compact CoT prompt.
 
 ### Fine-tuned models (SFT, DPO): Two-Phase CoT
 
 The fine-tuned models use the inference protocol they were trained for:
 
-1. **Phase 1 (Think):** Generate reasoning in `<think>` tags at temperature 0.3
-2. **Stop:** `ThinkStoppingCriteria` halts generation at the `</think>` token
-3. **Phase 2 (JSON):** Regenerate the structured JSON output at temperature 0.05
-4. **Safety:** `RepetitionDetector` catches infinite reasoning loops; hard cap at 6000 tokens
+1. **System prompt:** compact CoT training/evaluation prompt from `src/training/training_utils.py`
+2. **Phase 1 (Think):** Generate reasoning in `<think>` tags at temperature 0.3
+3. **Stop:** `ThinkStoppingCriteria` halts generation at the `</think>` token
+4. **Phase 2 (JSON):** Regenerate the structured JSON output at temperature 0.05
+5. **Safety:** `RepetitionDetector` catches infinite reasoning loops; hard cap at 6000 tokens
 
 Source: `src/evaluation/inference_utils.py:159-245`
 
-### Baseline models (GPT-4.1-mini, Base Qwen): Pipeline Extraction
+### Commercial GPT baselines: Pipeline Extraction
 
-The baselines use the simpler pipeline protocol:
+The commercial GPT baselines use the older, simpler pipeline protocol:
 
 1. **Single pass:** Send CSV with extraction prompt, receive JSON directly
-2. **System prompt:** `extractor_system_prompt.md` (simple extraction, no CoT instruction)
+2. **System prompt:** `extractor_system_prompt.md` (legacy API baseline prompt, no CoT instruction)
 3. **Temperature:** 0.0 (deterministic)
 
 | Aspect | CoT Two-Phase (Fine-tuned) | Pipeline (Baselines) |
 |--------|---------------------------|---------------------|
-| Prompt | Structured CoT with scanning rules | Simple extraction |
+| Prompt | Compact CoT training/evaluation prompt | Legacy API baseline extraction prompt |
 | Generation | Two separate phases | Single pass |
 | Token budget | Dynamic per dataset | Fixed (API default) |
 | Stopping | Custom StoppingCriteria | API default |
 
-**Implication:** The fine-tuned models have a structural advantage from the CoT protocol. A fairer comparison would run GPT-4.1-mini through the same two-phase protocol -- recommended as future work.
+**Implication:** The fine-tuned models are evaluated with the CoT protocol they were trained for, while the commercial baseline numbers come from the earlier single-pass protocol. This difference should be treated as a methodological caveat, not as evidence that the same system prompt was used in every experiment. A stricter like-for-like comparison would run GPT-4.1-mini through the same two-phase protocol -- recommended as future work.
+
+The Base Qwen row in the aggregate table below is an unfine-tuned local model reference, not a commercial API baseline call using `extractor_system_prompt.md`.
 
 ## Results
 
 ### Aggregate Performance
+
+The aggregate table reports archived local primary_v3 values from the April 2026 evaluation run. The published Hugging Face SFT adapter was later re-downloaded and verified on the same 30-dataset primary_v3 profile with F1=13.07%, which is within the documented tolerance of the archived SFT value (12.64%). GPT-4.1-mini's 49.1% F1 here belongs to the same 30 held-out evaluation pool; it is distinct from the earlier F1=0.33 measured on the 500-dataset commercial-baseline pool.
 
 | Model | P | R | F1 | Exact Match | Hallucination | Non-empty |
 |-------|---|---|----|-------------|---------------|-----------|
@@ -117,6 +122,6 @@ The model succeeds on small datasets (under 8 rows, under 6 columns) where the r
 
 3. **DPO regression is an honest negative result.** SFT+DPO (11.8% F1) performs slightly worse than SFT alone (12.6% F1). DPO improved specific datasets but hurt others, suggesting the 606-pair DPO dataset was insufficient to consistently improve the policy.
 
-4. **Scale dominates domain-specific fine-tuning.** GPT-4.1-mini (49.1% F1) vastly outperforms the fine-tuned 7B model (12.6% F1), even with a weaker inference protocol. This demonstrates that at this task complexity, model capacity matters more than task-specific training data.
+4. **Scale dominates domain-specific fine-tuning.** GPT-4.1-mini reaches 49.1% F1 on the same 30 held-out evaluation pool, while the fine-tuned 7B SFT adapter reaches 12.6% archived / 13.07% verified under primary_v3, even with a stronger two-phase protocol. This demonstrates that at this task complexity, model capacity matters more than task-specific training data.
 
 5. **Dataset size is the performance cliff.** Both fine-tuned models and GPT-4.1-mini show clear performance degradation on larger datasets. The fine-tuned model's failure mode is more abrupt: valid JSON on small datasets, complete parse failure on large ones.

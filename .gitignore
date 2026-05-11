@@ -36,6 +36,7 @@ dist/
 # ── Editors / IDE ──
 .vscode/
 .idea/
+*.code-workspace
 *.swp
 *.swo
 *.tmp
@@ -61,16 +62,18 @@ checkpoints/
 runs/
 wandb/
 
-# ── Large CSVs (500 datasets tracked via data/datasets_v2/) ──
+# ── Large/local CSVs ──
 *.csv
 !README.md
 !requirements.txt
+real_datasets/
 
 # ── Temporary / scratch files ──
 temp_*.csv
 scratch_*.py
 ds_TEST.csv
 master_seed.txt
+run_eval.sh
 
 # ── Caches ──
 .cache/

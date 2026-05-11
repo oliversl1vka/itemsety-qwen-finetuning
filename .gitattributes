@@ -1,5 +1,6 @@
 *.7z filter=lfs diff=lfs merge=lfs -text
 *.arrow filter=lfs diff=lfs merge=lfs -text
+data/hf_dataset_v3/**/*.arrow -filter -diff -merge -text
 *.bin filter=lfs diff=lfs merge=lfs -text
 *.bz2 filter=lfs diff=lfs merge=lfs -text
 *.ckpt filter=lfs diff=lfs merge=lfs -text

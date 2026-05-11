@@ -662,7 +662,7 @@ Some errors are auto-corrected:
 
 ## LLM Optimization
 - **Chunking:** Process 50 rows per API call (balance latency vs cost)
-- **Caching:** Skip LLM if Apriori output already exists (use `--skip-llm` flag)
+- **Caching:** Reuse persisted Apriori and validation artifacts where available
 - **Parallel batches:** Process multiple chunks concurrently (max 3)
 - **Response streaming:** Use SSE for real-time progress (future enhancement)
 
