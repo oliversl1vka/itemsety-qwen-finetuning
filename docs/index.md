@@ -2,7 +2,7 @@
 
 This repository presents an end-to-end ML research pipeline that fine-tunes **Qwen2.5-7B** to extract frequent itemsets from tabular CSV data. The Apriori algorithm serves as a deterministic, annotation-free ground-truth oracle, enabling a fully self-supervised training pipeline with no human labeling.
 
-Training combines **Supervised Fine-Tuning with Chain-of-Thought reasoning** (272 examples) and a controlled **Direct Preference Optimization ablation** on real LLM failure examples (606 pairs). The primary SFT-only checkpoint eliminates hallucinated evidence entirely (0% hallucination rate) while achieving archived F1=12.6% on 30 held-out evaluation datasets under the primary_v3 profile; the uploaded Hugging Face adapter reproduced this result at F1=13.07% in the verification run.
+Training combines **Supervised Fine-Tuning with Chain-of-Thought reasoning** (272 examples) and a controlled **Direct Preference Optimization ablation** on real LLM failure examples (606 pairs). The primary SFT-only checkpoint eliminates hallucinated evidence entirely (0% hallucination rate on the primary_v3 evaluation profile) while achieving archived F1=12.6% on 30 held-out evaluation datasets under the primary_v3 profile; the uploaded Hugging Face adapter reproduced this result at F1=13.07% in the verification run.
 
 ---
 
@@ -23,18 +23,18 @@ Evaluated on 30 held-out synthetic datasets (5--15 rows, 3--15 columns), min_sup
 
 | Model | Precision | Recall | F1 | Exact Match | Hallucination | JSON Parse |
 |-------|-----------|--------|----|-------------|---------------|------------|
-| Base Qwen2.5-7B | 6.7% | 0.5% | 1.0% | 0.0% | 6.7% | 20.0% |
-| + SFT (phase 1) | 13.4% | 19.2% | **12.6%** | 0.0% | **0.0%** | ~27% |
-| + SFT+DPO (phase 2) | 11.4% | 15.7% | 11.8% | 0.0% | **0.0%** | ~20% |
-| GPT-4.1-mini baseline | 89.6% | 38.2% | 49.1% | 3.3% | 3.3% | 100% |
+| Base Qwen2.5-7B | 6.7% | 0.5% | 1.0% | 0.0% | 6.7% | 20% (6/30) |
+| + SFT (phase 1) | 13.4% | 19.2% | **12.6%** | 0.0% | **0.0%** | 27% (8/30) |
+| + SFT+DPO (phase 2) | 11.4% | 15.7% | 11.8% | 0.0% | **0.0%** | 20% (6/30) |
+| GPT-4.1-mini baseline | 89.6% | 38.2% | 49.1% | 3.3% | 3.3% | 100% (30/30) |
 
 !!! note "Inference protocol difference"
   The fine-tuned models (SFT, DPO) use the **compact training/evaluation system prompt** and the two-phase CoT inference protocol they were trained for: reasoning in `<think>` tags at temperature 0.3, then JSON extraction at temperature 0.05. Commercial GPT baselines use the older single-pass API baseline prompt in `extractor_system_prompt.md`, without a CoT instruction. This is a chronological protocol difference from the research process, not a claim that one prompt was used everywhere. See [Evaluation](methodology/evaluation.md) and [Prompt Templates](reference/prompt-templates.md) for details.
 
 **Key findings:**
 
-- **Fine-tuning teaches the task**: on the 30-dataset primary_v3 profile, F1 jumps from 1.0% (base) to 12.6% archived SFT / 13.07% verified HF adapter, and the model produces output on all 30 datasets instead of 6/30.
-- **Zero hallucination** is the clearest training signal -- fine-tuned models never invent items absent from the input CSV.
+- **Fine-tuning teaches the task**: on the 30-dataset primary_v3 profile, F1 jumps from 1.0% (base) to 12.6% archived SFT / 13.07% verified HF adapter. The base model produces valid JSON on only 6/30 datasets; the SFT model achieves valid JSON on 8/30 (all small datasets under 8 rows).
+- **Zero hallucination on the primary_v3 profile** is the clearest training signal -- fine-tuned models achieve 0.0% hallucination rate under the primary_v3 evaluation configuration. (A 3% rate was observed under the alternative `reppenalty` profile.)
 - **DPO did not improve aggregate F1** (12.6% to 11.8%) -- an honest negative result discussed in [ADR-010](decisions/adr-010-grpo-skipped.md) and [DPO Training](methodology/dpo-training.md).
 - **Scale dominates**: GPT-4.1-mini reaches 49.1% F1 on the same 30 held-out evaluation pool, while the fine-tuned 7B SFT adapter reaches 12.6% archived / 13.07% verified under primary_v3, demonstrating that model capacity matters more than domain-specific fine-tuning at this scale.
 

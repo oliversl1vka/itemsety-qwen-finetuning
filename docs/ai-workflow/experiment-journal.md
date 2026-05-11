@@ -179,7 +179,7 @@ The solution is better training, not better inference configuration. This direct
 
 ```
 Phase 0: Data Prep → Concise CoT generation + DPO pair selection
-Phase 1: SFT      → r=32, alpha=64, lr=1e-4, 3 epochs, 2048 seq
+Phase 1: SFT      → r=32, alpha=64, lr=1e-4, 3 epochs, 4096 seq
 Phase 2: DPO      → beta=0.1, lr=5e-5, 1 epoch
 Phase 3: Eval     → Fixed 30-dataset eval set, 7 metrics
 ```

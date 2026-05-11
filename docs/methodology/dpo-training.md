@@ -73,7 +73,7 @@ From `notebooks/training_3phase_2026-03-09_v3.ipynb` Cell 2:
 | Batch size | 1 (per device) | DPO processes chosen+rejected pairs, doubling effective memory |
 | Gradient accumulation | 4 | Effective batch = 4 |
 | Epochs | 1 | Reduced from 2 in v2 -- DPO overfits quickly on 606 pairs |
-| Loss type | Standard DPO | TRL DPOTrainer default |
+| Loss type | "sigmoid" | TRL DPOTrainer default (standard DPO loss) |
 | Reference model | SFT checkpoint (frozen) | Standard DPO setup |
 
 See [ADR-014](../decisions/adr-014-dpo-hyperparams.md).
@@ -100,4 +100,4 @@ This is an honest negative result. Analysis of per-dataset performance shows:
 3. **The SFT model's dominant failure mode** (inability to produce valid JSON on large datasets) is not addressable by DPO -- it requires more SFT data covering larger datasets
 4. **DPO may have helped with specific error patterns** (like the col:val format leakage seen in SFT outputs) while hurting overall recall
 
-**What DPO did achieve:** The zero hallucination rate was maintained (0.0% for both SFT and DPO), confirming that preference optimization preserves the grounding behavior learned during SFT.
+**What DPO did achieve:** The zero hallucination rate on the primary_v3 profile was maintained (0.0% for both SFT and DPO), confirming that preference optimization preserves the grounding behavior learned during SFT.

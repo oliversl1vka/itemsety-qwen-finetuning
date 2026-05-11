@@ -44,7 +44,7 @@ Every numeric parameter used in this project, sourced to the exact file and line
 | num_train_epochs | 3 | `training_3phase_v3.ipynb` Cell 2 | Was 2 in v2 |
 | warmup_ratio | 0.10 | `training_3phase_v3.ipynb` Cell 2 | Was 0.05 in v2 |
 | weight_decay | 0.01 | `training_3phase_v3.ipynb` Cell 2 | Added in v3 |
-| max_seq_length | 2048 | `training_3phase_v3.ipynb` Cell 2 | Was 4096 in v2 |
+| max_seq_length | 4096 | `training_3phase_v3.ipynb` Cell 2 | Initially reduced to 2048 in v3, restored to 4096 in v3.7 to avoid truncating SFT targets |
 | optimizer | AdamW | TRL default | |
 | lr_scheduler | Linear warmup + cosine | TRL default | |
 | gradient_checkpointing | "unsloth" | `training_3phase_v3.ipynb` Cell 2 | Memory optimization |

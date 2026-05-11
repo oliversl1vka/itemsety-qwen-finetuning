@@ -29,7 +29,7 @@ This project documents every major architectural and engineering decision as an 
 | ADR | Title | Key Decision |
 |-----|-------|-------------|
 | [011](adr-011-cot-think-tags.md) | CoT with think Tags | Qwen-native reasoning format |
-| [012](adr-012-column-grouped-cot.md) | Column-Grouped CoT Format | 60% fewer tokens, no repetition loops |
+| [012](adr-012-column-grouped-cot.md) | Column-Grouped CoT Format | ~40% fewer tokens, no repetition loops |
 | [025](adr-025-synthetic-datasets.md) | 500 Synthetic Datasets | Full distribution control, zero licensing |
 
 ### Hyperparameters
@@ -38,7 +38,7 @@ This project documents every major architectural and engineering decision as an 
 |-----|-------|-------------|
 | [013](adr-013-sft-hyperparams.md) | SFT Hyperparameters | v3 changes: lr=1e-4, 3 epochs, regularization |
 | [014](adr-014-dpo-hyperparams.md) | DPO Hyperparameters | lr=5e-5, beta=0.1, 1 epoch |
-| [015](adr-015-seq-length-2048.md) | Sequence Length 2048 | Halved from 4096 for v3 CoT format |
+| [015](adr-015-seq-length-2048.md) | Sequence Length 4096 (Restored) | Initially reduced to 2048 in v3, restored to 4096 in v3.7 |
 | [021](adr-021-support-and-size.md) | min_support=3, max_size=3 | Empirical sweet spot for 4-26 row datasets |
 
 ### Inference

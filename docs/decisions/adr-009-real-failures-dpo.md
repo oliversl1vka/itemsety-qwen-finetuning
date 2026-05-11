@@ -51,4 +51,4 @@ Training against real failures teaches the model to recognize and avoid its actu
 
 ## Consequences
 
-This decision directly contributed to the zero hallucination rate achieved by both SFT and DPO models: training against real evidence-hallucination failures effectively taught the model to ground its outputs in the actual CSV data.
+This decision directly contributed to the zero hallucination rate on the primary_v3 evaluation profile achieved by both SFT and DPO models: training against real evidence-hallucination failures effectively taught the model to ground its outputs in the actual CSV data.

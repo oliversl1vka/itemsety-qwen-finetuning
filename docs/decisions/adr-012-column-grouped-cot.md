@@ -13,7 +13,7 @@ The chain-of-thought reasoning within `<think>` tags must systematically scan th
 |--------|-----------|-----------------|---------|
 | Row-by-row scanning (v2) | High | High -- same items revisited | Natural reading order |
 | Flat item list | Low | Low | Hard to follow reasoning |
-| **Column-grouped scanning (v3)** | Low (~60% less) | Low | Grouped by item |
+| **Column-grouped scanning (v3)** | Low (~40% less) | Low | Grouped by item |
 
 ## Decision
 
@@ -32,7 +32,7 @@ age:young=4(R1,R2,R5,R7)✓
 This structure:
 
 1. **Eliminates repetition triggers** -- each item appears once with all its rows
-2. **Reduces tokens by ~60%** -- compact notation vs. verbose row-by-row descriptions
+2. **Reduces tokens by ~40%** -- compact notation vs. verbose row-by-row descriptions
 3. **Provides RESULT SUMMARY** (`N singles + M pairs + K triples = TOTAL`) as a clear termination signal, preventing the model from continuing to generate after completing its analysis
 4. **Mirrors Apriori's logic** -- the algorithm itself works item-by-item, not row-by-row
 

@@ -74,7 +74,7 @@ def generate_cot(
     - RESULT SUMMARY termination marker
     - No verbose evidence_rows in <think> — only in final JSON
 
-    This format is ~60% shorter than v2, drastically reducing repetition loops.
+    This format is ~40% shorter than v2, drastically reducing repetition loops.
     """
     # Group by size
     by_size: Dict[int, List[Dict]] = {}

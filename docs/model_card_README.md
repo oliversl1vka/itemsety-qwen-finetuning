@@ -87,7 +87,9 @@ print(tokenizer.decode(outputs[0]))
 | + SFT (Phase 1) | 13.4% | 19.2% | 12.6% | 0.0% |
 | + SFT+DPO (Final) | 11.4% | 15.7% | 11.8% | 0.0% |
 
-The SFT model achieves zero hallucination (never invents items not in the input CSV).
+The SFT model achieves zero hallucination on the primary_v3 evaluation profile
+(0.0% hallucination rate — never invents items not in the input CSV under this
+configuration).
 Its archived local primary_v3 average F1 is 12.6%, while the uploaded Hugging Face
 adapter was separately verified at 13.07% on the same 30-dataset profile. Performance
 is strongest on small datasets (≤8 rows, ≤4 cols), where SFT primary_v3 reaches 70–81%

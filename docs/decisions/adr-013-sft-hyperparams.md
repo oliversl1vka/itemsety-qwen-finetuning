@@ -15,7 +15,7 @@ Each hyperparameter in the SFT configuration was adjusted in v3 based on v2 trai
 | Epochs | 2 | **3** | More passes help the model converge on a small dataset (272 examples) |
 | Warmup ratio | 0.05 | **0.10** | Larger warmup stabilizes the learning rate schedule on small datasets |
 | Weight decay | 0 | **0.01** | L2 regularization added as anti-overfitting measure |
-| Sequence length | 4096 | **2048** | v3 concise CoT format fits within 2048; halving saves ~4x attention VRAM |
+| Sequence length | 4096 | **4096** | Initially reduced to 2048 in v3, restored in v3.7 to avoid truncating CoT+JSON targets |
 | LoRA r | 64 | **32** | Reduced adapter capacity (see [ADR-004](adr-004-lora-rank-32.md)) |
 | LoRA alpha | 16 | **64** | Maintain alpha/r=2.0 scaling ratio |
 | LoRA dropout | 0 | **0.05** | Stochastic regularization during training |

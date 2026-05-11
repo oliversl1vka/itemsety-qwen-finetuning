@@ -75,12 +75,12 @@ The Base Qwen row in the aggregate table below is an unfine-tuned local model re
 
 The aggregate table reports archived local primary_v3 values from the April 2026 evaluation run. The published Hugging Face SFT adapter was later re-downloaded and verified on the same 30-dataset primary_v3 profile with F1=13.07%, which is within the documented tolerance of the archived SFT value (12.64%). GPT-4.1-mini's 49.1% F1 here belongs to the same 30 held-out evaluation pool; it is distinct from the earlier F1=0.33 measured on the 500-dataset commercial-baseline pool.
 
-| Model | P | R | F1 | Exact Match | Hallucination | Non-empty |
-|-------|---|---|----|-------------|---------------|-----------|
-| Base Qwen2.5-7B | 6.7% | 0.5% | 1.0% | 0.0% | 6.7% | 6/30 |
-| + SFT (Phase 1) | 13.4% | 19.2% | **12.6%** | 0.0% | **0.0%** | 30/30 |
-| + SFT+DPO (Final) | 11.4% | 15.7% | 11.8% | 0.0% | **0.0%** | 30/30 |
-| GPT-4.1-mini | **89.6%** | **38.2%** | **49.1%** | 3.3% | 3.3% | 30/30 |
+| Model | P | R | F1 | Exact Match | Hallucination | JSON Parse |
+|-------|---|---|----|-------------|---------------|------------|
+| Base Qwen2.5-7B | 6.7% | 0.5% | 1.0% | 0.0% | 6.7% | 20% (6/30) |
+| + SFT (Phase 1) | 13.4% | 19.2% | **12.6%** | 0.0% | **0.0%** | 27% (8/30) |
+| + SFT+DPO (Final) | 11.4% | 15.7% | 11.8% | 0.0% | **0.0%** | 20% (6/30) |
+| GPT-4.1-mini | **89.6%** | **38.2%** | **49.1%** | 3.3% | 3.3% | 100% (30/30) |
 
 ### Per-Dataset Performance (GPT-4.1-mini)
 
@@ -116,9 +116,9 @@ The model succeeds on small datasets (under 8 rows, under 6 columns) where the r
 
 ## Key Findings
 
-1. **Fine-tuning teaches the task.** F1 from 1.0% (base) to 12.6% (SFT). The base model produces empty output on 80% of datasets; the SFT model produces output on 100%.
+1. **Fine-tuning teaches the task.** F1 from 1.0% (base) to 12.6% (SFT). The base model produces valid JSON on only 20% of datasets (6/30); the SFT model achieves valid JSON on 27% (8/30) but produces non-empty output on all 30 datasets. The 8 valid-JSON datasets are small (under 8 rows), where the reasoning fits within model capacity.
 
-2. **Zero hallucination is the clearest win.** Both SFT and DPO models achieve 0.0% hallucination rate -- they never invent items absent from the input CSV. The base model hallucinates at 6.7%, GPT-4.1-mini at 3.3%.
+2. **Zero hallucination on the primary_v3 profile is the clearest win.** Both SFT and DPO models achieve 0.0% hallucination rate on the primary_v3 evaluation profile -- they never invent items absent from the input CSV under this configuration. The base model hallucinates at 6.7%, GPT-4.1-mini at 3.3%. (Under the alternative `reppenalty` profile, a 3% hallucination rate was observed.)
 
 3. **DPO regression is an honest negative result.** SFT+DPO (11.8% F1) performs slightly worse than SFT alone (12.6% F1). DPO improved specific datasets but hurt others, suggesting the 606-pair DPO dataset was insufficient to consistently improve the policy.
 

@@ -60,11 +60,12 @@ Each phase builds on the previous checkpoint: DPO starts from the SFT model, usi
 
 ## Iteration History
 
-The current results (v3) emerged from three training iterations:
+The current results (v3) emerged from four training iterations:
 
-1. **v1** (2026-03-01): First fine-tuning attempt. Identified baseline issues with output format compliance and repetition loops.
-2. **v2** (2026-03-07): Improved SFT data, 348 examples with row-by-row CoT. Showed overfitting with LoRA r=64 and seq_len=4096. Repetition loops in inference.
-3. **v3** (2026-03-09): Column-grouped CoT format (~60% fewer tokens), LoRA r=32, seq_len=2048, added dropout. Council analysis guided all changes. Current best results.
+1. **Iteration 1** (2026-02): Preliminary experiments with a 0.5B model (Qwen2.5-0.5B). Established the pipeline and identified that the 0.5B scale was insufficient for the task.
+2. **v1 / Iteration 2** (2026-03-01): First 7B fine-tuning attempt (Qwen2.5-7B). Three-phase training (SFT + DPO + GRPO). GRPO produced near-zero signal (200 steps, F1≈0) and was deemed counterproductive. Identified repetition loop issues.
+3. **v2 / Iteration 3** (2026-03-07): Improved SFT data, 348 examples with row-by-row CoT. Showed overfitting with LoRA r=64 and seq_len=4096. Repetition loops in 87% (13/15) of evaluated datasets.
+4. **v3 / Iteration 4** (2026-03-09): Column-grouped CoT format (~40% fewer tokens), LoRA r=32, seq_len=4096, added dropout. Council analysis guided all changes. Current best results.
 
 The full experiment journal is in [Experiment Journal](../ai-workflow/experiment-journal.md).
 

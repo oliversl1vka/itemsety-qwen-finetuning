@@ -115,7 +115,7 @@ nav:
       - "ADR-012: Column-Grouped CoT Format": decisions/adr-012-column-grouped-cot.md
       - "ADR-013: SFT Hyperparameters": decisions/adr-013-sft-hyperparams.md
       - "ADR-014: DPO Hyperparameters": decisions/adr-014-dpo-hyperparams.md
-      - "ADR-015: Sequence Length 2048": decisions/adr-015-seq-length-2048.md
+      - "ADR-015: Sequence Length 4096 (Restored)": decisions/adr-015-seq-length-2048.md
       - "ADR-016: Two-Phase Inference": decisions/adr-016-two-phase-inference.md
       - "ADR-017: Thinking Temperature 0.3": decisions/adr-017-think-temp-0.3.md
       - "ADR-018: Hash-Based Artifact Naming": decisions/adr-018-hash-artifact-naming.md

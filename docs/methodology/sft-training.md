@@ -42,7 +42,7 @@ Source: `src/training/training_utils.py:22-34`
 
 ## CoT Format v3 (Column-Grouped)
 
-The chain-of-thought reasoning uses a column-grouped scanning strategy introduced in v3, replacing the row-by-row format from v2. This change reduced token usage by approximately 60% and eliminated repetition loops during inference.
+The chain-of-thought reasoning uses a column-grouped scanning strategy introduced in v3, replacing the row-by-row format from v2. This change reduced token usage by approximately 40% and eliminated repetition loops during inference.
 
 **Structure:**
 
@@ -96,7 +96,7 @@ All values from `notebooks/training_3phase_2026-03-09_v3.ipynb` Cell 2 (v3 confi
 | Epochs | 3 | 2 | More passes on small dataset |
 | Warmup ratio | 0.10 | 0.05 | Stabilize early training |
 | Weight decay | 0.01 | 0 | L2 regularization |
-| Max sequence length | 2048 | 4096 | v3 CoT fits in 2048 |
+| Max sequence length | 4096 | 4096 | Initially reduced to 2048 in v3, restored in v3.7 to avoid truncating CoT+JSON targets |
 | Optimizer | AdamW | same | TRL default |
 | Scheduler | Linear warmup + cosine | same | TRL default |
 | Gradient checkpointing | "unsloth" | same | Memory optimization |
