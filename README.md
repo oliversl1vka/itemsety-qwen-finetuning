@@ -18,6 +18,13 @@ and up to F1 = 0.94 on small datasets (complexity ≤ 32). A controlled DPO abla
 Council I's recommendation that DPO is contraproductive for rigid-format tasks. The best commercial
 baseline (o4-mini) achieves F1 = 0.41. Full analysis in the thesis.
 
+## Repository Scope
+
+The documentation in this repository intentionally records the full thesis research journey, including
+methodology, experiments, decisions, results, and references to generated artifacts. The Git repository
+itself is kept code-focused for simplicity and reusability: generated datasets, training exports,
+HuggingFace dataset shards, local databases, logs, and evaluation outputs are not committed.
+
 ## Quick Start
 
 ```bash

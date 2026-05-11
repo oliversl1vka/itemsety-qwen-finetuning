@@ -57,6 +57,19 @@ logs/
 artifacts/
 visuals/
 
+# ── Generated research data (template repo keeps code only) ──
+data/datasets_v*/
+data/eval_datasets_v*/
+data/hf_dataset_v*/
+data/sft_cot*.json
+data/dpo_real*.json
+data/*.report.json
+!data/README.md
+
+# ── Generated evaluation outputs ──
+eval_results/*
+!eval_results/README.md
+
 # ── Training infrastructure (lives on GPU server) ──
 checkpoints/
 runs/
